@@ -25,15 +25,15 @@
     [else (cons x y)]))
 
 #| @List → X × @List |#
-(define (@car×cdr x)
+(define (@car+cdr x)
   (let ([a (car x)]
         [d (cdr x)])
     (cond
-      [(null? d) (values a '())]
+      [(null? d) (cons a '())]
       [else
        (let loop ([a (car a)] [d (cdr a)] [acc d])
          (cond
-           [(null? d) (values a acc)]
+           [(null? d) (cons a acc)]
            [else (loop (car a) (cdr a) (cons d acc))]))])))
 
 (define (empty-inf? s-inf)
@@ -46,9 +46,11 @@
 (define (first-mature-inf s-inf)
   (car (car s-inf)))
 
+; the mature part must be empty
 (define (force-inf s-inf)
-  (let-values ([(th ths) (@car×cdr (cdr s-inf))])
-    (append-inf (cons (car s-inf) ths) (th))))
+  (let ([th+rest (@car+cdr (cdr s-inf))])
+    (let ([th (car th+rest)])
+      (append-inf (cons '() (cdr th+rest)) (th)))))
 
 (define (empty-inf) (cons '() '()))
 (define (mature-inf v) (cons (list v) '()))
@@ -68,9 +70,7 @@
        (let ([ths (cdr s-inf)])
          (cond
            [(null? ths) '()]
-           [else
-            (let-values ([(th rest-ths) (@car×cdr ths)])
-              (take-inf n (append-inf (cons '() rest-ths) (th))))]))]
+           [else (take-inf n (force-inf s-inf))]))]
       [else (cons (car vs) (loop (and n (sub1 n)) (cdr vs)))])))
 
 #| (State → Stream) × Stream → Stream |#
@@ -81,7 +81,8 @@
        (cons '() (let inner ([ths (cdr s-inf)])
                    (cond
                      [(null? ths) '()]
-                     [else (let-values ([(th rest-ths) (@car×cdr ths)])
-                             (@++ (list (lambda () (append-map-inf g (th))))
-                                  (inner rest-ths)))])))]
+                     [else (let ([th+rest (@car+cdr ths)])
+                             (let ([th (car th+rest)])
+                               (@++ (list (lambda () (append-map-inf g (th))))
+                                    (inner (cdr th+rest)))))])))]
       [else (append-inf (g (car vs)) (outer (cdr vs)))])))
