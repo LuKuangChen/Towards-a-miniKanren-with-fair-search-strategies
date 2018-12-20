@@ -1,48 +1,58 @@
 #lang racket
-#| stream-ifte |#
-
 (provide empty-inf
          mature-inf
          immature-inf
          append-inf
          append-map-inf
          take-inf
-         ; ifte
          empty-inf?
          has-mature-inf?
          first-mature-inf
          force-inf)
-(require "fast-append.rkt")
 
-#| BEGIN list helpers |#
-(define (null) '())
+#|
 
-(define (car+cdr pr)
-  (values (car pr) (cdr pr)))
-#| END list helpers |#
+@List ::= '() | @NonEmpty
+@NotEmpty ::= `(,X .()) | `(,@NotEmpty . ,@NotEmpty)
 
-#| BEGIN ifte & once |#
+|#
+
+#| @List × @List → @List |#
+(define (@++ x y)
+  (cond
+    [(null? x) y]
+    [(null? y) x]
+    [else (cons x y)]))
+
+#| @List → X × @List |#
+(define (@car×cdr x)
+  (let ([a (car x)]
+        [d (cdr x)])
+    (cond
+      [(null? d) (values a '())]
+      [else
+       (let loop ([a (car a)] [d (cdr a)] [acc d])
+         (cond
+           [(null? d) (values a acc)]
+           [else (loop (car a) (cdr a) (cons d acc))]))])))
 
 (define (empty-inf? s-inf)
   (and (null? (car s-inf))
-       (@null? (cdr s-inf))))
+       (null? (cdr s-inf))))
 
 (define (has-mature-inf? s-inf)
   (not (null? (car s-inf))))
 
 (define (first-mature-inf s-inf)
-  (let-values ([(v vs) (car+cdr (car s-inf))])
-    v))
+  (car (car s-inf)))
 
 (define (force-inf s-inf)
   (let-values ([(th ths) (@car×cdr (cdr s-inf))])
     (append-inf (cons (car s-inf) ths) (th))))
 
-#| END ifte & once |#
-
-(define (empty-inf) (cons (null) (@null)))
-(define (mature-inf v) (cons (list v) (@null)))
-(define (immature-inf th) (cons (null) (@list th)))
+(define (empty-inf) (cons '() '()))
+(define (mature-inf v) (cons (list v) '()))
+(define (immature-inf th) (cons '() (list th)))
 
 #| Stream × Stream → Stream |#
 (define (append-inf s-inf t-inf)
@@ -57,23 +67,21 @@
       [(null? vs)
        (let ([ths (cdr s-inf)])
          (cond
-           [(@null? ths) '()]
+           [(null? ths) '()]
            [else
             (let-values ([(th rest-ths) (@car×cdr ths)])
-              (take-inf n (append-inf (cons (null) rest-ths) (th))))]))]
-      [else (let-values ([(v rest-vs) (car+cdr vs)])
-              (cons v (loop (and n (sub1 n)) rest-vs)))])))
+              (take-inf n (append-inf (cons '() rest-ths) (th))))]))]
+      [else (cons (car vs) (loop (and n (sub1 n)) (cdr vs)))])))
 
 #| (State → Stream) × Stream → Stream |#
 (define (append-map-inf g s-inf)
-  (let outer-loop ((vs (car s-inf))) ;; foldr
+  (let outer ((vs (car s-inf)))
     (cond
-      [(null? vs) (cons (null)
-                        (let inner-loop ([ths (cdr s-inf)])  ;; map
-                          (cond
-                            [(@null? ths) (@null)]
-                            [else (let-values ([(th rest-ths) (@car×cdr ths)])
-                                    (@++ (@list (lambda () (append-map-inf g (th))))
-                                         (inner-loop rest-ths)))])))]
-      [else (let-values ([(v rest-vs) (car+cdr vs)])
-              (append-inf (g v) (outer-loop rest-vs)))])))
+      [(null? vs)
+       (cons '() (let inner ([ths (cdr s-inf)])
+                   (cond
+                     [(null? ths) '()]
+                     [else (let-values ([(th rest-ths) (@car×cdr ths)])
+                             (@++ (list (lambda () (append-map-inf g (th))))
+                                  (inner rest-ths)))])))]
+      [else (append-inf (g (car vs)) (outer (cdr vs)))])))

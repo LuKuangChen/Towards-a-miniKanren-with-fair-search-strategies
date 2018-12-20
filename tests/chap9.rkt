@@ -1,8 +1,7 @@
 #lang racket
 #| chap9 |#
-(require "trs2-arith.rkt")
-(require "mk.rkt")
-;(require "trs2-mk.rkt")
+(require "../trs2-arith.rkt")
+(require "../mk.rkt")
 
 (defrel (alwayso)
   (conde

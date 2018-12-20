@@ -1,8 +1,7 @@
 #lang racket
 #| chap6 |#
 
-(require "mk.rkt")
-;(require "trs2-mk.rkt")
+(require "../mk.rkt")
 
 ; FRAME 1
 (defrel (alwayso)
