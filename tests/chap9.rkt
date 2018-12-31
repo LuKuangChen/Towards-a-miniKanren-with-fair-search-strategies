@@ -12,38 +12,38 @@
   (conda
     [fail succeed]
     [succeed fail]))
-; '()
+;'()
 
 (run 1 q
   (conda
     [fail succeed]
     [succeed succeed]))
-; '(_0)
+;'(_0)
 
 (run 1 q
   (conda
     [succeed fail]
     [succeed succeed]))
-; '()
+;'()
 
 (run 1 q
   (conda
     [succeed succeed]
     [succeed fail]))
-; '(_0)
+;'(_0)
 
 (run* x
   (conda
     [(== 'olive x) succeed]
     [succeed (== 'oil x)]))
-; '(olive)
+;'(olive)
 
 (run* x
   (conda
     [(== 'virgin x) fail]
     [(== 'olive x) succeed]
     [succeed (== 'oil x)]))
-; '()
+;'()
 
 (run* q
   (fresh (x y)
@@ -52,7 +52,7 @@
     (conda
       [(== 'split x) (== x y)]
       [succeed succeed])))
-; '()
+;'()
 
 (run* q
   (fresh (x y)
@@ -61,7 +61,7 @@
     (conda
       [(== x y) (== 'split x)]
       [succeed succeed])))
-; '(_0)
+;'(_0)
 
 ;; frame 11
 (defrel (not-pastao x)
@@ -73,14 +73,14 @@
   (conda
     [(not-pastao x) fail]
     [(== 'spaghetti x) succeed]))
-; '(spaghetti)
+;'(spaghetti)
 
 (run* x
   (== 'spaghetti x)
   (conda
     [(not-pastao x) fail]
     [(== 'spaghetti x) succeed]))
-; '()
+;'()
 
 #|
 (run* q
@@ -94,7 +94,7 @@
   (condu
     [(alwayso) succeed]
     [succeed fail]))
-; '(_0)
+;'(_0)
 
 #|
 (run* q
@@ -118,7 +118,7 @@
     [(alwayso) succeed]
     [succeed fail])
   fail)
-; '()
+;'()
 
 ;; frame 20
 (defrel (teacupo t)
@@ -134,26 +134,26 @@
 
 (run* x
   (onceo (teacupo x)))
-; '(tea)
+;'(tea)
 
 (run* r
   (conde
     [(teacupo r) succeed]
     [(== #f r) succeed]))
-; '(#f tea cup)
+;'(#f tea cup)
 
 (run* r
   (conda
     [(teacupo r) succeed]
     [succeed (== #f r)]))
-; '(tea cup)
+;'(tea cup)
 
 (run* r
   (== #f r)
   (conda
     [(teacupo r) succeed]
     [succeed (== #f r)]))
-; '(#f)
+;'(#f)
 
 (run* r
   (== #f r)
@@ -161,7 +161,7 @@
     [(teacupo r) succeed]
     [(== #f r) succeed]
     [succeed fail]))
-; '(#f)
+;'(#f)
 
 ;; frame 26
 (defrel (bumpo n x)
@@ -194,7 +194,7 @@
 
 (run* q
   (gen&test+o '(0 0 1) '(1 1) '(1 1 1)))
-; '(_0)
+;'(_0)
 
 #|
 (run 1 q
@@ -230,13 +230,11 @@
 ;  ((1) (1 1) (0 0 1))
 ;  ((0 1) (1) (1 1))
 ;  ((1 1) (1) (0 0 1)))
-; different in order
 
 
 (run 1 s
   (enumerate+o s '(1 1 1)))
-; NEW : '(((1 1 1) () (1 1 1)))
-; TRS2: '((() (1 1 1) (1 1 1)))
+;'(((1 1 1) () (1 1 1)))
 
 ; frame 58
 #; #| new |#
@@ -267,7 +265,7 @@
        (== k z)))
     (== `(,i ,j ,k) r)))
 
-;; extra
+#| the extra test |#
 (run* s
   (enumerateo *o s '(1 1)))
 ;'(((1) (1 1) (1 1))

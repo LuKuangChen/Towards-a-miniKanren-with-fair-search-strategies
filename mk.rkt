@@ -1,8 +1,7 @@
 #lang racket
-#| mk-ifte |#
-
 (provide (all-defined-out))
-(require "stream.rkt")
+(require "stream-1st.rkt")
+;(require "stream-2nd.rkt")
 
 (define var (lambda (x) (vector x)))
 (define var? (lambda (x) (vector? x)))
