@@ -29,11 +29,6 @@
 
 %%% NOTE %%%
 %
-% - how to write scheme code
-%
-%   scheme-listing on GitHub
-%   * use escapte to go back to latex world
-%
 % - plan paper writing
 %   
 %   * Abstract
@@ -41,8 +36,6 @@
 %   * Core Content
 %     * how stream is implemented in TRS2's miniKanren
 %     * how to do BFS search
-%
-% - how long does it usually take from drafting to submission
 %
 % - when is the deadline
 %
@@ -57,21 +50,14 @@
 
 \begin{abstract}
 
-% background
-% Translating Scheme programs to miniKanren programs is mostly mechanical. However,
-% translation of cond deserves some attention, because conde generally prioritizes its left 
-% clauses. For example, in a four-clauses conde expression, the first clause is searched 8 
-% times more frequently than the last one.
-
 The syntax of a programming language should reflect its semantics.
 When using a disjunction operator in relational programming, a programmer would
 expect all clauses of this disjunction to share the same chance of being explored,
 as these clauses are written in parallel. The existing disjunctive operators in miniKanren,
 however, prioritize their clauses by the order of which these clauses are written down.
-% solution
 We have devised a new search strategy that searches evenly in all clauses.
-% evaluation
-Based on our statistics, miniKanren slows down by a constant factor after applying our search strategy. (tested with very-recursiveo, need more tests)
+Based on our statistics, miniKanren slows down by a constant factor after applying our search strategy.
+(tested with very-recursiveo, need more tests)
 
 
 \end{abstract}
@@ -86,6 +72,8 @@ OUTLINE:
 
 ( Why the left clauses are explored more frequently? )
 
+%TODO define iDFS = interleaving DFS in Introduction
+
 ( How to solve the problem? )
 
 ( Summary of later sections )
@@ -93,31 +81,34 @@ OUTLINE:
 \section{cost of answers}
 
 %TODO the meaning of resolution step in Silvija Seres's paper
-%TODO REPLize comment
 
-The \emph{cost} of an answer is the number of relation applications needed to find the answer. We use the miniKanren program, \texttt{repeato}, in Fig.~\ref{repeato-1} to demonstrate the cost of answers. We borrow this idea from Silvija Seres's work [*]. \texttt{repeato} relates \texttt{x} with a list whose elements are all \texttt{x}s. The run expression uses \texttt{repeato} to generate 4 lists whose elements are all \texttt{*}s. The order of the answers reflects the order miniKanren discovers them. The leftmost answer is discovered first. The order here is not suprising: to generate the answer \texttt{'()}, miniKanren needs to apply \texttt{repeato} only once. And it needs more applications of \texttt{repeato} to find the later answers that are more complicated.
+The \emph{cost} of an answer is the number of relation applications needed to find the answer. We use the miniKanren relation \texttt{repeato} in Fig.~\ref{def-repeato} to demonstrate the cost of answers. We borrow this idea from Silvija Seres's work [*]. \texttt{repeato} relates \texttt{x} with a list whose elements are all \texttt{x}s. The run expression uses \texttt{repeato} to generate 4 lists whose elements are all \texttt{*}s. The order of the answers reflects the order miniKanren discovers them. The leftmost answer is discovered first. The order here is not suprising: to generate the answer \texttt{'()}, miniKanren needs to apply \texttt{repeato} only once. And it needs more applications of \texttt{repeato} to find the later answers that are more complicated. In this example, the cost of each answer is the same as one more than the number of \texttt{*}s. No answer of zero cost exists.
 
 \begin{figure}
-  \lstinputlisting{Code/repeat.rkt}
+  \lstinputlisting{Figures/defrel-repeato.rkt}
+  \lstinputlisting{Figures/run-repeato-1.rkt}
   \caption{\texttt{repeato}}
-  \label{repeato-1}
+  \label{def-repeato}
 \end{figure}
 
 %TODO relation *application*
-%TODO split figure 2 into 2 figures
-%TODO define iDFS = interleaving DFS in Introduction
-%TODO (define "cost-repsecting" "in order of increasing cost")
-In the  example above, the cost of each answer is the same as one more than the number of \texttt{*}s. No answer of zero cost exists. For this \texttt{run}, both search strategies produces answers in increasing order of costs. In more complicated cases, however, interleaving DFS does not always produces answers of lower costs first. For instance, the \texttt{run} in Fig.~\ref{repeato-2} uses the iDFS strategy to produce answers in a seemingly random order. The answers listed by iDFS are a blend of three kinds, i.e., lists of \texttt{a}s, lists of \texttt{b}s, and lists of \texttt{c}s. The answers of this \texttt{run} is not cost-respecting, although each kind of answer is cost-respecting.  
- 
-%TODO lafalf
 
-However, the blended answers tends to include more answers from the first conde line, i.e. from (repeato 'a q). In general, iDFS prioritizes the left conde clauses.
+For the above \texttt{run}, both search strategies produces answers in increasing order of costs, i.e. both of them are \emph{cost-respecting}. In more complicated cases, however, interleaving DFS does not always produces answers in cost-repecting order. For instance, with iDFS the \texttt{run} in Fig.~\ref{conde-repeato-iDFS} produces answers in a seemingly random order. In contrast, the same run with BFS produces answers in an expected order (Fig.~\ref{conde-repeato-BFS}).
 
 \begin{figure}
-	\lstinputlisting{Code/repeat-abc.rkt}
-	\caption{\texttt{repeato}}
-	\label{repeato-2}
+	\lstinputlisting{Figures/run-conde-repeato-iDFS.rkt}
+	\caption{run a program with interleaving depth-first search}
+	\label{conde-repeato-iDFS}
 \end{figure}
+
+\begin{figure}
+	\lstinputlisting{Figures/run-conde-repeato-BFS.rkt}
+	\caption{run a program with breadth-first search}
+	\label{conde-repeato-BFS}
+\end{figure}
+
+Although all answers by iDFS is not in cost-respecting order, the answers from each case are in cost-respecting order. The problem is that iDFS strategy prioritizes the first \texttt{conde} case considerablely. In general, when every conde case are equally productive, the iDFS strategy takes $1/2^{i}$ answers from the $i$-th case, except the last case, which share the same portion as the second last.
+
 
 
 
@@ -135,11 +126,11 @@ In mk-0, search space is represented by streams. Streams can be finite or infini
 
 (explain mk-0's append-inf)
 
-\lstinputlisting{Code/append-inf-trs2.rkt}
+\lstinputlisting{Figures/append-inf-trs2.rkt}
 
 To make the search BFS, we just need to have append-inf combines mature parts in the fashion of append, and combine non-empty immature parts by contructing a new procedure.
 
-\lstinputlisting{Code/append-inf-bfs-loop.rkt}
+\lstinputlisting{Figures/append-inf-bfs-loop.rkt}
 
 \subsection{stepstone of optimization}
 
