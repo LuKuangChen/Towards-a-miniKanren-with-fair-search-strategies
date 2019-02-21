@@ -114,23 +114,29 @@ Although all answers by iDFS is not in cost-respecting order, the answers from e
 
 \section{change search strategy}
 
-Now we change the search strategy and optimize the system in three steps. The result of these steps are mk-1, mk-2, and mk-3 respectively. The initial miniKanren is named mk-0, which is the miniKanren in TRS2.
+Now we change the search strategy and optimize the system. The whole process is completed in three steps, corresponding to 4 versions of miniKanren. The initial version, \texttt{mk-0} is exactly the miniKanren in \emph{The Reasoned Schemer, 2nd Edition}.
 
-\subsection{representation of search space}
+\subsection{from \texttt{mk-0} to \texttt{mk-1}}
 
-In mk-0, search space is represented by streams. Streams can be finite or infinite. Finite streams are just lists. And infinite streams are improper lists, whose last cdr is a procedure which takes no arguments and returns a stream when involked. Cars of streams are (possibly incomplete) answers. We call the cars the mature part, and the last cdr the immature part.
+In mk-0, search spaces are represented by streams of answers. Streams can be finite or infinite. Finite streams are just lists. And infinite streams are improper lists, whose last \texttt{cdr} is a thunk returning another stream. We call the \texttt{car}s the \emph{mature} part, and the last \texttt{cdr} the \emph{immature} part. 
 
-(connect stream with cost)
-
-\subsection{initial version}
+Streams are cost respective when they are initially constructed by \texttt{==}. However, \texttt{append-inf}, a composer of stream, breaks cost respectiveness. By changing its definition, we can make the whole search strategy cost respective.
 
 (explain mk-0's append-inf)
 
-\lstinputlisting{Figures/append-inf-trs2.rkt}
+\begin{figure}
+	 \lstinputlisting{Figures/append-inf-0.rkt}	
+	 \caption{\texttt{append-inf} in \texttt{mk-0}}
+	 \label{append-inf-0}
+\end{figure}
 
-To make the search BFS, we just need to have append-inf combines mature parts in the fashion of append, and combine non-empty immature parts by contructing a new procedure.
+\begin{figure}
+	 \lstinputlisting{Figures/append-inf-1.rkt}	
+	 \caption{\texttt{append-inf} in \texttt{mk-1}}
+	 \label{append-inf-1}
+\end{figure}
 
-\lstinputlisting{Figures/append-inf-bfs-loop.rkt}
+
 
 \subsection{stepstone of optimization}
 
