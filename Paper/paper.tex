@@ -82,7 +82,7 @@ OUTLINE:
 
 %TODO the meaning of resolution step in Silvija Seres's paper
 
-The \emph{cost} of an answer is the number of relation applications needed to find the answer. We use the miniKanren relation \texttt{repeato} in Fig.~\ref{def-repeato} to demonstrate the cost of answers. We borrow this idea from Silvija Seres's work [*]. \texttt{repeato} relates \texttt{x} with a list whose elements are all \texttt{x}s. The run expression uses \texttt{repeato} to generate 4 lists whose elements are all \texttt{*}s. The order of the answers reflects the order miniKanren discovers them. The leftmost answer is discovered first. The order here is not suprising: to generate the answer \texttt{'()}, miniKanren needs to apply \texttt{repeato} only once. And it needs more applications of \texttt{repeato} to find the later answers that are more complicated. In this example, the cost of each answer is the same as one more than the number of \texttt{*}s. No answer of zero cost exists.
+The \emph{cost} of an answer is the number of relation applications needed to find the answer. We use the miniKanren relation \texttt{repeato} in Fig.~\ref{def-repeato} to demonstrate the concept. We borrow this idea from Silvija Seres's work [*]. \texttt{repeato} relates a term \texttt{x} with a list whose elements are all \texttt{x}s. The \texttt{run} expression uses \texttt{repeato} to generate 4 lists whose elements are all \texttt{*}s. The order of the answers reflects the order miniKanren discovers them. The leftmost answer is discovered first. The order here is not suprising: to generate the answer \texttt{'()}, miniKanren needs to apply \texttt{repeato} only once. And it needs more applications of \texttt{repeato} to find the later answers that are more complicated. In this example, the cost of each answer is the same as one more than the number of \texttt{*}s. No answer of zero cost exists.
 
 \begin{figure}
   \lstinputlisting{Figures/defrel-repeato.rkt}
@@ -114,15 +114,13 @@ Although all answers by iDFS is not in cost-respecting order, the answers from e
 
 \section{change search strategy}
 
-Now we change the search strategy and optimize the system. The whole process is completed in three steps, corresponding to 4 versions of miniKanren. The initial version, \texttt{mk-0} is exactly the miniKanren in \emph{The Reasoned Schemer, 2nd Edition}.
+Now we change the search strategy and optimize the system. The whole process is completed in three steps, corresponding to 4 versions of miniKanren. The initial version, \texttt{mk-0}, is exactly the miniKanren in \emph{The Reasoned Schemer, 2nd Edition}.
 
 \subsection{from \texttt{mk-0} to \texttt{mk-1}}
 
-In mk-0, search spaces are represented by streams of answers. Streams can be finite or infinite. Finite streams are just lists. And infinite streams are improper lists, whose last \texttt{cdr} is a thunk returning another stream. We call the \texttt{car}s the \emph{mature} part, and the last \texttt{cdr} the \emph{immature} part. 
+In \texttt{mk-0} and \texttt{mk-1}, search spaces are represented by streams of answers. Streams can be finite or infinite. Finite streams are just lists. And infinite streams are improper lists, whose last \texttt{cdr} is a thunk returning another stream. We call the \texttt{car}s the \emph{mature} part, and the last \texttt{cdr} the \emph{immature} part. 
 
-Streams are cost respective when they are initially constructed by \texttt{==}. However, \texttt{append-inf}, a composer of stream, breaks cost respectiveness. By changing its definition, we can make the whole search strategy cost respective.
-
-(explain mk-0's append-inf)
+Streams are cost respective when they are initially constructed by \texttt{==}. However, the \texttt{mk-0} version of \texttt{append-inf} (Fig.~\ref{append-inf-0}), a composer of stream, can break cost respectiveness. when its first argument, \texttt{s-inf} is infinite. The resulting mature part contains only the mature part of \texttt{s-inf}. The whole \texttt{t-inf} goes to the resulting immature part -- the newly constructed thunk.
 
 \begin{figure}
 	 \lstinputlisting{Figures/append-inf-0.rkt}	
@@ -130,15 +128,20 @@ Streams are cost respective when they are initially constructed by \texttt{==}. 
 	 \label{append-inf-0}
 \end{figure}
 
+
+The \texttt{mk-1} version of \texttt{append-inf} (Fig.~\ref{append-inf-1}) restores cost-respectiveness by combining the mature parts in the fashion of \texttt{append}. \texttt{append-inf} calls its helper immediately, with the first argument, \texttt{s?}, set to \texttt{\#{}t}, which means \texttt{s-inf} in the helper is the \texttt{s-inf} in the driver. Two streams are swapped in the third \texttt{cond} clause, where \texttt{s?} is also changed accordingly.
+
 \begin{figure}
 	 \lstinputlisting{Figures/append-inf-1.rkt}	
 	 \caption{\texttt{append-inf} in \texttt{mk-1}}
 	 \label{append-inf-1}
 \end{figure}
 
-
+\texttt{mk-1} is not efficient in two aspects. \texttt{append-inf} need to copy all \texttt{cons} cells of two input stream when the first one is infinite. Besides, \texttt{mk-1} generates answers of the same cost at once, even when only a small portion is queried. We solves the two problems in the next two subsections.
 
 \subsection{stepstone of optimization}
+
+(eqv to Seres's BFS ?)
 
 Make irrelevant parts in mK representation-independent w.r.t. search space, and combine mature part and immature part with cons.
 
