@@ -82,33 +82,60 @@ OUTLINE:
 
 %TODO the meaning of resolution step in Silvija Seres's paper
 
-The \emph{cost} of an answer is the number of relation applications needed to find the answer. We use the miniKanren relation \texttt{repeato} in Fig.~\ref{def-repeato} to demonstrate the concept. We borrow this idea from Silvija Seres's work [*]. \texttt{repeato} relates a term \texttt{x} with a list whose elements are all \texttt{x}s. The \texttt{run} expression uses \texttt{repeato} to generate 4 lists whose elements are all \texttt{*}s. The order of the answers reflects the order miniKanren discovers them. The leftmost answer is discovered first. The order here is not suprising: to generate the answer \texttt{'()}, miniKanren needs to apply \texttt{repeato} only once. And it needs more applications of \texttt{repeato} to find the later answers that are more complicated. In this example, the cost of each answer is the same as one more than the number of \texttt{*}s. No answer of zero cost exists.
+The \emph{cost} of an answer is the number of relation applications needed to
+find the answer. This idea is borrowed from Silvija Seres's work [*].
+Now we illustrate the costs of answers by running a miniKanren relation.
+Fig.~\ref{def-repeato} defines the relation \texttt{repeato} that 
+relates a term \texttt{x} with a list whose elements are all \texttt{x}s.
 
 \begin{figure}
   \lstinputlisting{Figures/defrel-repeato.rkt}
-  \lstinputlisting{Figures/run-repeato-1.rkt}
   \caption{\texttt{repeato}}
   \label{def-repeato}
 \end{figure}
+
+Consider the following \texttt{run} of \texttt{repeato}.
+\begin{center}
+  \begin{tabular}{c}
+  \lstinputlisting{Figures/run-repeato-1.rkt}
+   \end{tabular}
+\end{center}
+
+The above \texttt{run} generates 4 answers. All are lists of \texttt{*}s.
+The order of the answers reflects the order miniKanren discovers them:
+the leftmost answer is the first one. This result is not suprising:
+to generate the first answer, \texttt{'()}, miniKanren needs to apply
+\texttt{repeato} only once and the later answers need more recursive
+applications. In this example, the cost of each answer is the same as
+one more than the number of \texttt{*}s. The cost of \texttt{'()} is 1,
+the cost of \texttt{'(*)} is 2, etc.
+
+A list of answer is in the \emph{cost-respecting} order if no answer occurs
+before another answer of a lower cost. In the above example, the answers are
+cost-respecting. The iDFS search, however, does not generate cost-respecting
+answers in general. As an example, consider the following \texttt{run} of
+\texttt{repeato}.
+\begin{center}
+  \begin{tabular}{c}
+   \lstinputlisting{Figures/run-conde-repeato-iDFS.rkt}
+   \end{tabular}
+\end{center}
+
+The results are not cost-respecting. For example, \texttt{'(a a)} occurs before
+\texttt{'(b)} while \texttt{'(a a)} is associated with a higher cost. 
+The problem is that iDFS strategy prioritizes the first \texttt{conde} case
+considerablely. In general, when every conde case are equally productive, the iDFS
+strategy takes $1/2^{i}$ answers from the $i$-th case, except the last case,
+which share the same portion as the second last.
+
+
 
 %TODO relation *application*
 
 For the above \texttt{run}, both search strategies produces answers in increasing order of costs, i.e. both of them are \emph{cost-respecting}. In more complicated cases, however, interleaving DFS does not always produces answers in cost-repecting order. For instance, with iDFS the \texttt{run} in Fig.~\ref{conde-repeato-iDFS} produces answers in a seemingly random order. In contrast, the same run with BFS produces answers in an expected order (Fig.~\ref{conde-repeato-BFS}).
 
-\begin{figure}
-	\lstinputlisting{Figures/run-conde-repeato-iDFS.rkt}
-	\caption{run a program with interleaving depth-first search}
-	\label{conde-repeato-iDFS}
-\end{figure}
 
-\begin{figure}
-	\lstinputlisting{Figures/run-conde-repeato-BFS.rkt}
-	\caption{run a program with breadth-first search}
-	\label{conde-repeato-BFS}
-\end{figure}
-
-Although all answers by iDFS is not in cost-respecting order, the answers from each case are in cost-respecting order. The problem is that iDFS strategy prioritizes the first \texttt{conde} case considerablely. In general, when every conde case are equally productive, the iDFS strategy takes $1/2^{i}$ answers from the $i$-th case, except the last case, which share the same portion as the second last.
-
+\lstinputlisting{Figures/run-conde-repeato-BFS.rkt}
 
 
 
