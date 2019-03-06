@@ -165,7 +165,7 @@ The \texttt{mk-1} version of \texttt{append-inf} (Fig.~\ref{append-inf-1}) resto
 	 \label{append-inf-1}
 \end{figure}
 
-\texttt{mk-1} is not efficient in two aspects. \texttt{append-inf} need to copy all \texttt{cons} cells of two input stream when the first one is infinite. Besides, \texttt{mk-1} generates answers of the same cost at once, even when only a small portion is queried. We solves the two problems in the next two subsections.
+\texttt{mk-1} is not efficient in two aspects. \texttt{append-inf} need to copy all \texttt{cons} cells of two input streams when the first stream has a non-trivial immature part. Besides, \texttt{mk-1} generates answers of the same cost at once, even when only a small portion is queried. We solves the two problems in the next two subsections.
 
 \subsection{stepstone of optimization}
 
