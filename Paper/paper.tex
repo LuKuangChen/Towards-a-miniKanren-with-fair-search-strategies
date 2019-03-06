@@ -29,17 +29,9 @@
 
 %%% NOTE %%%
 %
-% - plan paper writing
-%   
-%   * Abstract
-%   * send to Dan
-%   * Core Content
-%     * how stream is implemented in TRS2's miniKanren
-%     * how to do BFS search
+% - deadline?
 %
-% - when is the deadline
-%
-%   last year submission deadline July 23, 2018
+%   last year submission deadline May 15, 2018
 %
 %%%%%%%%%%%%
 
@@ -132,7 +124,7 @@ which share the same portion as the second last.
 
 %TODO relation *application*
 
-For the above \texttt{run}, both search strategies produces answers in increasing order of costs, i.e. both of them are \emph{cost-respecting}. In more complicated cases, however, interleaving DFS does not always produces answers in cost-repecting order. For instance, with iDFS the \texttt{run} in Fig.~\ref{conde-repeato-iDFS} produces answers in a seemingly random order. In contrast, the same run with BFS produces answers in an expected order (Fig.~\ref{conde-repeato-BFS}).
+For the above \texttt{run}, both search strategies produces answers in increasing order of costs, i.e. both of them are \emph{cost-respecting}. In more complicated cases, however, interleaving DFS might not produce answers in cost-repecting order. For instance, with iDFS the \texttt{run} in Fig.~\ref{conde-repeato-iDFS} produces answers in a seemingly random order. In contrast, the same run with BFS produces answers in an expected order (Fig.~\ref{conde-repeato-BFS}).
 
 
 \lstinputlisting{Figures/run-conde-repeato-BFS.rkt}
@@ -147,7 +139,7 @@ Now we change the search strategy and optimize the system. The whole process is 
 
 In \texttt{mk-0} and \texttt{mk-1}, search spaces are represented by streams of answers. Streams can be finite or infinite. Finite streams are just lists. And infinite streams are improper lists, whose last \texttt{cdr} is a thunk returning another stream. We call the \texttt{car}s the \emph{mature} part, and the last \texttt{cdr} the \emph{immature} part. 
 
-Streams are cost respective when they are initially constructed by \texttt{==}. However, the \texttt{mk-0} version of \texttt{append-inf} (Fig.~\ref{append-inf-0}), a composer of stream, can break cost respectiveness. when its first argument, \texttt{s-inf} is infinite. The resulting mature part contains only the mature part of \texttt{s-inf}. The whole \texttt{t-inf} goes to the resulting immature part -- the newly constructed thunk.
+Streams are cost respective when they are initially constructed by \texttt{==}. However, the \texttt{mk-0} version of \texttt{append-inf} (Fig.~\ref{append-inf-0}) breaks cost respectiveness when its first argument, \texttt{s-inf}, is infinite. The resulting mature part contains only the mature part of \texttt{s-inf}. The whole \texttt{t-inf} goes to the resulting immature part.
 
 \begin{figure}
 	 \lstinputlisting{Figures/append-inf-0.rkt}	
@@ -156,7 +148,7 @@ Streams are cost respective when they are initially constructed by \texttt{==}. 
 \end{figure}
 
 
-The \texttt{mk-1} version of \texttt{append-inf} (Fig.~\ref{append-inf-1}) restores cost-respectiveness by combining the mature parts in the fashion of \texttt{append}. \texttt{append-inf} calls its helper immediately, with the first argument, \texttt{s?}, set to \texttt{\#{}t}, which means \texttt{s-inf} in the helper is the \texttt{s-inf} in the driver. Two streams are swapped in the third \texttt{cond} clause, where \texttt{s?} is also changed accordingly.
+The \texttt{mk-1} version of \texttt{append-inf} (Fig.~\ref{append-inf-1}) restores cost-respectiveness by combining the mature parts in the fashion of \texttt{append}. This \texttt{append-inf} calls its helper immediately, with the first argument, \texttt{s?}, set to \texttt{\#{}t}, which means \texttt{s-inf} in the helper is the \texttt{s-inf} in the driver. Two streams are swapped in the third \texttt{cond} clause, where \texttt{s?} is also changed accordingly.
 
 \begin{figure}
 	 \lstinputlisting{Figures/append-inf-1.rkt}	
@@ -174,7 +166,7 @@ Make irrelevant parts in mK representation-independent w.r.t. search space, and 
 
 \subsection{optimization}
 
-The goal is to express BFS explicitly with queue, so that we don’t have to generate all answers of the same cost at once.
+The goal is to express BFS explicitly with queue, so that the system doesn't generate all answers of the same cost at once.
 
 Interesting changes: (1) put thunks in a list; (2) change force-inf (introduced in 4.B) so that it can make progress in all thunks (3) use a queue to manage thunks in take-inf.
 
