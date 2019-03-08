@@ -1,6 +1,5 @@
 #lang racket
-;(require "../mk-trs2.rkt")
-(require "../mk-3.scm")
+(require "../mk-3.rkt")
 
 (defrel (recur== x y)
   (conde
