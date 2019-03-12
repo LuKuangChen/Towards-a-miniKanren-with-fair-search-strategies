@@ -128,17 +128,12 @@
     (append-map-inf g2 (g1 s))))
 
 (define (append-map-inf g s-inf)
-  (cond
-    ((null-inf? s-inf) (empty-inf))
-    ((mature-inf? s-inf)
-     (append-inf (g (car-inf s-inf))
-       (append-map-inf g (cdr-inf s-inf))))
-    (else
-     (cons '()
-       (map (lambda (th)
-              (lambda ()
-                (append-map-inf g (th))))
-            (cdr s-inf))))))
+  (foldr append-inf
+         (cons '()
+           (map (lambda (t)
+                  (lambda () (append-map-inf g (t))))
+                (cdr s-inf)))
+         (map g (car s-inf))))
 
 (define (call/fresh name f)
   (f (var name)))
