@@ -8,16 +8,6 @@
 
 |#
 
-(define counter 0)
-
-(define-syntax time
-  (syntax-rules ()
-    [(time body)
-     (let ([start (current-inexact-milliseconds)])
-       (let ([r body])
-         (set! counter (+ (- (current-inexact-milliseconds) start) counter))
-         r))]))
-
 ; 1/5 CHANGES
 (define (empty-inf) '(() . ()))
 (define (unit-mature-inf v) `((,v) . ()))
@@ -32,10 +22,6 @@
 
 (define (car-inf s-inf)
   (car (car s-inf)))
-
-(define (cdr-inf s-inf)
-  (cons (cdr (car s-inf))
-    (cdr s-inf)))
 
 ; 2/5 CHANGES
 ; Invoke every thunk
@@ -138,15 +124,12 @@
     (append-map-inf g2 (g1 s))))
 
 (define (append-map-inf g s-inf)
-  (time
-   (cond
-     ((null-inf? s-inf) (empty-inf))
-     ((mature-inf? s-inf)
-      (append-inf (g (car-inf s-inf))
-        (append-map-inf g (cdr-inf s-inf))))
-     (else (unit-immature-inf
-             (lambda ()
-               (append-map-inf g (force-inf s-inf))))))))
+  (foldr append-inf
+         (cons '()
+           (map (lambda (t)
+                  (lambda () (append-map-inf g (t))))
+                (cdr s-inf)))
+         (map g (car s-inf))))
 
 (define (call/fresh name f)
   (f (var name)))

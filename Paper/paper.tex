@@ -31,7 +31,7 @@
 %
 % - deadline?
 %
-%   last year submission deadline May 15, 2018
+%   miniKanren workshop deadline May 15, 2018
 %
 %%%%%%%%%%%%
 
@@ -128,7 +128,7 @@ The results are not cost-respecting. For example, \texttt{'(a a)} occurs before
 The problem is that iDFS strategy prioritizes the first \texttt{conde} case
 considerablely. In general, when every conde case are equally productive, the iDFS
 strategy takes $1/2^{i}$ answers from the $i$-th case, except the last case,
-which share the same portion as the second last.
+which share the same portion as the second last one.
 
 %TODO relation *application*
 
@@ -141,9 +141,9 @@ answers in an expected order (Fig.~\ref{conde-repeato-BFS}).
 
 \lstinputlisting{Figures/run-conde-repeato-BFS.rkt}
 
-\section{change search strategy}
+\section{breadth-first search}
 
-Now we change the search strategy and optimize the system. The whole process is completed in three steps, corresponding to 4 versions of miniKanren. The initial version, \texttt{mk-0}, is exactly the miniKanren in \emph{The Reasoned Schemer, 2nd Edition}.
+In this section we change the search strategy to breadth-first search and optimize it. The whole process is completed in three steps, corresponding to 3 versions of miniKanren. We start with, \texttt{mk-0}, the miniKanren in \emph{The Reasoned Schemer, 2nd Edition}.
 
 \subsection{from \texttt{mk-0} to \texttt{mk-1}}
 
@@ -165,56 +165,30 @@ The \texttt{mk-1} version of \texttt{append-inf} (Fig.~\ref{append-inf-1}) resto
 	 \label{append-inf-1}
 \end{figure}
 
-\texttt{mk-1} is not efficient in two aspects. \texttt{append-inf} need to copy all \texttt{cons} cells of two input streams when the first stream has a non-trivial immature part. Besides, \texttt{mk-1} generates answers of the same cost at once, even when only a small portion is queried. We solves the two problems in the next two subsections.
+\texttt{mk-1} is not efficient in two aspects. \texttt{append-inf} need to copy all \texttt{cons} cells of two input streams when the first stream has a non-trivial immature part. Besides, \texttt{mk-1} computes answers of the same cost at once, even when only a portion is queried. We solves the two problems in the next subsections.
 
-\subsection{stepstone of optimization}
+\subsection{\texttt{mk-3}, optimized breadth-first search}
 
-In \texttt{mk-2} we set up an interface between streams and the rest of miniKanren,
-so that the optimization in \texttt{mk-3} is easier to present. As a side-effect, we
-also solve the problem of copying too many \texttt{cons} cells. We list all interface functions in Fig.~\ref{interface-functions}.
+We avoid generating same-cost answers at once by expressing BFS with a queue. The elements of the queue are delayed computation, represented by thunks. Every \texttt{mk-1} stream has zero or one thunk, so we have no interesting way to manage it. Therefore we change the representation of immature parts from thunks to lists of thunks. As as consequence, we also change the way to combine mature and immature part from \texttt{append} to \texttt{cons}. 
 
-\begin{figure}
-
-\begin{tabular}{|c|c|}
-\hline 
-interface function & meaning \\ 
-\hline 
-empty-inf & construct an empty stream \\ 
-\hline 
-unit-mature-inf & construct a stream with one answer \\ 
-\hline 
-unit-immature-stream & construct a stream with one thunk \\ 
-\hline 
-null-inf? & predicate whether a stream is empty \\ 
-\hline 
-mature-inf? & predicate whether a stream has some mature answers \\ 
-\hline 
-car-inf & take the first answer out of a mature stream \\ 
-\hline 
-cdr-inf & remove the first answer of a mature stream \\ 
-\hline 
-force-inf & get answers of higher cost \\ 
-\hline
-\end{tabular}
-	 \caption{interface functions and their meanings in mk-2 and mk-3}
-	 \label{interface-functions}
-\end{figure} 
-
-The representation of stream in \texttt{mk-2} is a pair of mature part and immature part. The mature parts are lists of answers. And the immature part is either a thunk or \texttt{'()}.
-
-Changes in \texttt{mk-2} are mostly about setting up the interface, except the change in \texttt{append-inf} (Fig.~\ref{append-inf-2}). This version of \texttt{mk-2} essentially does the same thing as the \texttt{mk-1} version. 
+After applying this two changes, stream representation becomes more complicated. It motivates us to set up an interface between stream functions and the rest of miniKanren. Listed in Fig.~\ref{interface} are all functions being aware of the stream representation, but \texttt{take-inf} and its helper function, which is explained later. The first three functions are constructors: \texttt{empty-inf} constructs an empty stream; \texttt{unit-mature-inf} constructs a stream with one mature solution; \texttt{unit-immature-inf} constructs a stream with one thunk. The \texttt{append-inf} in \texttt{mk-3} is relatively straightforwared compared with the \texttt{mk-1} version. \texttt{append-map-inf} is more tricky on how to construct the new immature part. We can follow the approach in mk-0 and mk-1 -- create a new thunk which invoke append-map-inf recursively when forced. But then we need to be careful: if we construct the thunk when the old immature part is an empty list, the resulting stream might be infinitely unproductive. Beside, all solutions of the next lowest cost in \texttt{s-inf} must be computed when the thunk is invoked. However sometimes only a portion of these solutions is required to answer a query. To avoid the trouble and the advanced computation, we choose to create a new thunk for every existing thunk. The next four functions are used only by \texttt{ifte} and \texttt{once}. Uninterested readers might skip them. \texttt{null-inf?} checks whether a stream is exausted. \texttt{mature-inf?} checks whether a stream has some mature solutions. \texttt{car-inf} takes the first solution out of a mature stream. \texttt{cdr-inf} drops the first solution of a mature stream. Finally, \texttt{force-inf} forces an a immature stream to do more computation.
 
 \begin{figure}
-	 \lstinputlisting{Figures/append-inf-2.rkt}	
-	 \caption{\texttt{append-inf} in \texttt{mk-2}}
-	 \label{append-inf-2}
-\end{figure} 
+	 \lstinputlisting{Figures/interface.rkt}	
+	 \caption{Functions being aware of stream representation}
+	 \label{interface}
+\end{figure}
 
-\subsection{optimization}
 
-The goal is to express BFS explicitly with queue, so that the system doesn't generate all answers of the same cost at once.
+The last interesting function is \texttt{take-inf} (Fig.~\ref{take-inf-3-1}). The parameter \texttt{vs} is a list of solutions. The next two parameters together represents a functional queue in a typical way. The first two \texttt{cond} lines are very similar to their counterparts in mk-0 and mk-1. The third line runs when we exaust all solutions. The forth line re-shape the queue. The fifth and last line invoke the first thunk in the queue and use the mature part of the resulting stream, \texttt{s-inf}, as the new \texttt{vs}, and enqueuing \texttt{s-inf}'s thunks.
 
-Interesting changes: (1) put thunks in a list; (2) change force-inf (introduced in 4.B) so that it can make progress in all thunks (3) use a queue to manage thunks in take-inf.
+\begin{figure}
+	 \lstinputlisting{Figures/take-inf-3-1.rkt}	
+	 \caption{\texttt{take-inf} in \texttt{mk-3-1}}
+	 \label{take-inf-3-1}
+\end{figure}
+
+
 
 \section{conclusion}
 
