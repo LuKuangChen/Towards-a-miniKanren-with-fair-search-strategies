@@ -105,7 +105,7 @@ Consider the following \texttt{run} of \texttt{repeato}.
 
 The above \texttt{run} generates 4 answers. All are lists of \texttt{*}s.
 The order of the answers reflects the order miniKanren discovers them:
-the leftmost answer is the first one. This result is not suprising:
+the first answer in the list is first discovered. This result is not suprising:
 to generate the first answer, \texttt{'()}, miniKanren needs to apply
 \texttt{repeato} only once and the later answers need more recursive
 applications. In this example, the cost of each answer is the same as
@@ -125,8 +125,8 @@ answers in general. As an example, consider the following \texttt{run} of
 
 The results are not cost-respecting. For example, \texttt{'(a a)} occurs before
 \texttt{'(b)} while \texttt{'(a a)} is associated with a higher cost. 
-The problem is that iDFS strategy prioritizes the first \texttt{conde} case
-considerablely. In general, when every conde case are equally productive, the iDFS
+iDFS strategy is the cause, since it prioritizes the first \texttt{conde} case
+considerablely. When every conde case are equally productive, the iDFS
 strategy takes $1/2^{i}$ answers from the $i$-th case, except the last case,
 which share the same portion as the second last one.
 
