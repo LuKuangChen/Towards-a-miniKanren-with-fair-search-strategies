@@ -45,11 +45,14 @@
 The syntax of a programming language should reflect its semantics.
 When using a disjunction operator in relational programming, a programmer would
 expect all clauses of this disjunction to share the same chance of being explored,
-as these clauses are written in parallel. The existing disjunctive operators in miniKanren,
-however, prioritize their clauses by the order of which these clauses are written down.
-We have devised a new search strategy that searches evenly in all clauses.
-Based on our statistics, miniKanren slows down by a constant factor after applying our search strategy.
+as these clauses are written in parallel. The existing disjunctive operators in
+miniKanren, however, prioritize their clauses by the order of which these clauses are
+written down. We have devised a new search strategy that searches evenly in all
+clauses. Based on our statistics, miniKanren slows down by a constant factor after
+applying our search strategy.
 (tested with very-recursiveo, need more tests)
+
+%TODO update "result" once having more test cases: quine, '(I love you).
 
 
 \end{abstract}
@@ -58,29 +61,46 @@ Based on our statistics, miniKanren slows down by a constant factor after applyi
 
 \section{introduction}
 
-miniKanren is a relational programming language embedable in many languages[cite
-miniKanren.org?]. 
+The best way to write a miniKanren program can depend on the search strategy. For example, with inteleaving depth-first search (iDFS), users sometimes need to order their conde clauses carefully to avoid starving later clauses. This is because iDFS spends half of computation effort on the first clause, a quater on the second, and so on. Seasoned miniKanreners usually know how to make use of this bias to optimize their programs. However, we believe search strategies less sensitive to conde clause order can also be useful. We propose two such search strategies, balanced interleaving DFS (biDFS) and breadth-first search (BFS), and observe how they affect the efficiency and answer order of some known miniKanren programs. The experiment is conducted within the miniKanren in \textit{The Reasoned Schemer, 2nd Edition}.
 
-The version of miniKanren in \textit{The Reasoned Schemer, 2nd Edition} features
-an efficient and complete search strategy -- interleaving depth-first search (iDFS).
-iDFS biases toward left conde lines. So miniKanren programmers sometimes need to
-organize their conde lines carefully. We proposed two search strategies and their
-implementations. The first strategy is breadth-first search. The second one is a
-modified iDFS.
+%TODO use microKanren instead?
 
-OUTLINE:
+%The version of miniKanren in \textit{The Reasoned Schemer, 2nd Edition} features
+%an efficient and complete search strategy -- interleaving depth-first search (iDFS).
+%iDFS biases toward left conde lines. So miniKanren programmers sometimes need to
+%organize their conde lines carefully. We propose and implement two search strategies,
+%breadth-first search (BFS) and balanced interleaving DFS (biDFS). With either of these
+%search strategy, miniKanren becomes less sensitive to the order of conde lines. 
 
-( About miniKanren )
+Section 2 explains why iDFS biases toward left conde clauses. Section 2 is about the biDFS. Section 3 is about BFS.
 
-( Why the left clauses are explored more frequently? )
+\section{why iDFS put more effort computing left clauses}
 
-%TODO define iDFS = interleaving DFS in Introduction
+\texttt{conde} clauses are combined by \texttt{disj2}, right associatively. The core functionality of \texttt{disj2} is completed by \texttt{append-inf} (Fig.~\ref{disj2-and-append-inf}). When both input streams are infinite, the resulting mature part contains only the mature part of \texttt{s-inf}. The whole \texttt{t-inf} goes to the resulting immature part. However, \texttt{t-inf} and \texttt{s-inf} are swapped in the delayed recursive call. Hence the search strategy spend computational effort evenly in two appended streams. As \texttt{disj2} is right associative, the left clauses are nested in less calls to \texttt{append-inf}, which implies that they are more likeyly being computed.
 
-( How to solve the problem? )
+\begin{figure}
+  \lstinputlisting{Figures/disj2.rkt}
+  \caption{\texttt{disj2} and \texttt{append-inf}}
+  \label{disj2-and-append-inf}
+\end{figure}
+ 
+\section{balanced interleaving DFS}
 
-( Summary of later sections )
+A \texttt{conde} expression looks like a binary tree, if we consider \texttt{disj2}s as internal nodes and \texttt{conde} clauses as a terminal nodes. In fact, each of them is one of the most unbalanced binary trees. The basic idea of our first solution, balanced interleaving DFS, is to make the tree balanced. We introduce a function \texttt{disj*} and its helper \texttt{split} (Fig.~\ref{disj*}). \texttt{disj*} essentially construct a balanced \texttt{disj2} tree. \texttt{split} splits elements of \texttt{ls} into two even half and pass them to the continuation parameter \texttt{k}.
 
-\section{cost of answers}
+\begin{figure}
+  \lstinputlisting{Figures/disj*.rkt}
+  \caption{\texttt{disj*}}
+  \label{disj*}
+\end{figure}
+
+\section{breadth-first search}
+
+In this section we change the search strategy to breadth-first search and optimize it. The whole process is completed in two steps. In the first step, from mk-0 to mk-1, BFS is introduced. In the second step, mk-1 to mk-3, BFS is optimized. The initial version, \texttt{mk-0}, is exactly the version in \emph{The Reasoned Schemer, 2nd Edition}.
+
+
+
+\subsection{cost of answers}
 
 %TODO the meaning of resolution step in Silvija Seres's paper
 
@@ -141,15 +161,11 @@ answers in an expected order (Fig.~\ref{conde-repeato-BFS}).
 
 \lstinputlisting{Figures/run-conde-repeato-BFS.rkt}
 
-\section{breadth-first search}
-
-In this section we change the search strategy to breadth-first search and optimize it. The whole process is completed in three steps, corresponding to 3 versions of miniKanren. We start with, \texttt{mk-0}, the miniKanren in \emph{The Reasoned Schemer, 2nd Edition}.
-
 \subsection{from \texttt{mk-0} to \texttt{mk-1}}
 
 In \texttt{mk-0} and \texttt{mk-1}, search spaces are represented by streams of answers. Streams can be finite or infinite. Finite streams are just lists. And infinite streams are improper lists, whose last \texttt{cdr} is a thunk returning another stream. We call the \texttt{car}s the \emph{mature} part, and the last \texttt{cdr} the \emph{immature} part. 
 
-Streams are cost respective when they are initially constructed by \texttt{==}. However, the \texttt{mk-0} version of \texttt{append-inf} (Fig.~\ref{append-inf-0}) breaks cost respectiveness when its first argument, \texttt{s-inf}, is infinite. The resulting mature part contains only the mature part of \texttt{s-inf}. The whole \texttt{t-inf} goes to the resulting immature part.
+Streams are cost respective when they are initially constructed by \texttt{==}. However, the \texttt{mk-0} version of \texttt{append-inf} (Fig.~\ref{append-inf-0}) breaks cost respectiveness if its first input stream, \texttt{s-inf}, is infinite. The resulting mature part contains only the mature part of \texttt{s-inf}. The whole \texttt{t-inf} goes to the resulting immature part.
 
 \begin{figure}
 	 \lstinputlisting{Figures/append-inf-0.rkt}	
@@ -157,7 +173,7 @@ Streams are cost respective when they are initially constructed by \texttt{==}. 
 	 \label{append-inf-0}
 \end{figure}
 
-The \texttt{mk-1} version of \texttt{append-inf} (Fig.~\ref{append-inf-1}) restores cost-respectiveness by combining the mature parts in the fashion of \texttt{append}. This \texttt{append-inf} calls its helper immediately, with the first argument, \texttt{s?}, set to \texttt{\#{}t}, which means \texttt{s-inf} in the helper is the \texttt{s-inf} in the driver. Two streams are swapped in the third \texttt{cond} clause, where \texttt{s?} is also changed accordingly.
+The \texttt{mk-1} version of \texttt{append-inf} (Fig.~\ref{append-inf-1}) restores cost-respectiveness by combining the mature parts in the fashion of \texttt{append}. This \texttt{append-inf} calls its helper immediately, with the first argument, \texttt{s?}, set to \texttt{\#{}t}, which means \texttt{s-inf} in the helper is the \texttt{s-inf} in the driver. Two streams are swapped in the third \texttt{cond} clause, with \texttt{s?} flipped accordingly.
 
 \begin{figure}
 	 \lstinputlisting{Figures/append-inf-1.rkt}	
