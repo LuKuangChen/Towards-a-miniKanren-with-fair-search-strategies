@@ -17,7 +17,7 @@
 
 % metadata
 
-\title{BFS search in miniKanren}
+\title{miniKanren with fair search}
 \author{Kuang-Chen Lu}
 \affiliation{Indiana University}
 \author{Weixi Ma}
@@ -45,14 +45,16 @@
 The syntax of a programming language should reflect its semantics.
 When using a disjunction operator in relational programming, a programmer would
 expect all clauses of this disjunction to share the same chance of being explored,
-as these clauses are written in parallel. The existing disjunctive operators in
-miniKanren, however, prioritize their clauses by the order of which these clauses are
-written down. We have devised a new search strategy that searches evenly in all
-clauses. Based on our statistics, miniKanren slows down by a constant factor after
-applying our search strategy.
-(tested with very-recursiveo, need more tests)
+as these clauses are written in parallel. 
+% The existing disjunctive operators in miniKanren, however, prioritize their clauses
+The existing multiarity disjunctive operator in miniKanren, however, prioritize its clauses
+by the order of which these clauses are written down. 
+% We have devised a new search strategy that searches evenly in all clauses.
+We have devised two new search strategies that allocate computational effort fairly in all clauses.
 
-%TODO update "result" once having more test cases: quine, '(I love you).
+(TODO: evaluation of performance)
+
+%TODO test cases: quine, '(I love you).
 
 
 \end{abstract}
