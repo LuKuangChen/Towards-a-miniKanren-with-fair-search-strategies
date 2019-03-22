@@ -42,19 +42,21 @@
 
 \begin{abstract}
 
-The syntax of a programming language should reflect its semantics.
-When using a disjunction operator in relational programming, a programmer would
-expect all clauses of this disjunction to share the same chance of being explored,
-as these clauses are written in parallel. 
-% The existing disjunctive operators in miniKanren, however, prioritize their clauses
-The existing multiarity disjunctive operator in miniKanren, however, prioritize its clauses
-by the order of which these clauses are written down. 
-% We have devised a new search strategy that searches evenly in all clauses.
-We have devised two new search strategies that allocate computational effort fairly in all clauses.
+The syntax of a programming language should reflect its semantics. When using a
+disjunction operator in relational programming, a programmer would expect all
+clauses of this disjunction to share the same chance of being explored, as
+these clauses are written in parallel. The existing multiarity disjunctive
+operator in miniKanren, however, prioritize its clauses by the order of which
+these clauses are written down. We have devised two new search strategies that
+allocate computational effort fairly in all clauses.
 
 (TODO: evaluation of performance)
 
 %TODO test cases: quine, '(I love you).
+
+%TODO 1. reformat LaTeX (80 chars per line)
+%TODO 2. stat quine
+%TODO 3. keep writing
 
 
 \end{abstract}
@@ -63,9 +65,23 @@ We have devised two new search strategies that allocate computational effort fai
 
 \section{introduction}
 
-With interleaving depth-first search, disjunctive operator allocates half computational effort to its first goal, and quater to the second, eighth to the third, and so on. Consequently, miniKanren programmers sometimes need to order their \texttt{conde} clauses carefully to prevent some clauses absorbing unproportional computational effort. For example, when a relational proof checker is used as a proof generator, the eliminational rules should comes later.
-%TODO KC: prefer an example from other literatures 
-Seasoned miniKanreners usually know how to make use of this unfair allocation to optimize their programs. However, we believe search strategies less sensitive to goal order can also be useful to little miniKanreners as well as seansoned ones. We propose two such search strategies, balanced interleaving DFS (biDFS) and breadth-first search (BFS), and observe how they affect the efficiency and query result of known miniKanren programs. The experiment is conducted with the miniKanren from \textit{The Reasoned Schemer, 2nd Edition}.
+With interleaving depth-first search, disjunctive operator allocates half
+computational effort to its first goal, and quater to the second, eighth to the
+third, and so on. If a goal that can generate planty of unwanted partial 
+solutions is placed at the beginning of a \texttt{conde} expressions, it might
+waste a lot computational resource. Consequently, miniKanren programmers 
+sometimes need to order their \texttt{conde} clauses carefully to prevent some 
+clauses absorbing unproportional computational effort. For example, when a 
+relational proof checker is used as a proof generator, the eliminational rules 
+should comes later.
+%TODO KC: prefer an example from other literatures
+Seasoned miniKanreners usually know how to utilize the unfairness to optimize
+their programs. However, we believe search strategies less sensitive to goal
+order can also be useful to little miniKanreners as well as seansoned ones. We 
+propose two such search strategies, balanced interleaving DFS (biDFS) and
+breadth-first search (BFS), and observe how they affect the efficiency and
+query result of known miniKanren programs. The experiment is conducted with the
+miniKanren from \textit{The Reasoned Schemer, 2nd Edition}.
 
 %TODO KC: Should we use microKanren instead?
 
@@ -76,11 +92,20 @@ Seasoned miniKanreners usually know how to make use of this unfair allocation to
 %breadth-first search (BFS) and balanced interleaving DFS (biDFS). With either of these
 %search strategy, miniKanren becomes less sensitive to the order of \texttt{conde} lines. 
 
-(TODO: summarize following sections) Section 2 explains why iDFS biases toward left \texttt{conde} clauses. Section 3 is about the biDFS. Section 3 is about BFS.
+(TODO: summarize following sections) Section 2 explains why iDFS biases toward left \texttt{conde} clauses. Section 3 is about the biDFS. Section 4 is about BFS.
 
 \section{why iDFS put more effort computing left clauses}
 
-\texttt{conde} clauses are combined by \texttt{disj2}, right associatively. The core functionality of \texttt{disj2} is completed by \texttt{append-inf} (Fig.~\ref{disj2-and-append-inf}). When both input streams are infinite, the resulting mature part contains only the mature part of \texttt{s-inf}. The whole \texttt{t-inf} goes to the resulting immature part. However, \texttt{t-inf} and \texttt{s-inf} are swapped in the delayed recursive call. Hence the search strategy spend computational effort evenly in two appended streams. As \texttt{disj2} is right associative, the left clauses are nested in less calls to \texttt{append-inf}, which implies that they are more likeyly being computed.
+\texttt{conde} clauses are combined by \texttt{disj2}, right associatively. The
+core functionality of \texttt{disj2} is completed by \texttt{append-inf} (Fig.~
+ref{disj2-and-append-inf}). When both input streams are infinite, the resulting
+mature part contains only the mature part of \texttt{s-inf}. The whole
+\texttt{t-inf} goes to the resulting immature part. However, \texttt{t-inf} and
+\texttt{s-inf} are swapped in the delayed recursive call. Hence the search
+strategy spend computational effort evenly in two appended streams. As
+\texttt{disj2} is right associative, the left clauses are nested in less calls
+to \texttt{append-inf}, which implies that they are more likeyly being
+computed.
 
 \begin{figure}
   \lstinputlisting{Figures/disj2.rkt}
@@ -90,7 +115,14 @@ Seasoned miniKanreners usually know how to make use of this unfair allocation to
  
 \section{balanced interleaving DFS}
 
-A \texttt{conde} expression looks like a binary tree, if we consider \texttt{disj2}s as internal nodes and \texttt{conde} clauses as a terminal nodes. In fact, each of them is one of the most unbalanced binary trees. The basic idea of our first solution, balanced interleaving DFS, is to make the tree balanced. We introduce a function \texttt{disj*} and its helper \texttt{split} (Fig.~\ref{disj*}). \texttt{disj*} essentially construct a balanced \texttt{disj2} tree. \texttt{split} splits elements of \texttt{ls} into two even half and pass them to the continuation parameter \texttt{k}.
+A \texttt{conde} expression looks like a binary tree, if we consider 
+\texttt{disj2}s as internal nodes and \texttt{conde} clauses as a terminal 
+nodes. In fact, each of them is one of the most unbalanced binary trees. The 
+basic idea of our first solution, balanced interleaving DFS, is to make the 
+tree balanced. We introduce a function \texttt{disj*} and its helper 
+\texttt{split} (Fig.~\ref{disj*}). \texttt{disj*} essentially construct a 
+balanced \texttt{disj2} tree. \texttt{split} splits elements of \texttt{ls} 
+into two even half and pass them to the continuation parameter \texttt{k}.
 
 \begin{figure}
   \lstinputlisting{Figures/disj*.rkt}
@@ -100,9 +132,11 @@ A \texttt{conde} expression looks like a binary tree, if we consider \texttt{dis
 
 \section{breadth-first search}
 
-In this section we change the search strategy to breadth-first search and optimize it. The whole process is completed in two steps. In the first step, from mk-0 to mk-1, BFS is introduced. In the second step, mk-1 to mk-3, BFS is optimized. The initial version, \texttt{mk-0}, is exactly the version in \emph{The Reasoned Schemer, 2nd Edition}.
-
-
+In this section we change the search strategy to breadth-first search and 
+optimize it. The whole process is completed in two steps. In the first step, 
+from mk-0 to mk-1, BFS is introduced. In the second step, mk-1 to mk-3, BFS is 
+optimized. The initial version, \texttt{mk-0}, is exactly the version in 
+\emph{The Reasoned Schemer, 2nd Edition}.
 
 \subsection{cost of answers}
 
@@ -156,20 +190,29 @@ which share the same portion as the second last one.
 
 %TODO relation *application*
 
-For the above \texttt{run}, both search strategies produces answers in increasing
-order of costs, i.e. both of them are \emph{cost-respecting}. In more complicated
-cases, however, interleaving DFS might not produce answers in cost-repecting order.
-For instance, with iDFS the \texttt{run} in Fig.~\ref{conde-repeato-iDFS} produces
-answers in a seemingly random order. In contrast, the same run with BFS produces
-answers in an expected order (Fig.~\ref{conde-repeato-BFS}).
+For the above \texttt{run}, both search strategies produces answers in 
+increasing order of costs, i.e. both of them are \emph{cost-respecting}. In 
+more complicated cases, however, interleaving DFS might not produce answers in 
+cost-repecting order. For instance, with iDFS the \texttt{run} in Fig.~
+\ref{conde-repeato-iDFS} produces answers in a seemingly random order. In 
+contrast, the same run with BFS produces answers in an expected order (Fig.~
+\ref{conde-repeato-BFS}).
 
 \lstinputlisting{Figures/run-conde-repeato-BFS.rkt}
 
 \subsection{from \texttt{mk-0} to \texttt{mk-1}}
 
-In \texttt{mk-0} and \texttt{mk-1}, search spaces are represented by streams of answers. Streams can be finite or infinite. Finite streams are just lists. And infinite streams are improper lists, whose last \texttt{cdr} is a thunk returning another stream. We call the \texttt{car}s the \emph{mature} part, and the last \texttt{cdr} the \emph{immature} part. 
+In \texttt{mk-0} and \texttt{mk-1}, search spaces are represented by streams of 
+answers. Streams can be finite or infinite. Finite streams are just lists. And 
+infinite streams are improper lists, whose last \texttt{cdr} is a thunk 
+returning another stream. We call the \texttt{car}s the \emph{mature} part, and 
+the last \texttt{cdr} the \emph{immature} part. 
 
-Streams are cost respective when they are initially constructed by \texttt{==}. However, the \texttt{mk-0} version of \texttt{append-inf} (Fig.~\ref{append-inf-0}) breaks cost respectiveness if its first input stream, \texttt{s-inf}, is infinite. The resulting mature part contains only the mature part of \texttt{s-inf}. The whole \texttt{t-inf} goes to the resulting immature part.
+Streams are cost respective when they are initially constructed by \texttt{==}. 
+However, the \texttt{mk-0} version of \texttt{append-inf} (Fig.~\ref{append-
+inf-0}) breaks cost respectiveness if its first input stream, \texttt{s-inf}, 
+is infinite. The resulting mature part contains only the mature part of 
+\texttt{s-inf}. The whole \texttt{t-inf} goes to the resulting immature part.
 
 \begin{figure}
 	 \lstinputlisting{Figures/append-inf-0.rkt}	
@@ -177,7 +220,12 @@ Streams are cost respective when they are initially constructed by \texttt{==}. 
 	 \label{append-inf-0}
 \end{figure}
 
-The \texttt{mk-1} version of \texttt{append-inf} (Fig.~\ref{append-inf-1}) restores cost-respectiveness by combining the mature parts in the fashion of \texttt{append}. This \texttt{append-inf} calls its helper immediately, with the first argument, \texttt{s?}, set to \texttt{\#{}t}, which means \texttt{s-inf} in the helper is the \texttt{s-inf} in the driver. Two streams are swapped in the third \texttt{cond} clause, with \texttt{s?} flipped accordingly.
+The \texttt{mk-1} version of \texttt{append-inf} (Fig.~\ref{append-inf-1}) 
+restores cost-respectiveness by combining the mature parts in the fashion of 
+\texttt{append}. This \texttt{append-inf} calls its helper immediately, with 
+the first argument, \texttt{s?}, set to \texttt{\#{}t}, which means \texttt{s-
+inf} in the helper is the \texttt{s-inf} in the driver. Two streams are swapped 
+in the third \texttt{cond} clause, with \texttt{s?} flipped accordingly.
 
 \begin{figure}
 	 \lstinputlisting{Figures/append-inf-1.rkt}	
@@ -185,13 +233,45 @@ The \texttt{mk-1} version of \texttt{append-inf} (Fig.~\ref{append-inf-1}) resto
 	 \label{append-inf-1}
 \end{figure}
 
-\texttt{mk-1} is not efficient in two aspects. \texttt{append-inf} need to copy all \texttt{cons} cells of two input streams when the first stream has a non-trivial immature part. Besides, \texttt{mk-1} computes answers of the same cost at once, even when only a portion is queried. We solves the two problems in the next subsections.
+\texttt{mk-1} is not efficient in two aspects. \texttt{append-inf} need to copy 
+all \texttt{cons} cells of two input streams when the first stream has a non-
+trivial immature part. Besides, \texttt{mk-1} computes answers of the same cost 
+at once, even when only a portion is queried. We solves the two problems in the 
+next subsections.
 
 \subsection{\texttt{mk-3}, optimized breadth-first search}
 
-We avoid generating same-cost answers at once by expressing BFS with a queue. The elements of the queue are delayed computation, represented by thunks. Every \texttt{mk-1} stream has zero or one thunk, so we have no interesting way to manage it. Therefore we change the representation of immature parts from thunks to lists of thunks. As as consequence, we also change the way to combine mature and immature part from \texttt{append} to \texttt{cons}. 
+We avoid generating same-cost answers at once by expressing BFS with a queue. 
+The elements of the queue are delayed computation, represented by thunks. Every 
+\texttt{mk-1} stream has zero or one thunk, so we have no interesting way to 
+manage it. Therefore we change the representation of immature parts from thunks 
+to lists of thunks. As as consequence, we also change the way to combine mature 
+and immature part from \texttt{append} to \texttt{cons}. 
 
-After applying this two changes, stream representation becomes more complicated. It motivates us to set up an interface between stream functions and the rest of miniKanren. Listed in Fig.~\ref{interface} are all functions being aware of the stream representation, but \texttt{take-inf} and its helper function, which is explained later. The first three functions are constructors: \texttt{empty-inf} constructs an empty stream; \texttt{unit-mature-inf} constructs a stream with one mature solution; \texttt{unit-immature-inf} constructs a stream with one thunk. The \texttt{append-inf} in \texttt{mk-3} is relatively straightforwared compared with the \texttt{mk-1} version. \texttt{append-map-inf} is more tricky on how to construct the new immature part. We can follow the approach in mk-0 and mk-1 -- create a new thunk which invoke append-map-inf recursively when forced. But then we need to be careful: if we construct the thunk when the old immature part is an empty list, the resulting stream might be infinitely unproductive. Beside, all solutions of the next lowest cost in \texttt{s-inf} must be computed when the thunk is invoked. However sometimes only a portion of these solutions is required to answer a query. To avoid the trouble and the advanced computation, we choose to create a new thunk for every existing thunk. The next four functions are used only by \texttt{ifte} and \texttt{once}. Uninterested readers might skip them. \texttt{null-inf?} checks whether a stream is exausted. \texttt{mature-inf?} checks whether a stream has some mature solutions. \texttt{car-inf} takes the first solution out of a mature stream. \texttt{cdr-inf} drops the first solution of a mature stream. Finally, \texttt{force-inf} forces an a immature stream to do more computation.
+After applying this two changes, stream representation becomes more 
+complicated. It motivates us to set up an interface between stream functions 
+and the rest of miniKanren. Listed in Fig.~\ref{interface} are all functions 
+being aware of the stream representation, but \texttt{take-inf} and its helper 
+function, which is explained later. The first three functions are constructors: 
+\texttt{empty-inf} constructs an empty stream; \texttt{unit-mature-inf} 
+constructs a stream with one mature solution; \texttt{unit-immature-inf} 
+constructs a stream with one thunk. The \texttt{append-inf} in \texttt{mk-3} is 
+relatively straightforwared compared with the \texttt{mk-1} version. 
+\texttt{append-map-inf} is more tricky on how to construct the new immature 
+part. We can follow the approach in mk-0 and mk-1 -- create a new thunk which 
+invoke append-map-inf recursively when forced. But then we need to be careful: 
+if we construct the thunk when the old immature part is an empty list, the 
+resulting stream might be infinitely unproductive. Beside, all solutions of the 
+next lowest cost in \texttt{s-inf} must be computed when the thunk is invoked. 
+However sometimes only a portion of these solutions is required to answer a 
+query. To avoid the trouble and the advanced computation, we choose to create a 
+new thunk for every existing thunk. The next four functions are used only by 
+\texttt{ifte} and \texttt{once}. Uninterested readers might skip them. 
+\texttt{null-inf?} checks whether a stream is exausted. \texttt{mature-inf?} 
+checks whether a stream has some mature solutions. \texttt{car-inf} takes the 
+first solution out of a mature stream. \texttt{cdr-inf} drops the first 
+solution of a mature stream. Finally, \texttt{force-inf} forces an a immature 
+stream to do more computation.
 
 \begin{figure}
 	 \lstinputlisting{Figures/interface.rkt}	
@@ -200,7 +280,14 @@ After applying this two changes, stream representation becomes more complicated.
 \end{figure}
 
 
-The last interesting function is \texttt{take-inf} (Fig.~\ref{take-inf-3-1}). The parameter \texttt{vs} is a list of solutions. The next two parameters together represents a functional queue in a typical way. The first two \texttt{cond} lines are very similar to their counterparts in mk-0 and mk-1. The third line runs when we exaust all solutions. The forth line re-shape the queue. The fifth and last line invoke the first thunk in the queue and use the mature part of the resulting stream, \texttt{s-inf}, as the new \texttt{vs}, and enqueuing \texttt{s-inf}'s thunks.
+The last interesting function is \texttt{take-inf} (Fig.~\ref{take-inf-3-1}). 
+The parameter \texttt{vs} is a list of solutions. The next two parameters, 
+\texttt{P} and \texttt{Q}, together represent a queue. The first two 
+\texttt{cond} lines are very similar to their counterparts in mk-0 and mk-1. 
+The third line runs when we exaust all solutions. The forth line re-shape the 
+queue. The fifth and last line invoke the first thunk in the queue and use the 
+mature part of the resulting stream, \texttt{s-inf}, as the new \texttt{vs}, 
+and enqueuing \texttt{s-inf}'s thunks.
 
 \begin{figure}
 	 \lstinputlisting{Figures/take-inf-3-1.rkt}	
