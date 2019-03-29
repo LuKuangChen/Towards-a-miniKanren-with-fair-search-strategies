@@ -82,6 +82,9 @@ and observe how they affect the efficiency and query result of known miniKanren
 programs. The experiment is conducted with the miniKanren from \textit{The 
 Reasoned Schemer, 2nd Edition}.
 
+The unfairness of disjunction is not unawared. (KC: discuss existing works, 
+including the monad paper and Seres's paper).
+
 
 % ---from here to the end of this section are materials for this section---
 
@@ -121,17 +124,6 @@ terminate.
 % Observation:
 Stream cannot model \texttt{nevero}... The system knows a stream by nevero has no end, but doesn't know the stream will never produce an item.
 
-If a goal that can generate planty of unwanted partial 
-solutions is placed at the beginning of a \texttt{conde} expressions, it might
-waste a lot computational effort. Consequently, miniKanren programmers 
-sometimes need to order their \texttt{conde} clauses carefully to prevent some 
-clauses absorbing unproportional computational effort. For example, when a 
-relational proof checker is used as a proof generator, the eliminational rules 
-should comes later.
-%TODO KC: prefer an example from other literatures
-
-%TODO KC: Should we use microKanren instead?
-
 %The version of miniKanren in \textit{The Reasoned Schemer, 2nd Edition} features
 %an efficient and complete search strategy -- interleaving depth-first search (iDFS).
 %iDFS biases toward left \texttt{conde} lines. So miniKanren programmers sometimes need to
@@ -139,9 +131,19 @@ should comes later.
 %breadth-first search (BFS) and balanced interleaving DFS (biDFS). With either of these
 %search strategy, miniKanren becomes less sensitive to the order of \texttt{conde} lines. 
 
-(TODO: summarize following sections) Section 2 explains why iDFS biases toward left \texttt{conde} clauses. Section 3 is about the biDFS. Section 4 is about BFS.
+% TODO: summarize following sections) Section 2 explains why iDFS biases toward 
+% left \texttt{conde} clauses. Section 3 is about the biDFS. Section 4 is 
+% about BFS.
 
-\section{why iDFS put more effort computing left clauses}
+\section{\texttt{disj} is unfair}
+
+The multiarity disjuction operator \texttt{disj} combine its sub-goals with 
+\texttt{disj2} right associatively. \texttt{disj2} is fair in the sence that it 
+allocates computational effort evenly to its two sub-goals. Unfortunately, the 
+fairness of \texttt{disj2} leads to the unfairness of \texttt{disj}, because the 
+first sub-goal of \texttt{disj} consumes half of all computational effort.
+
+% below are materials.
 
 \texttt{conde} clauses are combined by \texttt{disj2}, right associatively. The
 core functionality of \texttt{disj2} is completed by \texttt{append-inf} (Fig.~
@@ -154,11 +156,11 @@ strategy spend computational effort evenly in two appended streams. As
 to \texttt{append-inf}, which implies that they are more likeyly being
 computed.
 
-\begin{figure}
-  \lstinputlisting{Figures/disj2.rkt}
-  \caption{\texttt{disj2} and \texttt{append-inf}}
-  \label{disj2-and-append-inf}
-\end{figure}
+% \begin{figure}
+%   \lstinputlisting{Figures/disj2.rkt}
+%   \caption{\texttt{disj2} and \texttt{append-inf}}
+%   \label{disj2-and-append-inf}
+% \end{figure}
  
 \section{balanced interleaving DFS}
 
