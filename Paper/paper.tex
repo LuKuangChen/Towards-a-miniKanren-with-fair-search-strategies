@@ -17,7 +17,7 @@
 
 % metadata
 
-\title{miniKanren with fair search}
+\title{miniKanren with fair search strategies}
 \author{Kuang-Chen Lu}
 \affiliation{Indiana University}
 \author{Weixi Ma}
@@ -36,6 +36,17 @@
 %%%%%%%%%%%%
 
 
+%TODO test cases: quine, '(I love you).
+
+%TODO 1. reformat LaTeX (80 chars per line)
+%TODO 2. stat quine
+%TODO 3. keep writing
+
+% Forget the issues about efficiency
+% Read the monad paper
+
+
+
 
 % body
 \begin{document}
@@ -48,16 +59,8 @@ clauses of this disjunction to share the same chance of being explored, as
 these clauses are written in parallel. The existing multiarity disjunctive
 operator in miniKanren, however, prioritize its clauses by the order of which
 these clauses are written down. We have devised two new search strategies that
-allocate computational effort fairly in all clauses.
-
-(TODO: evaluation of performance)
-
-%TODO test cases: quine, '(I love you).
-
-%TODO 1. reformat LaTeX (80 chars per line)
-%TODO 2. stat quine
-%TODO 3. keep writing
-
+% allocate computational effort fairly in all clauses.
+allocate computational effort more fairly in all clauses.
 
 \end{abstract}
 
@@ -65,23 +68,67 @@ allocate computational effort fairly in all clauses.
 
 \section{introduction}
 
-With interleaving depth-first search, disjunctive operator allocates half
-computational effort to its first goal, and quater to the second, eighth to the
-third, and so on. If a goal that can generate planty of unwanted partial 
+When every sub-goal of a disjunction produces infinite states, the existing 
+disjunctive operator allocates half computational effort to its first goal, and 
+quater to the second, eighth to the third, and so on. The unfairness provides 
+both opportunity and burden: miniKanren programmers can place more productive 
+goal at the beginning to optimize their programs; however, it might be a 
+catastrophe if a necessary goal is placed at the end. Seasoned miniKanreners 
+usually know how to utilize the unfairness to optimize their programs. However, 
+we believe search strategies less sensitive to goal order can also be useful to 
+little miniKanreners as well as seansoned ones. We propose two such search 
+strategies, balanced interleaving DFS (biDFS) and breadth-first search (BFS), 
+and observe how they affect the efficiency and query result of known miniKanren 
+programs. The experiment is conducted with the miniKanren from \textit{The 
+Reasoned Schemer, 2nd Edition}.
+
+
+% ---from here to the end of this section are materials for this section---
+
+
+% Compare with Backtracking, Interleaving, and Terminating Monad Transformers
+The \texttt{interleaving} operator has trouble with \texttt{nevero}. Its 
+\texttt{conde} suffers from unfairness, but biDFS and BFS does not. This paper 
+defines \textit{unfairness} as: "a non-deterministic choice between two 
+alternatives tries every solution from the first alternative before any 
+solution from the second alternative".
+
+However, like Seres's work, this search cannot handle infinite failure.
+
+% Compare with The Algebra of Logic Programming by Seresall
+Seres's work is in Haskell, hence having an easy implementation of stream:
+List. Our work is in Scheme. So we have to be explicit about lazyness.
+Her definition of fairness is: "a fair search strategy would share the 
+computation effort more evenly between the two branches of the computation of 
+\texttt{||}, and a fair selection rule would allow one to chose the
+literals in a different order."
+
+Her interleaving DFS is the same as the interleaving in the monad paper, but 
+they are different from what's known as iDFS in miniKanren community.
+
+Her implementation of fair disjunction cannot handle nevero (or "infinite 
+failure" in her terminology): "Note that this implementation of operators does 
+not give breadth-first search of the search tree; it deals with infinite 
+success but not with infinite failure. Even in the interleaved implementation, 
+the first element of the answer list has to be computed before we can switch 
+branches; if this takes an infinite number of steps the other branch will never
+be reached."
+
+And her streams are all infinitely long, hence querying all answers doesn't 
+terminate.
+
+
+% Observation:
+Stream cannot model \texttt{nevero}... The system knows a stream by nevero has no end, but doesn't know the stream will never produce an item.
+
+If a goal that can generate planty of unwanted partial 
 solutions is placed at the beginning of a \texttt{conde} expressions, it might
-waste a lot computational resource. Consequently, miniKanren programmers 
+waste a lot computational effort. Consequently, miniKanren programmers 
 sometimes need to order their \texttt{conde} clauses carefully to prevent some 
 clauses absorbing unproportional computational effort. For example, when a 
 relational proof checker is used as a proof generator, the eliminational rules 
 should comes later.
 %TODO KC: prefer an example from other literatures
-Seasoned miniKanreners usually know how to utilize the unfairness to optimize
-their programs. However, we believe search strategies less sensitive to goal
-order can also be useful to little miniKanreners as well as seansoned ones. We 
-propose two such search strategies, balanced interleaving DFS (biDFS) and
-breadth-first search (BFS), and observe how they affect the efficiency and
-query result of known miniKanren programs. The experiment is conducted with the
-miniKanren from \textit{The Reasoned Schemer, 2nd Edition}.
 
 %TODO KC: Should we use microKanren instead?
 
