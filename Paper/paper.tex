@@ -69,98 +69,77 @@ allocate computational effort more fairly in all clauses.
 \section{introduction}
 
 When every sub-goal of a disjunction produces infinite states, the existing 
-disjunctive operator allocates half computational effort to its first goal, and 
+disjunctive operator allocates half computational effort to its first goal, 
 quater to the second, eighth to the third, and so on. The unfairness provides 
-both opportunity and burden: miniKanren programmers can place more productive 
+both opportunity and burden: miniKanren users can place more frequently used 
 goal at the beginning to optimize their programs; however, it might be a 
-catastrophe if a necessary goal is placed at the end. Seasoned miniKanreners 
-usually know how to utilize the unfairness to optimize their programs. However, 
-we believe search strategies less sensitive to goal order can also be useful to 
-little miniKanreners as well as seansoned ones. We propose two such search 
-strategies, balanced interleaving DFS (biDFS) and breadth-first search (BFS), 
-and observe how they affect the efficiency and query result of known miniKanren 
-programs. The experiment is conducted with the miniKanren from \textit{The 
-Reasoned Schemer, 2nd Edition}.
+catastrophe if a goal that generate many useless partial solution is placed 
+before more important goals. Seasoned miniKanreners usually know how to utilize 
+the unfairness to optimize their programs. However, we believe search strategies 
+that is less sensitive to goal order can also be useful to little miniKanreners 
+as well as seansoned ones. We propose two such search strategies, balanced 
+interleaving DFS (biDFS) and breadth-first search (BFS), and observe how they 
+affect the efficiency and the answer order of known miniKanren programs. The 
+experiment is conducted with the miniKanren from \textit{The Reasoned Schemer, 
+2nd Edition}.
 
-The unfairness of disjunction is not unawared. (KC: discuss existing works, 
-including the monad paper and Seres's paper).
+\subsection{fairness}
 
+A disjunction is fair if when a corresponding goal is queried, answers of 
+lower costs come first. The \emph{cost} of an answer the number of relation 
+applications needed to find the answer. This idea is borrowed from Silvija 
+Seres's work [*].
 
-% ---from here to the end of this section are materials for this section---
+Interleaving DFS, the search strategy of TRS2 miniKanren, is not fair. Among 
+the search strategies we devised, biDFS is not fair, but is more fair than 
+iDFS. And BFS is fair.
 
+\subsection{related works}
 
-% Compare with Backtracking, Interleaving, and Terminating Monad Transformers
-The \texttt{interleaving} operator has trouble with \texttt{nevero}. Its 
-\texttt{conde} suffers from unfairness, but biDFS and BFS does not. This paper 
-defines \textit{unfairness} as: "a non-deterministic choice between two 
-alternatives tries every solution from the first alternative before any 
-solution from the second alternative".
-
-However, like Seres's work, this search cannot handle infinite failure.
-
-% Compare with The Algebra of Logic Programming by Seresall
-Seres's work is in Haskell, hence having an easy implementation of stream:
-List. Our work is in Scheme. So we have to be explicit about lazyness.
-Her definition of fairness is: "a fair search strategy would share the 
-computation effort more evenly between the two branches of the computation of 
-\texttt{||}, and a fair selection rule would allow one to chose the
-literals in a different order."
-
-Her interleaving DFS is the same as the interleaving in the monad paper, but 
-they are different from what's known as iDFS in miniKanren community.
-
-Her implementation of fair disjunction cannot handle nevero (or "infinite 
-failure" in her terminology): "Note that this implementation of operators does 
-not give breadth-first search of the search tree; it deals with infinite 
-success but not with infinite failure. Even in the interleaved implementation, 
-the first element of the answer list has to be computed before we can switch 
-branches; if this takes an infinite number of steps the other branch will never
-be reached."
-
-And her streams are all infinitely long, hence querying all answers doesn't 
-terminate.
-
-
-% Observation:
-Stream cannot model \texttt{nevero}... The system knows a stream by nevero has no end, but doesn't know the stream will never produce an item.
-
-%The version of miniKanren in \textit{The Reasoned Schemer, 2nd Edition} features
-%an efficient and complete search strategy -- interleaving depth-first search (iDFS).
-%iDFS biases toward left \texttt{conde} lines. So miniKanren programmers sometimes need to
-%organize their \texttt{conde} lines carefully. We propose and implement two search strategies,
-%breadth-first search (BFS) and balanced interleaving DFS (biDFS). With either of these
-%search strategy, miniKanren becomes less sensitive to the order of \texttt{conde} lines. 
+The unfairness of disjunction has been noticed by Seres et al. Their complete 
+and fair search strategy is also named breadth-first search. Their BFS 
+is fair and is similar to ours. However, their Haskell implementation cannot be 
+translated to Scheme directly. This is partially due to the difference if 
+calling convensions of host languages. Another reason is that their search 
+space are infinite even when no answers exists. This is not feasible 
+in miniKanren, where users can query all answers. 
 
 % TODO: summarize following sections) Section 2 explains why iDFS biases toward 
 % left \texttt{conde} clauses. Section 3 is about the biDFS. Section 4 is 
 % about BFS.
 
-\section{\texttt{disj} is unfair}
+\section{representation of search space}
+
+``Stream'' is often used to name the representation of search space in 
+miniKanren. However, the search space is more like a stream of list, 
+because the information that a stream has no \texttt{car} is employed in all 
+complete miniKanren search strategies to redirect search effort. If the search 
+space is a normal stream, the information should have been used in a more 
+trivial way. 
+
+In the rest of this paper, we call the \texttt{car}s of a stream 
+its \textit{mature part}, and the last \texttt{cdr} its \textit{immature part}.
+
+\section{why disj is unfair}
 
 The multiarity disjuction operator \texttt{disj} combine its sub-goals with 
-\texttt{disj2} right associatively. \texttt{disj2} is fair in the sence that it 
-allocates computational effort evenly to its two sub-goals. Unfortunately, the 
-fairness of \texttt{disj2} leads to the unfairness of \texttt{disj}, because the 
-first sub-goal of \texttt{disj} consumes half of all computational effort.
+\texttt{disj2}, right associatively. \texttt{disj2} is fair in the sence that 
+it allocates computational effort evenly to its two sub-goals. Unfortunately, 
+the way how \texttt{disj2} achieves fairness leads to the unfairness of 
+\texttt{disj}. The core functionality of \texttt{disj2} is completed by 
+\texttt{append-inf} (Fig.~ref{disj2-and-append-inf}). When both input streams 
+are infinite, the resulting mature part contains only the mature part of 
+\texttt{s-inf}. The whole \texttt{t-inf} goes to the resulting immature part. 
+However, \texttt{t-inf} and \texttt{s-inf} are swapped in the delayed recursive 
+call. Hence the search strategy spend computational effort evenly in two 
+appended streams. As \texttt{disj} applys \texttt{disj2} right associatively, 
+the left clauses are more frequently explored.
 
-% below are materials.
-
-\texttt{conde} clauses are combined by \texttt{disj2}, right associatively. The
-core functionality of \texttt{disj2} is completed by \texttt{append-inf} (Fig.~
-ref{disj2-and-append-inf}). When both input streams are infinite, the resulting
-mature part contains only the mature part of \texttt{s-inf}. The whole
-\texttt{t-inf} goes to the resulting immature part. However, \texttt{t-inf} and
-\texttt{s-inf} are swapped in the delayed recursive call. Hence the search
-strategy spend computational effort evenly in two appended streams. As
-\texttt{disj2} is right associative, the left clauses are nested in less calls
-to \texttt{append-inf}, which implies that they are more likeyly being
-computed.
-
-% \begin{figure}
-%   \lstinputlisting{Figures/disj2.rkt}
-%   \caption{\texttt{disj2} and \texttt{append-inf}}
-%   \label{disj2-and-append-inf}
-% \end{figure}
+\begin{figure}
+  \lstinputlisting{Figures/disj2.rkt}
+  \caption{\texttt{disj2} and \texttt{append-inf}}
+  \label{disj2-and-append-inf}
+\end{figure}
  
 \section{balanced interleaving DFS}
 
@@ -181,18 +160,16 @@ into two even half and pass them to the continuation parameter \texttt{k}.
 
 \section{breadth-first search}
 
-In this section we change the search strategy to breadth-first search and 
-optimize it. The whole process is completed in two steps. In the first step, 
-from mk-0 to mk-1, BFS is introduced. In the second step, mk-1 to mk-3, BFS is 
-optimized. The initial version, \texttt{mk-0}, is exactly the version in 
+In this section we change the search strategy to \textit{breadth-first search} 
+and optimize it. The whole process is completed in two steps. In the first 
+step, from mk-0 to mk-1, BFS is introduced. In the second step, mk-1 to mk-3, 
+BFS is optimized. The initial version, \texttt{mk-0}, is exactly the version in 
 \emph{The Reasoned Schemer, 2nd Edition}.
 
 \subsection{cost of answers}
 
 %TODO the meaning of resolution step in Silvija Seres's paper
 
-The \emph{cost} of an answer is the number of relation applications needed to
-find the answer. This idea is borrowed from Silvija Seres's work [*].
 Now we illustrate the costs of answers by running a miniKanren relation.
 Fig.~\ref{def-repeato} defines the relation \texttt{repeato} that 
 relates a term \texttt{x} with a list whose elements are all \texttt{x}s.
