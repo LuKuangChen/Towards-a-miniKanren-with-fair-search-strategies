@@ -1,15 +1,12 @@
 #lang racket
 (provide (all-defined-out))
-#| mk-fair |#
+#| mk-bd |#
 #|
 
-This version is less fair than the previous versions,
-but it is almost as efficient as TRS2 mk.
+based on mk-0
 
-The core idea lies in a helper function append-inf*.
-It takes a list of streams and returns one. The input
-streams are combined with append-inf 'balancedly'
-(in the sense of balanced binary tree).
+balanced disjunction
+
 |#
 
 (define var (lambda (x) (vector x)))
@@ -62,24 +59,9 @@ streams are combined with append-inf 'balancedly'
   (lambda (s)
     '()))
 
-;; 1 of 4 changes
-(define (disj* . g*)
+(define (disj2 g1 g2)
   (lambda (s)
-    (append-inf* (map (λ (g) (g s)) g*))))
-
-;; 2 of 4 changes
-#| (Listof Stream) → Stream |#
-;; keep spliting the list at the middle
-(define (append-inf* los)
-  (cond
-    [(null? los) '()]
-    [else
-     (let A ([los los])
-       (cond
-         [(null? (cdr los)) (car los)]
-         [else (let ([n (quotient (length los) 2)])
-                 (append-inf (A (take los n))
-                   (A (drop los n))))]))]))
+    (append-inf (g1 s) (g2 s))))
 
 (define (append-inf s-inf t-inf)
   (cond
@@ -104,19 +86,14 @@ streams are combined with append-inf 'balancedly'
   (lambda (s)
     (append-map-inf g2 (g1 s))))
 
-;; 3 of 4 changes
-;; make use of append-inf so that conj is also fair
 (define (append-map-inf g s-inf)
-  (let loop ([s-inf s-inf]
-             [los '()])
-    (cond
-      ((pair? s-inf)
-       (loop (cdr s-inf)
-         (cons (g (car s-inf)) los)))
-      ((null? s-inf) (append-inf* los))
-      (else (append-inf*
-              (cons (λ () (append-map-inf g (s-inf)))
-                los))))))
+  (cond
+    ((null? s-inf) '())
+    ((pair? s-inf)
+     (append-inf (g (car s-inf))
+       (append-map-inf g (cdr s-inf))))
+    (else (lambda () 
+            (append-map-inf g (s-inf))))))
 
 (define (call/fresh name f)
   (f (var name)))
@@ -185,13 +162,28 @@ streams are combined with append-inf 'balancedly'
         (else (lambda ()
                 (loop (s-inf))))))))
 
+(define (split ls k)
+  (cond
+    [(null? ls) (k '() '())]
+    [else (split (cdr ls)
+            (λ (l1 l2)
+              (k l2 (cons (car ls) l1))))]))
+
+(define (disj* gs)
+  (cond
+    [(null? gs) fail]
+    [(null? (cdr gs)) (car gs)]
+    [else
+     (split gs
+       (λ (gs1 gs2)
+         (disj2 (disj* gs1)
+                (disj* gs2))))]))
 
 ;;; Here are the key parts of Appendix A
 
-;; 4 of 4 changes
 (define-syntax disj
   (syntax-rules ()
-    ((disj g0 g ...) (disj* g0 g ...))))
+    [(disj g ...) (disj* (list g ...))]))
 
 (define-syntax conj
   (syntax-rules ()
