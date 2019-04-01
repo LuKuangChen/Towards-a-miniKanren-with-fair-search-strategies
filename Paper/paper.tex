@@ -83,96 +83,34 @@ affect the efficiency and the answer order of known miniKanren programs. The
 experiment is conducted with the miniKanren from \textit{The Reasoned Schemer, 
 2nd Edition}.
 
-\subsection{fairness}
-
-A disjunction is fair if when a corresponding goal is queried, answers of 
-lower costs come first. The \emph{cost} of an answer the number of relation 
-applications needed to find the answer. This idea is borrowed from Silvija 
-Seres's work [*].
-
-Interleaving DFS, the search strategy of TRS2 miniKanren, is not fair. Among 
-the search strategies we devised, biDFS is not fair, but is more fair than 
-iDFS. And BFS is fair.
-
-\subsection{related works}
+\section{related works}
 
 The unfairness of disjunction has been noticed by Seres et al. Their complete 
 and fair search strategy is also named breadth-first search. Their BFS 
 is fair and is similar to ours. However, their Haskell implementation cannot be 
-translated to Scheme directly. This is partially due to the difference if 
-calling convensions of host languages. Another reason is that their search 
-space are infinite even when no answers exists. This is not feasible 
-in miniKanren, where users can query all answers. 
+translated to Scheme directly. This is partially due to the difference in 
+calling convensions of host languages. Besides, their search space are infinite 
+even when no answers exists. This is not feasible in miniKanren, where 
+users can query all answers.
 
-% TODO: summarize following sections) Section 2 explains why iDFS biases toward 
-% left \texttt{conde} clauses. Section 3 is about the biDFS. Section 4 is 
-% about BFS.
 
-\section{representation of search space}
 
-``Stream'' is often used to name the representation of search space in 
-miniKanren. However, the search space is more like a stream of list, 
-because the information that a stream has no \texttt{car} is employed in all 
-complete miniKanren search strategies to redirect search effort. If the search 
-space is a normal stream, the information should have been used in a more 
-trivial way. 
+\section{fairness}
 
-In the rest of this paper, we call the \texttt{car}s of a stream 
-its \textit{mature part}, and the last \texttt{cdr} its \textit{immature part}.
+% KC: I changed the cost definition from ``... needed to *find* the answer''
+%                                     to ``... needed to *verify* the answer''
 
-\section{why disj is unfair}
+A disjunction is fair if when a corresponding goal is queried, answers of 
+lower costs come first. The \emph{cost} of an answer the number of relation 
+applications needed to verify the answer. Now we illustrate the costs of answers 
+by running a miniKanren relation. Fig.~\ref{def-repeato} defines the relation 
+\texttt{repeato} that relates a term \texttt{x} with a list whose elements are 
+all \texttt{x}s.
 
-The multiarity disjuction operator \texttt{disj} combine its sub-goals with 
-\texttt{disj2}, right associatively. \texttt{disj2} is fair in the sence that 
-it allocates computational effort evenly to its two sub-goals. Unfortunately, 
-the way how \texttt{disj2} achieves fairness leads to the unfairness of 
-\texttt{disj}. The core functionality of \texttt{disj2} is completed by 
-\texttt{append-inf} (Fig.~ref{disj2-and-append-inf}). When both input streams 
-are infinite, the resulting mature part contains only the mature part of 
-\texttt{s-inf}. The whole \texttt{t-inf} goes to the resulting immature part. 
-However, \texttt{t-inf} and \texttt{s-inf} are swapped in the delayed recursive 
-call. Hence the search strategy spend computational effort evenly in two 
-appended streams. As \texttt{disj} applys \texttt{disj2} right associatively, 
-the left clauses are more frequently explored.
-
-\begin{figure}
-  \lstinputlisting{Figures/disj2.rkt}
-  \caption{\texttt{disj2} and \texttt{append-inf}}
-  \label{disj2-and-append-inf}
-\end{figure}
- 
-\section{balanced interleaving DFS}
-
-A \texttt{conde} expression looks like a binary tree, if we consider 
-\texttt{disj2}s as internal nodes and \texttt{conde} clauses as a terminal 
-nodes. In fact, each of them is one of the most unbalanced binary trees. The 
-basic idea of our first solution, balanced interleaving DFS, is to make the 
-tree balanced. We introduce a function \texttt{disj*} and its helper 
-\texttt{split} (Fig.~\ref{disj*}). \texttt{disj*} essentially construct a 
-balanced \texttt{disj2} tree. \texttt{split} splits elements of \texttt{ls} 
-into two even half and pass them to the continuation parameter \texttt{k}.
-
-\begin{figure}
-  \lstinputlisting{Figures/disj*.rkt}
-  \caption{\texttt{disj*}}
-  \label{disj*}
-\end{figure}
-
-\section{breadth-first search}
-
-In this section we change the search strategy to \textit{breadth-first search} 
-and optimize it. The whole process is completed in two steps. In the first 
-step, from mk-0 to mk-1, BFS is introduced. In the second step, mk-1 to mk-3, 
-BFS is optimized. The initial version, \texttt{mk-0}, is exactly the version in 
-\emph{The Reasoned Schemer, 2nd Edition}.
-
-\subsection{cost of answers}
-
-%TODO the meaning of resolution step in Silvija Seres's paper
-
-Now we illustrate the costs of answers by running a miniKanren relation.
-Fig.~\ref{def-repeato} defines the relation \texttt{repeato} that 
-relates a term \texttt{x} with a list whose elements are all \texttt{x}s.
+% COmmented out: This idea is borrowed from Silvija Seres's work [*].
+% KC: Seres didn't phrase it this way.
+%   We might need to compare our definition with Seres's one, instead of 
+%   saying the idea is borrowed.
 
 \begin{figure}
   \lstinputlisting{Figures/defrel-repeato.rkt}
@@ -189,42 +127,100 @@ Consider the following \texttt{run} of \texttt{repeato}.
 
 The above \texttt{run} generates 4 answers. All are lists of \texttt{*}s.
 The order of the answers reflects the order miniKanren discovers them:
-the first answer in the list is first discovered. This result is not suprising:
+the first answer in the list is first discovered. This order is not suprising:
 to generate the first answer, \texttt{'()}, miniKanren needs to apply
 \texttt{repeato} only once and the later answers need more recursive
 applications. In this example, the cost of each answer is the same as
 one more than the number of \texttt{*}s: the cost of \texttt{'()} is 1,
 the cost of \texttt{'(*)} is 2, and so on.
 
-A list of answer is in the \emph{cost-respecting} order if no answer occurs
-before another answer of a lower cost. In the above example, the answers are
-cost-respecting. The iDFS search, however, does not generate cost-respecting
-answers in general. As an example, consider the following \texttt{run} of
-\texttt{repeato}.
+A query result (list of answers) is in the \emph{cost-respecting} order if no 
+answer occurs before another answer of a lower cost. In the above example, the 
+result is cost-respecting. The iDFS search, however, does not generate 
+cost-respecting answers in general. As an example, consider the following 
+\texttt{run} of \texttt{repeato}.
+
 \begin{center}
   \begin{tabular}{c}
    \lstinputlisting{Figures/run-conde-repeato-iDFS.rkt}
    \end{tabular}
 \end{center}
 
-The results are not cost-respecting. For example, \texttt{'(a a)} occurs before
+The results is not cost-respecting. For example, \texttt{'(a a)} occurs before
 \texttt{'(b)} while \texttt{'(a a)} is associated with a higher cost. 
 iDFS strategy is the cause, since it prioritizes the first \texttt{conde} case
 considerablely. When every \texttt{conde} case are equally productive, the iDFS
 strategy takes $1/2^{i}$ answers from the $i$-th case, except the last case,
-which share the same portion as the second last one.
+which share the same portion as the second last one. In contrast, the same run 
+with BFS produces answers in an expected order.
 
-%TODO relation *application*
+\begin{center}
+  \begin{tabular}{c}
+   \lstinputlisting{Figures/run-conde-repeato-BFS.rkt}
+   \end{tabular}
+\end{center}
 
-For the above \texttt{run}, both search strategies produces answers in 
-increasing order of costs, i.e. both of them are \emph{cost-respecting}. In 
-more complicated cases, however, interleaving DFS might not produce answers in 
-cost-repecting order. For instance, with iDFS the \texttt{run} in Fig.~
-\ref{conde-repeato-iDFS} produces answers in a seemingly random order. In 
-contrast, the same run with BFS produces answers in an expected order (Fig.~
-\ref{conde-repeato-BFS}).
 
-\lstinputlisting{Figures/run-conde-repeato-BFS.rkt}
+% \section{representation of search space}
+% 
+% ``Stream'' is often used to name the representation of search space in 
+% miniKanren. However, the search space is more like a stream of list, because the 
+% information that a stream is thunk is employed to redirect search effort. If the 
+% search space is a normal stream, the information should have been used in a more 
+% trivial way. 
+% 
+% In the rest of this paper, we call the \texttt{car}s of a stream 
+% its \textit{mature part}, and the last \texttt{cdr} its \textit{immature part}.
+% 
+% \section{why disj is unfair}
+% 
+% The multiarity disjuction operator \texttt{disj} combine its sub-goals with 
+% \texttt{disj2}, right associatively. Interestingly, although \texttt{disj} is 
+% unfair, \texttt{disj2} is fair. The core functionality of \texttt{disj2} is 
+% completed by \texttt{append-inf} (Fig.~ref{disj2-and-append-inf}). When both 
+% input streams are infinite, the resulting mature part contains only the mature 
+% part of \texttt{s-inf}. The whole \texttt{t-inf} goes to the resulting immature 
+% part. However, \texttt{t-inf} and \texttt{s-inf} are swapped in the delayed 
+% recursive call. Hence the search strategy spend computational effort evenly in 
+% two appended streams. As \texttt{disj} applys \texttt{disj2} right 
+% associatively, the left clauses are more frequently explored.
+% 
+% \begin{figure}
+%   \lstinputlisting{Figures/disj2.rkt}
+%   \caption{\texttt{disj2} and \texttt{append-inf}}
+%   \label{disj2-and-append-inf}
+% \end{figure}
+ 
+\section{balanced interleaving DFS}
+
+Our first solution, balanced interleaving DFS, is based on the observation that 
+a disjuction can be viewed as a binary tree, where \texttt{disj2}s are nodes 
+and sub-goals are leaves. In iDFS, the tree is in one of the most unbalanced 
+forms, because \texttt{disj} applys \texttt{disj2} right associatively. As 
+\texttt{disj2} allocates computational effort interleavingly to its two 
+sub-goals, a disjunction allocates half computational effort to its first 
+sub-goal, quater to the second, eighth to the third, and so on.
+
+The key idea of biDFS is to make disjunction trees balanced 
+(Fig.~\ref{balanced-disj}). We introduce a function \texttt{disj*} and its 
+helper \texttt{split}, and change the \texttt{disj} macro to call 
+\texttt{disj*} immediately. \texttt{disj*} essentially construct a balanced 
+\texttt{disj2} tree. The \texttt{split} helper splits elements of \texttt{ls} 
+into two lists of roughly the same length, then apply \texttt{k} to them.
+
+\begin{figure}
+  \lstinputlisting{Figures/balanced-disj.rkt}
+  \caption{\texttt{balanced-disj}}
+  \label{balanced-disj}
+\end{figure}
+
+\section{breadth-first search}
+
+In this section we change the search strategy to \textit{breadth-first search} 
+and optimize it. The whole process is completed in two steps. In the first 
+step, from mk-0 to mk-1, BFS is introduced. In the second step, mk-1 to mk-3, 
+BFS is optimized. The initial version, \texttt{mk-0}, is exactly the version in 
+\emph{The Reasoned Schemer, 2nd Edition}.
 
 \subsection{from \texttt{mk-0} to \texttt{mk-1}}
 
