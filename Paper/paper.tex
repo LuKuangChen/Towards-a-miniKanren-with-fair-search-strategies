@@ -73,8 +73,8 @@ disjunctive operator allocates half computational effort to its first goal,
 quater to the second, eighth to the third, and so on. The unfairness provides 
 both opportunity and burden: miniKanren users can place more frequently used 
 goal at the beginning to optimize their programs; however, it might be a 
-catastrophe if a goal that generate many useless partial solution is placed 
-before more important goals. Seasoned miniKanreners usually know how to utilize 
+catastrophe if a goal that generate many useless states is placed before more 
+important goals. Seasoned miniKanreners usually know how to utilize 
 the unfairness to optimize their programs. However, we believe search strategies 
 that is less sensitive to goal order can also be useful to little miniKanreners 
 as well as seansoned ones. We propose two such search strategies, balanced 
@@ -85,13 +85,15 @@ experiment is conducted with the miniKanren from \textit{The Reasoned Schemer,
 
 \section{related works}
 
-The unfairness of disjunction has been noticed by Seres et al. Their complete 
-and fair search strategy is also named breadth-first search. Their BFS 
-is fair and is similar to ours. However, their Haskell implementation cannot be 
-translated to Scheme directly. This is partially due to the difference in 
-calling convensions of host languages. Besides, their search space are infinite 
-even when no answers exists. This is not feasible in miniKanren, where 
-users can query all answers.
+% TODO rewrite, because Seres did provide a solution for possibly finite stream
+% The unfairness of disjunction has been noticed by Seres et 
+% al~\citet{seres1999algebra}. Their complete 
+% and fair search strategy is also named breadth-first search. Their BFS 
+% is fair and is similar to ours. However, their Haskell implementation cannot be 
+% translated to Scheme directly. This is partially due to the difference in 
+% calling convensions of host languages. Besides, their search space are infinite 
+% even when no answers exists. This is not feasible in miniKanren, where 
+% users can query all answers.
 
 
 
@@ -100,10 +102,10 @@ users can query all answers.
 % KC: I changed the cost definition from ``... needed to *find* the answer''
 %                                     to ``... needed to *verify* the answer''
 
-A disjunction is fair if when a corresponding goal is queried, answers of 
-lower costs come first. The \emph{cost} of an answer the number of relation 
-applications needed to verify the answer. Now we illustrate the costs of answers 
-by running a miniKanren relation. Fig.~\ref{def-repeato} defines the relation 
+A search strategy is \emph{fair} if answers of lower costs always come first. 
+The \emph{cost} of an answer the number of relation applications needed to 
+verify the answer. Now we illustrate the costs of answers by running a 
+miniKanren relation. Fig.~\ref{def-repeato} defines the relation 
 \texttt{repeato} that relates a term \texttt{x} with a list whose elements are 
 all \texttt{x}s.
 
@@ -129,16 +131,19 @@ The above \texttt{run} generates 4 answers. All are lists of \texttt{*}s.
 The order of the answers reflects the order miniKanren discovers them:
 the first answer in the list is first discovered. This order is not suprising:
 to generate the first answer, \texttt{'()}, miniKanren needs to apply
-\texttt{repeato} only once and the later answers need more recursive
+\texttt{repeato} only once and the later answers need more relation
 applications. In this example, the cost of each answer is the same as
 one more than the number of \texttt{*}s: the cost of \texttt{'()} is 1,
 the cost of \texttt{'(*)} is 2, and so on.
 
-A query result (list of answers) is in the \emph{cost-respecting} order if no 
-answer occurs before another answer of a lower cost. In the above example, the 
-result is cost-respecting. The iDFS search, however, does not generate 
-cost-respecting answers in general. As an example, consider the following 
-\texttt{run} of \texttt{repeato}.
+% A query result (list of answers) is in the \emph{cost-respecting} order if no 
+% answer occurs before another answer of a lower cost. In the above example, the 
+% result is cost-respecting. The iDFS search, however, does not generate 
+% cost-respecting answers in general. As an example, consider the following 
+% \texttt{run} of \texttt{repeato}.
+
+In the above example, all search strategies look fair. However, the following 
+example points out that iDFS is not fair.
 
 \begin{center}
   \begin{tabular}{c}
@@ -146,13 +151,13 @@ cost-respecting answers in general. As an example, consider the following
    \end{tabular}
 \end{center}
 
-The results is not cost-respecting. For example, \texttt{'(a a)} occurs before
-\texttt{'(b)} while \texttt{'(a a)} is associated with a higher cost. 
-iDFS strategy is the cause, since it prioritizes the first \texttt{conde} case
-considerablely. When every \texttt{conde} case are equally productive, the iDFS
-strategy takes $1/2^{i}$ answers from the $i$-th case, except the last case,
-which share the same portion as the second last one. In contrast, the same run 
-with BFS produces answers in an expected order.
+With iDFS, \texttt{'(a a)} occurs before \texttt{'(b)} while \texttt{'(a a)} is 
+associated with a higher cost. iDFS strategy is the cause, since it prioritizes 
+the first \texttt{conde} case considerablely. When every \texttt{conde} case 
+are equally productive, the iDFS strategy takes $1/2^{i}$ answers from the 
+$i$-th case, except the last case, which share the same portion as the second 
+last one. In contrast, the same run with BFS produces answers in an expected 
+order.
 
 \begin{center}
   \begin{tabular}{c}
@@ -193,20 +198,23 @@ with BFS produces answers in an expected order.
  
 \section{balanced interleaving DFS}
 
-Our first solution, balanced interleaving DFS, is based on the observation that 
-a disjuction can be viewed as a binary tree, where \texttt{disj2}s are nodes 
-and sub-goals are leaves. In iDFS, the tree is in one of the most unbalanced 
-forms, because \texttt{disj} applys \texttt{disj2} right associatively. As 
-\texttt{disj2} allocates computational effort interleavingly to its two 
-sub-goals, a disjunction allocates half computational effort to its first 
-sub-goal, quater to the second, eighth to the third, and so on.
+Our first solution, balanced interleaving DFS (biDFS), is not fair as well. 
+However, it is less sensitive to goal order in disjucntion and is as efficient 
+as iDFS. This search strategy is based on the  observations that a disjuction 
+can be viewed as a binary tree, where \texttt{disj2}s are nodes 
+and sub-goals are leaves, and that the position of a leaf has direct relation 
+with its priority -- the deeper a leaf, the lower computational effort it is 
+shared. In iDFS, the tree is in one of the most unbalanced forms, because 
+\texttt{disj} applys \texttt{disj2} right associatively. Hence the goal order 
+is very important. The reason why the tree shape can determine priority is that 
+\texttt{disj2} allocates computational effort evenly to its two sub-goals.
 
-The key idea of biDFS is to make disjunction trees balanced 
-(Fig.~\ref{balanced-disj}). We introduce a function \texttt{disj*} and its 
-helper \texttt{split}, and change the \texttt{disj} macro to call 
-\texttt{disj*} immediately. \texttt{disj*} essentially construct a balanced 
-\texttt{disj2} tree. The \texttt{split} helper splits elements of \texttt{ls} 
-into two lists of roughly the same length, then apply \texttt{k} to them.
+The key idea of biDFS is to make the tree balanced (Fig.~\ref{balanced-disj}). 
+We introduce a function \texttt{disj*} and its helper \texttt{split}, and change 
+the \texttt{disj} macro to call \texttt{disj*} immediately. \texttt{disj*} 
+essentially construct a balanced \texttt{disj2} tree. The \texttt{split} helper 
+splits elements of \texttt{ls} into two lists of roughly the same length, then 
+apply \texttt{k} to them.
 
 \begin{figure}
   \lstinputlisting{Figures/balanced-disj.rkt}
@@ -216,25 +224,44 @@ into two lists of roughly the same length, then apply \texttt{k} to them.
 
 \section{breadth-first search}
 
-In this section we change the search strategy to \textit{breadth-first search} 
-and optimize it. The whole process is completed in two steps. In the first 
-step, from mk-0 to mk-1, BFS is introduced. In the second step, mk-1 to mk-3, 
-BFS is optimized. The initial version, \texttt{mk-0}, is exactly the version in 
-\emph{The Reasoned Schemer, 2nd Edition}.
+%TODO compare with Seres's approach
 
-\subsection{from \texttt{mk-0} to \texttt{mk-1}}
+Breadth-first search (BFS) is fair. Our BFS is similar to the one by Seres et 
+al \citet{seres1999algebra}. We conjecture that the two strategies produce
+answers in the same order. ;; need more comparision
 
-In \texttt{mk-0} and \texttt{mk-1}, search spaces are represented by streams of 
-answers. Streams can be finite or infinite. Finite streams are just lists. And 
-infinite streams are improper lists, whose last \texttt{cdr} is a thunk 
-returning another stream. We call the \texttt{car}s the \emph{mature} part, and 
-the last \texttt{cdr} the \emph{immature} part. 
+In the first subsection, we change the search strategy from iDFS to BFS. In the 
+second subsection we optimize the search engine by using a queue to manage the 
+search order. The two subsections corresponds to two new version of miniKanren, 
+\texttt{mk-1} and \texttt{mk-2}. We refer to the original version from TRS2 as 
+\texttt{mk-0}. 
 
-Streams are cost respective when they are initially constructed by \texttt{==}. 
-However, the \texttt{mk-0} version of \texttt{append-inf} (Fig.~\ref{append-
-inf-0}) breaks cost respectiveness if its first input stream, \texttt{s-inf}, 
-is infinite. The resulting mature part contains only the mature part of 
-\texttt{s-inf}. The whole \texttt{t-inf} goes to the resulting immature part.
+% In this section we change the search strategy to \textit{breadth-first search} 
+% and optimize it. The whole process is completed in two steps. In the first 
+% step, from mk-0 to mk-1, BFS is introduced. In the second step, mk-1 to mk-3, 
+% BFS is optimized. The initial version, \texttt{mk-0}, is exactly the version in 
+% \emph{The Reasoned Schemer, 2nd Edition}.
+
+\subsection{change search strategy from iDFS to BFS}
+
+In both \texttt{mk-0} and \texttt{mk-1}, search spaces are represented by 
+streams of  answers. The thunky streams in \texttt{mk-0} denote delayed 
+computation, however, they do not necessary mean an increment in cost. We use 
+the same kind of stream in \texttt{mk-1} but only put thunk at those places 
+where the cost of following answers is increased by one.
+
+To ease discussion, we call the \texttt{car}s of an stream its \emph{mature} 
+part, and the last \texttt{cdr} the \emph{immature} part. When the stream is 
+definitely finite, its immature part is an empty list, otherwise, it is a 
+thunk. We sometimes say a stream is immature to mean its mature part is empty.
+
+Streams denote cost correctly when they are constructed by \texttt{==}, 
+\texttt{succeed}, and \texttt{fail}. However, the \texttt{mk-0} version of 
+\texttt{append-inf} (Fig.~\ref{append-inf-0}) breaks cost respectiveness if its 
+first input stream, \texttt{s-inf},  is infinite. The resulting mature part 
+contains only the mature part of \texttt{s-inf}. If we want to encode the 
+cost information correctly, the resulting mature part should also contains the 
+mature part of \texttt{t-inf}.
 
 \begin{figure}
 	 \lstinputlisting{Figures/append-inf-0.rkt}	
@@ -243,11 +270,11 @@ is infinite. The resulting mature part contains only the mature part of
 \end{figure}
 
 The \texttt{mk-1} version of \texttt{append-inf} (Fig.~\ref{append-inf-1}) 
-restores cost-respectiveness by combining the mature parts in the fashion of 
-\texttt{append}. This \texttt{append-inf} calls its helper immediately, with 
-the first argument, \texttt{s?}, set to \texttt{\#{}t}, which means \texttt{s-
-inf} in the helper is the \texttt{s-inf} in the driver. Two streams are swapped 
-in the third \texttt{cond} clause, with \texttt{s?} flipped accordingly.
+gain fairness by combining the mature parts in the fashion of \texttt{append}. 
+This \texttt{append-inf} calls its helper immediately, with the first argument, 
+\texttt{s?}, set to \texttt{\#{}t}, which means \texttt{s-inf} in the helper is 
+the \texttt{s-inf} in the driver. Two streams are swapped in the third 
+\texttt{cond} clause, with \texttt{s?} flipped accordingly.
 
 \begin{figure}
 	 \lstinputlisting{Figures/append-inf-1.rkt}	
@@ -256,25 +283,26 @@ in the third \texttt{cond} clause, with \texttt{s?} flipped accordingly.
 \end{figure}
 
 \texttt{mk-1} is not efficient in two aspects. \texttt{append-inf} need to copy 
-all \texttt{cons} cells of two input streams when the first stream has a non-
-trivial immature part. Besides, \texttt{mk-1} computes answers of the same cost 
+all \texttt{cons} cells of \emph{both} input streams when the first stream is 
+possibly infinite. Besides, \texttt{mk-1} computes answers of the same cost
 at once, even when only a portion is queried. We solves the two problems in the 
 next subsections.
 
-\subsection{\texttt{mk-3}, optimized breadth-first search}
+\subsection{optimize breadth-first search}
 
-We avoid generating same-cost answers at once by expressing BFS with a queue. 
-The elements of the queue are delayed computation, represented by thunks. Every 
-\texttt{mk-1} stream has zero or one thunk, so we have no interesting way to 
-manage it. Therefore we change the representation of immature parts from thunks 
-to lists of thunks. As as consequence, we also change the way to combine mature 
-and immature part from \texttt{append} to \texttt{cons}. 
+We avoid generating same-cost answers at once by expressing BFS with a queue, 
+whose elements thunks that return a new stream. Every \texttt{mk-1} stream has 
+zero or one thunk, so we cannot manage it with queue in interesting 
+way. Therefore we change the representation of immature parts from thunks to 
+lists of thunks. As as consequence, we also change the way to combine mature and 
+immature part from \texttt{append} to \texttt{cons}. 
 
 After applying this two changes, stream representation becomes more 
-complicated. It motivates us to set up an interface between stream functions 
+complicated. It motivates us to set up an interface between stream 
 and the rest of miniKanren. Listed in Fig.~\ref{interface} are all functions 
 being aware of the stream representation, but \texttt{take-inf} and its helper 
-function, which is explained later. The first three functions are constructors: 
+function, which are explained later. The first three functions are 
+constructors: 
 \texttt{empty-inf} constructs an empty stream; \texttt{unit-mature-inf} 
 constructs a stream with one mature solution; \texttt{unit-immature-inf} 
 constructs a stream with one thunk. The \texttt{append-inf} in \texttt{mk-3} is 
@@ -286,8 +314,8 @@ if we construct the thunk when the old immature part is an empty list, the
 resulting stream might be infinitely unproductive. Beside, all solutions of the 
 next lowest cost in \texttt{s-inf} must be computed when the thunk is invoked. 
 However sometimes only a portion of these solutions is required to answer a 
-query. To avoid the trouble and the advanced computation, we choose to create a 
-new thunk for every existing thunk. The next four functions are used only by 
+query. To avoid the trouble and the too-early computation, we choose to create 
+a new thunk for every existing thunk. The next four functions are used only by 
 \texttt{ifte} and \texttt{once}. Uninterested readers might skip them. 
 \texttt{null-inf?} checks whether a stream is exausted. \texttt{mature-inf?} 
 checks whether a stream has some mature solutions. \texttt{car-inf} takes the 
@@ -301,7 +329,6 @@ stream to do more computation.
 	 \label{interface}
 \end{figure}
 
-
 The last interesting function is \texttt{take-inf} (Fig.~\ref{take-inf-3-1}). 
 The parameter \texttt{vs} is a list of solutions. The next two parameters, 
 \texttt{P} and \texttt{Q}, together represent a queue. The first two 
@@ -309,7 +336,7 @@ The parameter \texttt{vs} is a list of solutions. The next two parameters,
 The third line runs when we exaust all solutions. The forth line re-shape the 
 queue. The fifth and last line invoke the first thunk in the queue and use the 
 mature part of the resulting stream, \texttt{s-inf}, as the new \texttt{vs}, 
-and enqueuing \texttt{s-inf}'s thunks.
+and enqueuing \texttt{s-inf}'s thunks. 
 
 \begin{figure}
 	 \lstinputlisting{Figures/take-inf-3-1.rkt}	
@@ -323,7 +350,8 @@ and enqueuing \texttt{s-inf}'s thunks.
 
 \section*{acknowledgments}
 
-\section*{references}
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{citation}
 
 \end{document}
 
