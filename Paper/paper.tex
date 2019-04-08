@@ -68,9 +68,12 @@ allocate computational effort more fairly in all clauses.
 
 \section{introduction}
 
-When every sub-goal of a disjunction produces infinite states, the existing 
-disjunctive operator allocates half computational effort to its first goal, 
-quater to the second, eighth to the third, and so on. The unfairness provides 
+Interleaving DFS, the search strategy of \texttt{cond$^e$} in
+miniKanren~\citep{friedman_reasoned_2018}, allocates computational resource
+by the order in which the claueses are written. Each clause of a
+\texttt{cond$^e$} takes a half of the current resource and passes the other half
+to its following clauses, except for the last clause that takes all of current
+resource. 
 both opportunity and burden: miniKanren users can place more frequently used 
 goal at the beginning to optimize their programs; however, it might be a 
 catastrophe if a goal that generate many useless states is placed before more 
