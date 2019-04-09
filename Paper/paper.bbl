@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{1}
+\begin{thebibliography}{2}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -36,6 +36,17 @@
 \providecommand\bibinfo[2]{#2}
 \providecommand\natexlab[1]{#1}
 \providecommand\showeprint[2][]{arXiv:#2}
+
+\bibitem[\protect\citeauthoryear{Friedman, Byrd, Kiselyov, and Hemann}{Friedman
+  et~al\mbox{.}}{2018}]%
+        {friedman_reasoned_2018}
+\bibfield{author}{\bibinfo{person}{Daniel~P. Friedman},
+  \bibinfo{person}{William~E. Byrd}, \bibinfo{person}{Oleg Kiselyov}, {and}
+  \bibinfo{person}{Jason Hemann}.} \bibinfo{year}{2018}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{The {Reasoned} {Schemer}, {Second}
+  {Edition}}}.
+\newblock
+
 
 \bibitem[\protect\citeauthoryear{Seres, Spivey, and Hoare}{Seres
   et~al\mbox{.}}{1999}]%
