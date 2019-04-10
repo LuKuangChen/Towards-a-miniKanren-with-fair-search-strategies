@@ -29,24 +29,17 @@
 
 %%% NOTE %%%
 %
-% - deadline?
-%
-%   miniKanren workshop deadline May 15, 2018
+%  SUBMISSION DEADLINE: May 15, 2019
 %
 %%%%%%%%%%%%
 
 
-%TODO test cases: quine, '(I love you).
-
-%TODO 1. reformat LaTeX (80 chars per line)
-%TODO 2. stat quine
-%TODO 3. keep writing
-
-
 \newcommand{\conde}{\texttt{cond$^e$} } 
 
-% body
+
 \begin{document}
+% TODO how about making all disjunction trees complete by filling missing
+% leaves with nevero?
 
 \begin{abstract}
 
@@ -85,22 +78,7 @@ experiment is conducted with the miniKanren from \textit{The Reasoned Schemer,
 
 \section{related works}
 
-% TODO rewrite, because Seres did provide a solution for possibly finite stream
-% The unfairness of disjunction has been noticed by Seres et 
-% al~\citet{seres1999algebra}. Their complete 
-% and fair search strategy is also named breadth-first search. Their BFS 
-% is fair and is similar to ours. However, their Haskell implementation cannot be 
-% translated to Scheme directly. This is partially due to the difference in 
-% calling convensions of host languages. Besides, their search space are infinite 
-% even when no answers exists. This is not feasible in miniKanren, where 
-% users can query all answers.
-
-
-
 \section{fairness}
-
-% KC: I changed the cost definition from ``... needed to *find* the answer''
-%                                     to ``... needed to *verify* the answer''
 
 A search strategy is \emph{fair} if answers of lower costs always come first. 
 The \emph{cost} of an answer is the number of relation applications. Now we 
@@ -108,7 +86,7 @@ illustrate the costs of answers by running a miniKanren relation.
 Fig.~\ref{def-repeato} defines the relation \texttt{repeato} that relates a term 
 \texttt{x} with a list whose elements are all \texttt{x}s.
 
-% COmmented out: This idea is borrowed from Silvija Seres's work [*].
+% Commented out: This idea is borrowed from Silvija Seres's work [*].
 % KC: Seres didn't phrase it this way.
 %   We might need to compare our definition with Seres's one, instead of 
 %   saying the idea is borrowed.
@@ -291,8 +269,8 @@ next subsections.
 
 We avoid generating same-cost answers at once by expressing BFS with a queue, 
 whose elements thunks that return a new stream. Every \texttt{mk-1} stream has 
-zero or one thunk, so we cannot manage it with queue in interesting 
-way. Therefore we change the representation of immature parts from thunks to 
+zero or one thunk, so it is uninteresting to manage them with queue . Therefore 
+we change the representation of immature parts from thunks to 
 lists of thunks. As as consequence, we also change the way to combine mature and 
 immature part from \texttt{append} to \texttt{cons}. 
 
@@ -300,27 +278,33 @@ After applying this two changes, stream representation becomes more
 complicated. It motivates us to set up an interface between stream 
 and the rest of miniKanren. Listed in Fig.~\ref{interface} are all functions 
 being aware of the stream representation, but \texttt{take-inf} and its helper 
-function, which are explained later. The first three functions are 
-constructors: 
-\texttt{empty-inf} constructs an empty stream; \texttt{unit-mature-inf} 
-constructs a stream with one mature solution; \texttt{unit-immature-inf} 
-constructs a stream with one thunk. The \texttt{append-inf} in \texttt{mk-3} is 
-relatively straightforwared compared with the \texttt{mk-1} version. 
-\texttt{append-map-inf} is more tricky on how to construct the new immature 
-part. We can follow the approach in mk-0 and mk-1 -- create a new thunk which 
-invoke append-map-inf recursively when forced. But then we need to be careful: 
-if we construct the thunk when the old immature part is an empty list, the 
-resulting stream might be infinitely unproductive. Beside, all solutions of the 
-next lowest cost in \texttt{s-inf} must be computed when the thunk is invoked. 
-However sometimes only a portion of these solutions is required to answer a 
-query. To avoid the trouble and the too-early computation, we choose to create 
-a new thunk for every existing thunk. The next four functions are used only by 
-\texttt{ifte} and \texttt{once}. Uninterested readers might skip them. 
-\texttt{null-inf?} checks whether a stream is exausted. \texttt{mature-inf?} 
-checks whether a stream has some mature solutions. \texttt{car-inf} takes the 
-first solution out of a mature stream. \texttt{cdr-inf} drops the first 
-solution of a mature stream. Finally, \texttt{force-inf} forces an a immature 
-stream to do more computation.
+function, which are explained later. 
+
+The first three functions are constructors: \texttt{empty-inf} constructs an 
+empty stream; \texttt{unit-mature-inf} constructs a stream with one mature 
+solution; \texttt{unit-immature-inf} constructs a stream with one thunk. 
+
+The \texttt{append-inf} in \texttt{mk-3} is relatively straightforwared compared 
+with the \texttt{mk-1} version. \texttt{append-map-inf} is more tricky on how to 
+construct the new immature part. We can follow the approach in mk-0 and mk-1 -- 
+create a new thunk which invoke append-map-inf recursively when forced. But then 
+we need to be careful: if we construct the thunk when the old immature part is 
+an empty list, the resulting stream might be infinitely unproductive. Beside, 
+all solutions of the next lowest cost in \texttt{s-inf} must be computed when 
+the thunk is invoked. However sometimes only a portion of these solutions is 
+required to answer a query. To avoid the trouble and the too-early computation, 
+we choose to create a new thunk for every existing thunk. 
+
+The next four functions are used only by \texttt{ifte} and \texttt{once}. 
+Uninterested readers might skip them. \texttt{null-inf?} checks whether a stream 
+is exausted. \texttt{mature-inf?} checks whether a stream has some mature 
+solutions. \texttt{car-inf} takes the first solution out of a mature stream. 
+\texttt{cdr-inf} drops the first solution of a mature stream. Finally, 
+\texttt{force-inf} forces an a immature stream to do more computation.
+
+\texttt{unit-mature-inf}, \texttt{append-map-inf}, \texttt{empty-inf} and 
+\texttt{append-inf} form a \emph{MonadPlus}, where they corresponds to 
+\texttt{unit}, \texttt{bind}, \texttt{mzero}, and \texttt{mplus} respectively.
 
 \begin{figure}
 	 \lstinputlisting{Figures/interface.rkt}	
@@ -349,6 +333,14 @@ and enqueuing \texttt{s-inf}'s thunks.
 
 %TODO contributions
 %TODO future works
+
+We devise a new search strategy, balanced interleaving DFS. The key idea is to 
+make disjunction tree balanced. Changing search strategy from iDFS to biDFS is 
+not hard: 2 new functions and 1 modified macro. 
+
+We also devise breadth-first search, which is similar to Seres's BFS. These two 
+BFSs have similar intuition, but whether they are equivalent is not clear yet. 
+Our optimization on BFS with queue, however, is new.
 
 \section*{acknowledgments}
 
