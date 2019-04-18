@@ -1,48 +1,11 @@
 #lang racket
 (provide (all-defined-out))
-#| mk-2 |#
-#|
+#| mk-silbija |#
 
-* RI search space
-* use "cons" (instead of "append") to combine mature
-  part and immature part of search space
-
-|#
-
-; 1/7 CHANGES
+; 1 of 8 changes
 (define (empty-inf) '())
-(define (unit-mature-inf v) `((,v)))
-(define (unit-immature-inf th) `(() . ,th))
-
-; 2/7 CHANGES
-(define (null-inf? s-inf)
-  (null? s-inf))
-
-; 3/7 CHANGES
-; Ask whether some answer is ready to use
-(define (mature-inf? s-inf)
-  (and (pair? s-inf) (pair? (car s-inf))))
-
-; 4/7 CHANGES
-; Take the first answer of a mature-inf
-(define (car-inf s-inf)
-  (car (car s-inf)))
-
-; 5/7 CHANGES
-; Drop the first answer of a mature-inf
-(define (cdr-inf s-inf)
-  (cons (cdr (car s-inf))
-    (cdr s-inf)))
-
-; 6/7 CHANGES
-; Try to get more answer from an ∞ which is neither
-; null-inf nor mature-inf
-(define (force-inf s-inf)
-  (cond
-    [(pair? s-inf) (cdr s-inf)]
-    [else (s-inf)]))
-
-#| code below is RI wrt ∞, except append-map |#
+(define (unit x) `((,x)))
+(define (step s-inf) `(() . ,s-inf))
 
 (define var (lambda (x) (vector x)))
 (define var? (lambda (x) (vector? x)))
@@ -81,91 +44,99 @@
            (unify (cdr u) (cdr v) s))))
       (else #f))))
 
-; trivial change
 (define (== u v)
   (lambda (s)
     (let ((s (unify u v s)))
-      (if s (unit-mature-inf s) (empty-inf)))))
+      (if s (unit s) (empty-inf)))))
 
-; trivial change
 (define succeed
   (lambda (s)
-    (unit-mature-inf s)))
+    (unit s)))
  
-; trivial change
 (define fail
   (lambda (s)
     (empty-inf)))
 
+; 2 of 8 changes
 (define (disj2 g1 g2)
   (lambda (s)
     (zipw append (g1 s) (g2 s))))
 
-; trivial change
+; 3 of 8 changes
 (define (take-inf n s-inf)
   (cond
     ((and n (zero? n)) '())
-    ((null-inf? s-inf) '())
-    ((mature-inf? s-inf)
-     (cons (car-inf s-inf)
+    ((null? s-inf) '())
+    ((and (pair? s-inf) (pair? (car s-inf)))
+     (cons (car (car s-inf))
        (take-inf (and n (sub1 n))
-         (cdr-inf s-inf))))
-    (else (take-inf n (force-inf s-inf)))))
+         (cons (cdr (car s-inf)) (cdr s-inf)))))
+    ((pair? s-inf) (take-inf n (cdr s-inf)))
+    (else (take-inf n (s-inf)))))
 
-; trivial change
+; 4 of 8 changes
 (define (append-map-inf g s-inf)
   (shuffle ((mmap g) s-inf)))
 
+; 5 of 8 changes (including the following 8 helpers)
 (define ((conj2 p1 p2) s)
   (shuffle ((mmap p2) (p1 s))))
 
+; conj2 helper
 (define (smap f sx)
   (cond
-    [(null? sx) '()]
-    [(pair? sx) (cons (f (car sx)) (smap f (cdr sx)))]
-    [else (λ () (smap f (sx)))]))
+    ((null? sx) '())
+    ((pair? sx) (cons (f (car sx)) (smap f (cdr sx))))
+    (else (lambda () (smap f (sx))))))
 
+; conj2 helper
 (define (mmap f)
-  (λ (slx)
-    (smap (λ (xs) (map f xs)) slx)))
+  (lambda (slx)
+    (smap (lambda (xs) (map f xs)) slx)))
 
+; conj2 helper
 (define (concat xss)
   (foldr append '() xss))
 
+; conj2 helper
 (define (shuffle slslx)
   (smap (compose concat concat)
         (diag (smap transpose slslx))))
 
+; conj2 helper
 (define (wrap x) `(,x))
 
+; conj2 helper
 (define (diag ssx)
   (cond
-    [(null? ssx) '()]
-    [(pair? ssx)
-     (cond
-       [(null? (car ssx)) (cons '() (diag (cdr ssx)))]
-       [else (cons `(,(caar ssx))
-               (zipw append
-                     (smap wrap (cdar ssx))
-                     (diag (cdr ssx))))])]
-    [else (λ () (diag (ssx)))]))
+    ((null? ssx) '())
+    ((and (pair? ssx) (null? (car ssx)))
+     (cons '() (diag (cdr ssx))))
+    ((pair? ssx)
+     (cons `(,(car (car ssx)))
+       (zipw append
+             (smap wrap (cdr (car ssx)))
+             (diag (cdr ssx)))))
+    (else (lambda () (diag (ssx))))))
 
+; conj2 helper
 (define (transpose lsx)
   (cond
-    [(null? lsx) '()]
-    [else (zipw append
+    ((null? lsx) '())
+    (else (zipw append
                 (smap wrap (car lsx))
-                (transpose (cdr lsx)))]))
+                (transpose (cdr lsx))))))
 
+; conj2 helper
 (define (zipw f sx sy)
   (cond
-    [(null? sx) sy]
-    [(null? sy) sx]
-    [(and (pair? sx) (pair? sy))
+    ((null? sx) sy)
+    ((null? sy) sx)
+    ((and (pair? sx) (pair? sy))
      (cons (f (car sx) (car sy))
-       (zipw f (cdr sx) (cdr sy)))]
-    [(pair? sx) (λ () (zipw f sx (sy)))]
-    [else (λ () (zipw f (sx) sy))]))
+       (zipw f (cdr sx) (cdr sy))))
+    ((pair? sx) (lambda () (zipw f sx (sy))))
+    (else (lambda () (zipw f (sx) sy)))))
 
 (define (call/fresh name f)
   (f (var name)))
@@ -214,31 +185,27 @@
 (define (run-goal n g)
   (take-inf n (g empty-s)))
 
-; trivial change
+; 6 of 8 changes
 (define (ifte g1 g2 g3)
   (lambda (s)
     (let loop ((s-inf (g1 s)))
       (cond
-        ((null-inf? s-inf) (g3 s))
-        ((mature-inf? s-inf)
+        ((null? s-inf) (g3 s))
+        ((and (pair? s-inf) (pair? (car s-inf)))
          (append-map-inf g2 s-inf))
-        (else (unit-immature-inf
-                (lambda ()
-                  (loop (force-inf s-inf)))))))))
+        ((pair? s-inf) (step (loop (cdr s-inf))))
+        (else (lambda () (loop (s-inf))))))))
 
-; trivial change
+; 7 of 8 changes
 (define (once g)
   (lambda (s)
     (let loop ((s-inf (g s)))
       (cond
-        ((null-inf? s-inf) (empty-inf))
-        ((mature-inf? s-inf)
-         (unit-mature-inf (car-inf s-inf)))
-        (else (unit-immature-inf
-                (lambda ()
-                  (loop (force-inf s-inf)))))))))
-
-
+        ((null? s-inf) '())
+        ((and (pair? s-inf) (pair? (car s-inf)))
+         (unit (car (car s-inf))))
+        ((pair? s-inf) (step (loop (cdr s-inf))))
+        (else (lambda () (loop (s-inf))))))))
 
 ;;; Here are the key parts of Appendix A
 
@@ -254,13 +221,13 @@
     ((conj g) g)
     ((conj g0 g ...) (conj2 g0 (conj g ...)))))
 
-; trivial change
+; 8 of 8 changes
 (define-syntax defrel
   (syntax-rules ()
     ((defrel (name x ...) g ...)
      (define (name x ...)
        (lambda (s)
-         (unit-immature-inf
+         (step
            (lambda ()
              ((conj g ...) s))))))))
 
