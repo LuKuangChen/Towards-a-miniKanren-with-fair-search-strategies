@@ -10,8 +10,8 @@
 
 ; 1/5 CHANGES
 (define (empty-inf) '(() . ()))
-(define (unit-mature-inf v) `((,v) . ()))
-(define (unit-immature-inf th) `(() . (,th)))
+(define (unit v) `((,v) . ()))
+(define (step f) `(() . (,f)))
 
 (define (null-inf? s-inf)
   (and (null? (car s-inf))
@@ -79,11 +79,11 @@
 (define (== u v)
   (lambda (s)
     (let ((s (unify u v s)))
-      (if s (unit-mature-inf s) (empty-inf)))))
+      (if s (unit s) (empty-inf)))))
 
 (define succeed
   (lambda (s)
-    (unit-mature-inf s)))
+    (unit s)))
  
 (define fail
   (lambda (s)
@@ -189,7 +189,7 @@
         ((null-inf? s-inf) (g3 s))
         ((mature-inf? s-inf)
          (append-map-inf g2 s-inf))
-        (else (unit-immature-inf
+        (else (step
                 (lambda ()
                   (loop (force-inf s-inf)))))))))
 
@@ -199,8 +199,8 @@
       (cond
         ((null-inf? s-inf) (empty-inf))
         ((mature-inf? s-inf)
-         (unit-mature-inf (car-inf s-inf)))
-        (else (unit-immature-inf
+         (unit (car-inf s-inf)))
+        (else (step
                 (lambda ()
                   (loop (force-inf s-inf)))))))))
 
@@ -225,7 +225,7 @@
     ((defrel (name x ...) g ...)
      (define (name x ...)
        (lambda (s)
-         (unit-immature-inf
+         (step
            (lambda ()
              ((conj g ...) s))))))))
 
