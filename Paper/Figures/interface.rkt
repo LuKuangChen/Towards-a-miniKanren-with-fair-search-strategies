@@ -1,6 +1,6 @@
 (define (empty-inf) '(() . ()))
-(define (unit-mature-inf v) `((,v) . ()))
-(define (unit-immature-inf th) `(() . (,th)))
+(define (unit v) `((,v) . ()))
+(define (step f) `(() . (,f)))
 
 (define (append-inf s-inf t-inf)
   (cons (append (car s-inf) (car t-inf))

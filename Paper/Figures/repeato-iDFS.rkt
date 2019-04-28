@@ -1,0 +1,6 @@
+;; iDFS (unfair disj)
+'((a)
+  (a a) (b)
+  (a a a) (c)
+  (a a a a) (b b)
+  (a a a a a) (c c))

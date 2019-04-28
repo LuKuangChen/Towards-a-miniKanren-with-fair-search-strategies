@@ -3,7 +3,7 @@
     [(null? ls) (k '() '())]
     [else (split (cdr ls)
             (lambda (l1 l2)
-              (k l2 (cons (car ls) l1))))]))
+              (k (cons (car ls) l2) l1)))]))
 
 (define (disj* gs)
   (cond
