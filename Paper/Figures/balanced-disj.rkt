@@ -1,3 +1,4 @@
+#| [Goal] x ([Goal] x [Goal] -> Goal) -> Goal |#
 (define (split ls k)
   (cond
     [(null? ls) (k '() '())]
@@ -5,9 +6,9 @@
             (lambda (l1 l2)
               (k (cons (car ls) l2) l1)))]))
 
+#| [Goal] -> Goal |#
 (define (disj* gs)
   (cond
-    [(null? gs) fail]
     [(null? (cdr gs)) (car gs)]
     [else
      (split gs
@@ -17,4 +18,5 @@
 
 (define-syntax disj
   (syntax-rules ()
+    [(disj) fail]
     [(disj g ...) (disj* (list g ...))]))
