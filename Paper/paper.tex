@@ -44,7 +44,15 @@
 \begin{abstract}
 
 %TODO rewrite abstract
-%The syntax of a programming language should reflect its semantics. When using a disjunctive operator in relational programming, a programmer would expect all sub-goals of this disjunct to share the same chance of being explored, as these clauses are written in parallel. The existing multi-arity disjunctive operator in miniKanren, however, prioritize its clauses by the order of which these clauses are written down. We have devised two new search strategies that allocate computational effort more fairly in all clauses.
+%The syntax of a programming language should reflect its semantics. When using 
+%a disjunctive operator in relational programming, a programmer would expect 
+%all 
+%sub-goals of this disjunct to share the same chance of being explored, as 
+%these 
+%clauses are written in parallel. The existing multi-arity disjunctive operator 
+%in miniKanren, however, prioritize its clauses by the order of which these 
+%clauses are written down. We have devised two new search strategies that 
+%allocate computational effort more fairly in all clauses.
 
 \end{abstract}
 
@@ -52,11 +60,27 @@
 
 \section{introduction}
 
-miniKanren programs, especially relational interpreters, have been proven to be useful in solving many problems \citep{byrd2017unified}. A subtlety in writing relational programs having large \conde expressions, such as interpreters, is that the order of \conde clauses can affect the speed considerably. When a \conde expression is large enough, the left clauses consume almost all the resource and the right ones are hardly explored. The unfair \disj{} of the current search strategy, interleaving DFS, is the cause. Under the hood, \conde uses \texttt{conj} to create a goal for each clause, and \texttt{disj} to combine these goals to one. The current \texttt{disj} allocates half resource to its first goal, then allocates the other half to the rest similarly, except for the last clause which takes all the resource. 
+miniKanren programs, especially relational interpreters, have been proven to be 
+useful in solving many problems \citep{byrd2017unified}. A subtlety in writing 
+relational programs having large \conde expressions, such as interpreters, is 
+that the order of \conde clauses can affect the speed considerably. When a 
+\conde expression is large enough, the left clauses consume almost all the 
+resource and the right ones are hardly explored. The unfair \disj{} of the 
+current search strategy, interleaving DFS, is the cause. Under the hood, \conde 
+uses \texttt{conj} to create a goal for each clause, and \texttt{disj} to 
+combine these goals to one. The current \texttt{disj} allocates half resource 
+to its first goal, then allocates the other half to the rest similarly, except 
+for the last clause which takes all the resource. 
 
-Being aware of \texttt{disj} fairness, we also investigate \texttt{conj} fairness. 
+Being aware of \texttt{disj} fairness, we also investigate \texttt{conj} 
+fairness. 
 
-We propose three new search strategies, balanced interleaving DFS (biDFS), fair DFS (fDFS), and BFS. They have different characteristics of fairness (Table.~\ref{fairness}). We prove that our BFS and the BFS proposed by Seres et al~\citep{seres1999algebra} produce the same result when queried. But our code is shorter and runs faster. We also compare the efficiency of these new search strategies with the existing ones.
+We propose three new search strategies, balanced interleaving DFS (biDFS), fair 
+DFS (fDFS), and BFS. They have different characteristics of fairness 
+(Table.~\ref{fairness}). We prove that our BFS and the BFS proposed by Seres et 
+al~\citep{seres1999algebra} produce the same result when queried. But our code 
+is shorter and runs faster. Because the two BFSs are equivalent, we do not 
+distinguish them in most places, except section 6 (quantitative evaluation).
  
 \begin{table}
 	\begin{tabular}{|c|c|c|c|c|}
@@ -76,16 +100,28 @@ We propose three new search strategies, balanced interleaving DFS (biDFS), fair 
 % miniKanren~\citep{friedman_reasoned_2018}, allocates computational resource
 % by the order in which the clauses are written. Each clause of a
 % \conde takes half of the current resource and passes the other half
-% to its following clauses, except for the last clause that takes all of the current resource. 
-% The biased treatment provides both opportunity and burden: miniKanren users can place more frequently used 
+% to its following clauses, except for the last clause that takes all of the 
+%current resource. 
+% The biased treatment provides both opportunity and burden: miniKanren users 
+%can place more frequently used 
 % goal at the beginning to optimize their programs; however, it might be a 
-% catastrophe if a goal that generates many useless states is placed before more 
+% catastrophe if a goal that generates many useless states is placed before 
+%more 
 % important goals. Seasoned miniKanreners usually know how to utilize 
-% the unfairness to optimize their programs. However, we believe search strategies that is less sensitive to goal order can also be useful to little miniKanreners as well as seasoned ones. We propose two such search strategies, balanced interleaving DFS (biDFS) and breadth-first search (BFS), and observe how they affect the efficiency and the answer order of known miniKanren programs. The experiment is conducted with the miniKanren from \textit{The Reasoned Schemer, 2nd Edition}.
+% the unfairness to optimize their programs. However, we believe search 
+%strategies that is less sensitive to goal order can also be useful to little 
+%miniKanreners as well as seasoned ones. We propose two such search strategies, 
+%balanced interleaving DFS (biDFS) and breadth-first search (BFS), and observe 
+%how they affect the efficiency and the answer order of known miniKanren 
+%programs. The experiment is conducted with the miniKanren from \textit{The 
+%Reasoned Schemer, 2nd Edition}.
 
 \section{fairness}
 
-We demonstrate the aspects (\disj{} or \conj{}) and levels (unfair, almost-fair, or fair) of fairness by running queries about \texttt{repeato}, a relational definition that relates a term \texttt{x} with a non-empty list whose elements are \texttt{x} (Fig.~\ref{repeato}).
+We demonstrate the aspects (\disj{} or \conj{}) and levels (unfair, 
+almost-fair, or fair) of fairness by running queries about \texttt{repeato}, a 
+relational definition that relates a term \texttt{x} with a non-empty list 
+whose elements are \texttt{x} (Fig.~\ref{repeato}).
 
 \begin{figure}
 	\lstinputlisting{Figures/repeato.rkt}
@@ -95,7 +131,11 @@ We demonstrate the aspects (\disj{} or \conj{}) and levels (unfair, almost-fair,
 
 \subsection{fair \texttt{disj}}
 
-In the following program, the three \conde clauses differ in a trivial way. So we expect lists of each sort constitute $1/4$ of the answer list. However, iDFS, the current search strategy, gives us much more lists of \texttt{a} than other sorts of lists. And some sorts (e.g. lists of \texttt{c}) are hardly found. The situation would be worse if we add more \conde clauses.
+In the following program, the three \conde clauses differ in a trivial way. So 
+we expect lists of each sort constitute $1/4$ of the answer list. However, 
+iDFS, the current search strategy, gives us much more lists of \texttt{a} than 
+other sorts of lists. And some sorts (e.g. lists of \texttt{c}) are hardly 
+found. The situation would be worse if we add more \conde clauses.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -103,7 +143,8 @@ In the following program, the three \conde clauses differ in a trivial way. So w
 	\end{tabular}
 \end{center}
 
-On the contrary, search strategies with fair \disj{} (e.g. fDFS and BFS) give a nice answer list.
+On the contrary, search strategies with fair \disj{} (e.g. fDFS and BFS) give a 
+nice answer list.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -111,7 +152,13 @@ On the contrary, search strategies with fair \disj{} (e.g. fDFS and BFS) give a 
 	\end{tabular}
 \end{center}
 
-Search strategies with almost-fair \disj{} (e.g. biDFS) give the same result in this case. However, as its name suggests, almost-fair strategies are not always fair. Fortunately, the maximal ratio of the allocated resource is bounded by a constant. Our biDFS is fair when the number of goals is a power of 2, otherwise, some goals are allocated twice more resource than the others. In following example, the clauses of \texttt{b}, \texttt{c}, and \texttt{d} are allocated more resource.
+Search strategies with almost-fair \disj{} (e.g. biDFS) give the same result in 
+this case. However, as its name suggests, almost-fair strategies are not always 
+fair. Fortunately, the maximal ratio of the allocated resource among 
+disjunctive goals is bounded by a constant. Our biDFS is fair when the number 
+of goals is a power of 2, otherwise, some goals are allocated twice more 
+resource than the others. In following example, the clauses of \texttt{b}, 
+\texttt{c}, and \texttt{d} are allocated more resource.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -121,7 +168,14 @@ Search strategies with almost-fair \disj{} (e.g. biDFS) give the same result in 
 
 \subsection{fair \texttt{conj}}
 
-In the following program, the three \conde clauses differ in a trivial way. So we expect lists of each sort constitute  $1/4$ of the answer list. However, search strategies with unfair \conj{} gives us much more lists of \texttt{a} than other sorts of lists. And some sorts (e.g. lists of \texttt{c}) are hardly found. The situation would be worse if we add more \conde clauses. The result with biDFS, whose \conj{} is also unfair, is similar, but due to its different \disj{}, the position of \texttt{b} and \texttt{c} and swapped. 
+In the following program, the three \conde clauses differ in a trivial way. So 
+we expect lists of each sort constitute  $1/4$ of the answer list. However, 
+search strategies with unfair \conj{} (e.g. iDFS, fDFS) give us much 
+more lists of \texttt{a} than other sorts of lists. And some sorts (e.g. lists 
+of \texttt{c}) are hardly found. The situation would be worse if we add more 
+\conde clauses. The result with biDFS, whose \conj{} is also unfair, is 
+similar, but due to its different \disj{}, the position of \texttt{b} and 
+\texttt{c} and swapped. 
 
 \begin{center}
 	\begin{tabular}{c}
@@ -129,7 +183,8 @@ In the following program, the three \conde clauses differ in a trivial way. So w
 	\end{tabular}
 \end{center}
 
-On the contrary, search strategies with fair \conj{} (e.g. BFS) give a nice answer list.
+On the contrary, search strategies with fair \conj{} (e.g. BFS) give a nice 
+answer list.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -137,7 +192,10 @@ On the contrary, search strategies with fair \conj{} (e.g. BFS) give a nice answ
 	\end{tabular}
 \end{center}
 
-A more interesting situation is when the first conjunctive goal produces infinite many states. Consider the following example, a naive specification of fair \conj{} might require search strategies to produce all sorts of singleton lists, but no longer lists, which makes the strategies \emph{incomplete}. 
+A more interesting situation is when the first conjunctive goal produces 
+infinite many states. Consider the following example, a naive specification of 
+fair \conj{} might require search strategies to produce all sorts of singleton 
+lists, but no longer ones, which makes the strategies \emph{incomplete}. 
 
 \begin{center}
 	\begin{tabular}{c}
@@ -145,7 +203,24 @@ A more interesting situation is when the first conjunctive goal produces infinit
 	\end{tabular}
 \end{center}
 
-Fairness is good but is not good enough to kick away completeness. A solution also taken in \citep{seres1999algebra} is bagging states and requiring that search spaces derived from states in the same bag are treated fairly. A natural way to bag states is by their costs. The \emph{cost} of a state is its depth in the search tree (i.e. the number of calls to relational definitions required to find them) \citep{seres1999algebra}. BFS is more than fair -- it produces answers in increasing order of cost. Running the same program gives an answer list sorted by answers' costs. In this case, the cost of an answer is equal to the length of the inner lists plus the length of the outer list.
+Fairness is good but is not good enough to kick away completeness. A solution  
+is bagging states and requiring that 
+search spaces derived from states in the same bag are treated fairly. A natural 
+way to bag states is by their costs.
+This approach is also taken in \citep{seres1999algebra}.
+The \emph{cost} of a state is its depth in 
+the search tree (i.e. the number of calls to relational definitions required to 
+find them) \citep{seres1999algebra}. BFS is more than fair -- it produces 
+answers in increasing order of cost. Running the same program gives an answer 
+list sorted by answers' costs. In this case, the cost of an answer is equal to 
+the length of the inner lists plus the length of the outer list.
+
+Our definition of fair \conj{} is difference from the one in 
+\citep{seres1999algebra}. They consider a \conj{} (or "selection rule" in their 
+words) is fair if it ``would allow one to choose the literals in different 
+order''\citep{seres1999algebra}. This requirement is not stronger than 
+\emph{completeness}. We prefer our definition because it avoids overlapping 
+with a known concept.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -155,17 +230,25 @@ Fairness is good but is not good enough to kick away completeness. A solution al
  
 \section{balanced interleaving DFS}
 
-Balanced interleaving DFS (biDFS) has almost-fair \disj{} and unfair \conj{}. The implementation of biDFS differs from iDFS in the \disj{} macro. We list the new \disj{} with its helpers in Fig.~\ref{balanced-disj}. The first helper function, \texttt{split}, takes a list of goals \texttt{ls} and a procedure \texttt{k}, partitions \texttt{ls} into two sub-lists of roughly equal length, and returns the application of \texttt{k} to the two sub-lists. \texttt{disj*} takes a non-empty list of goals \texttt{gs} and returns a goal. With the help of \texttt{split}, it essentially constructs a \emph{balanced} binary tree where leaves are goals in \texttt{gs} and nodes are \texttt{disj2}, whence the name of this search strategy. In contrast, the \disj{} in iDFS essentially constructs the same sort of binary tree in one of the most unbalanced forms.
-
 \begin{figure}
-  \lstinputlisting{Figures/balanced-disj.rkt}
-  \caption{\texttt{balanced-disj}}
-  \label{balanced-disj}
+	\lstinputlisting{Figures/balanced-disj.rkt}
+	\caption{\texttt{balanced-disj}}
+	\label{balanced-disj}
 \end{figure}
 
-\section{fair DFS}
+Balanced interleaving DFS (biDFS) has almost-fair \disj{} and unfair \conj{}. 
+The implementation of biDFS differs from iDFS in the \disj{} macro. We list the 
+new \disj{} with its helpers in Fig.~\ref{balanced-disj}. The first helper 
+function, \texttt{split}, takes a list of goals \texttt{ls} and a procedure 
+\texttt{k}, partitions \texttt{ls} into two sub-lists of roughly equal length, 
+and returns the application of \texttt{k} to the two sub-lists. \texttt{disj*} 
+takes a non-empty list of goals \texttt{gs} and returns a goal. With the help 
+of \texttt{split}, it essentially constructs a \emph{balanced} binary tree 
+where leaves are elements of \texttt{gs} and nodes are \texttt{disj2}, whence 
+the name of this search strategy. In contrast, the \disj{} in iDFS essentially 
+constructs the same sort of binary tree in one of the most unbalanced forms.
 
-Fair DFS (fDFS) has fair \disj{} and unfair \conj{}. The implementation of fDFS differs from iDFS's in \texttt{disj2} (Fig.~\ref{fDFS}). \texttt{disj2} is changed to call a new and fair version of \texttt{append-inf}. \texttt{append-inf/fair} immediately calls its helper, \texttt{append-inf/fair\^{}}, with the first argument, \texttt{s?}, set to \texttt{\#{}t}, which indicates that \texttt{s-inf} and \texttt{t-inf} haven't been swapped. The swapping happens in the third \texttt{cond} clause of the helper, where \texttt{s?} is changed accordingly. The first two \texttt{cond} clauses essentially copy the \texttt{car}s and stop recursion when one of the input spaces is obviously finite. The third clause, as we mentioned early, is just for swapping. When the fourth and last clause runs, we know that both \texttt{s-inf} and \texttt{t-inf} are ended with a thunk. In this case, a new thunk is constructed. The new thunk calls the driver recursively. Here changing the order of \texttt{t-inf} and \texttt{s-inf} won't hurt the fairness (though it will change the order of answers). We swapped them back so that answers are produced in a more natural order.
+\section{fair DFS}
 
 \begin{figure}
 	\lstinputlisting{Figures/fDFS.rkt}
@@ -173,52 +256,148 @@ Fair DFS (fDFS) has fair \disj{} and unfair \conj{}. The implementation of fDFS 
 	\label{fDFS}
 \end{figure}
 
+Fair DFS (fDFS) has fair \disj{} and unfair \conj{}. The implementation of fDFS 
+differs from iDFS's in \texttt{disj2} (Fig.~\ref{fDFS}). \texttt{disj2} is 
+changed to call a new and fair version of \texttt{append-inf}. 
+\texttt{append-inf/fair} immediately calls its helper, 
+\texttt{append-inf/fair\^{}}, with the first argument, \texttt{s?}, set to 
+\texttt{\#{}t}, which indicates that \texttt{s-inf} and \texttt{t-inf} haven't 
+been swapped. The swapping happens at the third \texttt{cond} clause in the 
+helper, where \texttt{s?} is updated accordingly. The first two \texttt{cond} 
+clauses essentially copy the \texttt{car}s and stop recursion when one of the 
+input spaces is obviously finite. The third clause, as we mentioned early, is 
+just for swapping. When the fourth and last clause runs, we know that both 
+\texttt{s-inf} and \texttt{t-inf} are ended with a thunk. In this case, a new 
+thunk is constructed. The new thunk calls the driver recursively. Here changing 
+the order of \texttt{t-inf} and \texttt{s-inf} won't hurt the fairness (though 
+it will change the order of answers). We swapped them back so that answers are 
+produced in a more natural order.
+
 
 \section{breadth-first search}
 
-Our BFS is fair in both \disj{} and \conj{}. Its implementation is based on fDFS (not iDFS). All we have to do is changing the use of \texttt{append-inf} in \texttt{append-map-inf} to \texttt{append-inf/fair}. After making this change, \texttt{append-inf} is useless.
+Our BFS is fair in both \disj{} and \conj{}. Its implementation is based on 
+fDFS (not iDFS). All we have to do is apply two trivial changes to 
+\texttt{append-map-inf}. First, rename it to \texttt{append-map-inf/fair}. 
+Second, replace its use of \texttt{append-inf} to \texttt{append-inf/fair}. 
 
-The implementation can be improved in two aspects. First, as we mentioned in section 2.2, our BFS bag states by their cost. However, in this implementation, it is unclear where this information is recorded. Second, \texttt{append-inf/fair} is space inefficient. It makes $O(n+m)$ new \texttt{cons} cells every time, where $n$ and $m$ is the ``length'' of each input search space. We address these issues in the first subsection.
+The implementation can be improved in two aspects. First, as we mentioned in 
+section 2.2, our BFS bag states by their cost. However, in this implementation, 
+it is unclear where this information is recorded. Second, 
+\texttt{append-inf/fair} is space inefficient. It makes $O(n+m)$ new 
+\texttt{cons} cells every time, where $n$ and $m$ are the ``length''s of 
+input search spaces. We address these issues in the first subsection.
 
-Both our BFS and Seres's BFS \citep{seres1999algebra} produce answers in increasing order of cost. So it is interesting to see if they are equivalent. We prove the equivalence in Coq. The details are in the second subsection.
-
-
-% The first subsection describe an optimized BFS. The optimization makes the type of search space representation more clear and reduces time-complexity of some function. The second subsection compares the pure subset of the optimized BFS with the BFS found in \citep{seres1999algebra}. We prove the two BFSs return the same answer list.
+Both our BFS and Seres's BFS \citep{seres1999algebra} produce answers in 
+increasing order of cost. So it is interesting to see if they are equivalent. 
+We prove the so in Coq. The details are in the second subsection.
 
 \subsection{optimized BFS}
 
-As we mentioned in section 2.2, our BFS bag states by their cost. The bagging information is recorded subtly -- the \texttt{car}s of a search space have cost 0 (they are in the same bag), and the costs of states in thunk are increased by one. It is even more difficult to see \texttt{append-inf/fair} and the modified \texttt{append-map-inf} respects the cost information. We make things clear by changing the type of search space, modify related function definitions, and introducing a few more functions.
-
-The new type is a pair whose \texttt{car} is a list of state (the bag), and whose \texttt{cdr} is either a \texttt{\#{}f} or a thunk returning a search space. A falsy \texttt{cdr} indicates that the search space is obviously finite. 
-
-Both modified functions and introduced ones are listed in Fig.~\ref{BFS-opt}. The first three functions in Fig.~\ref{BFS-opt} are search space constructor. They are newly introduced. \texttt{none} makes an empty search space. \texttt{unit} makes an space from one state. \texttt{step} makes a space from a thunk. The next function, \texttt{split}, is used to implement impure features (i.e. \texttt{ifte} and \texttt{once}). It takes a space \texttt{s-inf} and two continuations \texttt{ks} and \texttt{kf}. When \texttt{s-inf} contains some states, \texttt{ks} is called with the first state and the rest space. Otherwise, \texttt{kf} is called with no argument. Here `s' and `f' means `succeed' and `fail' respectively. The remaining functions do the same thing as before. Now it should be not difficult to see that \texttt{append-inf/fair} and \texttt{append-map-inf} do respect cost information.
-
-Luckily, the change in \texttt{append-inf/fair} also fixes the miserable space inefficiency -- the use of \texttt{append} helps us to reuse the first bag of \texttt{t-inf}.
-
-Noted that some functions in the list constitute a \emph{MonadPlus}: \texttt{none}, \texttt{unit}, \texttt{append-map-inf}, and \texttt{append-inf} correspond to \texttt{mzero}, \texttt{unit}, \texttt{bind}, and \texttt{mplus} respectively.
-
 \begin{figure}
 	\lstinputlisting{Figures/BFS-opt.rkt}	
-	\caption{interface functions in optimized BFS}
+	\caption{interface functions in optimized BFS (pure)}
 	\label{BFS-opt}
 \end{figure}
 
+As we mentioned in section 2.2, our BFS bag states by their cost. The bagging 
+information is recorded subtly -- the \texttt{car}s of a search space have cost 
+0 (i.e. they are in the same bag), and the costs of states in thunk are 
+computed recursively then increased by one. It is even more difficult to see 
+\texttt{append-inf/fair} and the \texttt{append-map-inf/fair} respects the cost 
+information. We make things clear by changing the type of search space, modify 
+related function definitions, and introducing a few more functions.
+
+The new type is a pair whose \texttt{car} is a list of state (the bag), and 
+whose \texttt{cdr} is either a \texttt{\#{}f} or a thunk returning a search 
+space. A falsy \texttt{cdr} indicates that the search space is obviously 
+finite. 
+
+Functions related to the pure subset are listed in Fig.~\ref{BFS-opt}. The 
+first three functions in Fig.~\ref{BFS-opt} are search space constructor. 
+They are newly introduced. \texttt{none} makes an empty search space. 
+\texttt{unit} makes an space from one state. \texttt{step} makes a space from a 
+thunk. The remaining functions do the same thing as 
+before. Now it should be not difficult to see that \texttt{append-inf/fair} and 
+\texttt{append-map-inf} do respect cost information.
+
+Luckily, the change in \texttt{append-inf/fair} also fixes the miserable space 
+inefficiency -- the use of \texttt{append} helps us to reuse the first bag of 
+\texttt{t-inf}.
+
+Noted that some functions in the list constitute a \emph{MonadPlus}: 
+\texttt{none}, \texttt{unit}, \texttt{append-map-inf}, and \texttt{append-inf} 
+correspond to \texttt{mzero}, \texttt{unit}, \texttt{bind}, and \texttt{mplus} 
+respectively.
+
+\begin{figure}
+	\lstinputlisting{Figures/BFS-opt-cont.rkt}	
+	\caption{interface functions in optimized BFS (impure)}
+	\label{BFS-opt-cont}
+\end{figure}
+
+Functions implementing impure features are in Fig.~\ref{BFS-opt-cont}. The 
+first function, \texttt{elim}, is used to implement \texttt{ifte} and 
+\texttt{once}. It takes a space \texttt{s-inf} and two continuations 
+\texttt{ks} and \texttt{kf}. When \texttt{s-inf} contains some states, 
+\texttt{ks} is called with the first state and the rest space. Otherwise, 
+\texttt{kf} is called with no argument. Here `s' and `f' means `succeed' and 
+`fail' respectively. The remaining functions do the same thing as before.
 
 \subsection{comparison with Silvija's BFS}
 
-In this section, we compare the pure subset of our optimized BFS with the BFS found in \citep{seres1999algebra}. We focus on the pure subset because Silvija's system is pure. 
+In this section, we compare the pure subset of our optimized BFS with the BFS 
+found in \citep{seres1999algebra}. We focus on the pure subset because 
+Silvija's system is pure. 
 
-To compare efficiency, we translate her Haskell code into Racket (See supplements for the translated code), and embed it into miniKanren. The translation is fairly straightforward due to the similarity in both logic programming system and search space representation. The translated code is less efficient when running our benchmark. Details about efficiency difference are in section 6.
+To compare efficiency, we translate her Haskell code into Racket (See 
+supplements for the translated code), and embed it into miniKanren. The 
+translation is fairly straightforward due to the similarity in both logic 
+programming system and search space representation. The translated code is less 
+efficient when running our benchmark. Details about efficiency difference are 
+in section 6.
 
-We prove the two search strategies are equivalent in Coq. Since search space can be infinite, we should use a co-inductive data type. However, Coq is too strict in the guardedness condition to accept a direct translation of the implementations. Therefore, we prove core theorems with finite search space instead. In order to generalize the conclusion to the cases with infinite search space, we prove a few more theorems saying that whenever we query answers lower than some finite cost, we can restrict goals to truncate search spaces at some finite depth without changing the query result. (See supplements for the formal proof)
-
-;;TODO to be more specific?
+We prove the two search strategies are equivalent in Coq. Since search space 
+can be infinite, we should use a co-inductive data type. However, Coq is too 
+strict in the guardedness condition to accept a direct translation of the 
+implementations. Therefore, we prove core theorems with finite search space 
+instead. In order to generalize the conclusion to the cases with infinite 
+search space, we prove a few more theorems saying that whenever we query 
+answers lower than some finite cost, we can restrict goals to truncate search 
+spaces at some finite depth without changing the query result. (See supplements 
+for the formal proof)
 
 \section{quantitative evaluation}
 
-In this section, we compare the efficiency of search strategies. A concise description is in Table~\ref{compare-efficiency}. A hyphen means running out of memory. The first three benchmarks are taken from \citep{friedman_reasoned_2018}. Next two benchmarks about quine are modified from a similar test case in \citep{byrd2017unified}. The modifications are made to circumvent the need for symbolic constraint. Our version generates de Bruijnized expressions and forbids closures going into list. The two benchmarks differ in the \conde clause order of their relation interpreters. The last two benchmarks are about synthesizing expressions that evaluate to \texttt{'(I love you)}. This benchmark is also inspired by \citep{byrd2017unified}. Again, they differ in the \conde clause order of their relation interpreters. The first one has elimination rules (i.e. application, \texttt{car}, and \texttt{cdr}) at the end, while the other has them at the beginning. We conjecture that iDFS would perform badly in the second case because elimination rules complicate the problem when running backward. Our statistics support our conjecture.
+;;TODO check if reverso and appendo are absolutely the same as the ones in TRS2.
 
-In general, only iDFS and biDFS constantly perform well. Among them, biDFS seems to be less sensitive to change in \conde clause order (see the last four benchmarks). The other search strategies all have fair \disj{}. And they all perform badly in the \texttt{very-recursiveo} benchmark. However, the drawback of having fair \disj{} alone (i.e. fDFS) is not shown elsewhere. Fair \conj{} impose overhead constantly except in \texttt{appendo}. The reason might be that strategies with fair \conj{} tend to keep more intermediate states in the memory. Among the BFSs, our version performs better in most cases, and equally well elsewhere. 
+In this section, we compare the efficiency of search strategies. A concise 
+description is in Table~\ref{compare-efficiency}. A hyphen means running out of 
+memory. The first three benchmarks are taken from 
+\citep{friedman_reasoned_2018}. Next two benchmarks about quine are modified 
+from a similar test case in \citep{byrd2017unified}. The modifications are made 
+to circumvent the need for symbolic constraints (e.g. $\neq$, 
+\texttt{absento}). Our version generates de 
+Bruijnized expressions and forbids closures going into list. The two benchmarks 
+differ in the \conde clause order of their relation interpreters. The last two 
+benchmarks are about synthesizing expressions that evaluate to \texttt{'(I love 
+you)}. This benchmark is also inspired by \citep{byrd2017unified}. Again, the 
+sibling benchmarks differ in the \conde clause order of their relation 
+interpreters. The first one 
+has elimination rules (i.e. application, \texttt{car}, and \texttt{cdr}) at the 
+end, while the other has them at the beginning. We conjecture that iDFS would 
+perform badly in the second case because elimination rules complicate the 
+problem when running backward. Our statistics support our conjecture.
+
+In general, only iDFS and biDFS constantly perform well. Among them, biDFS 
+seems to be less sensitive to change in \conde clause order (see the last four 
+benchmarks). The other search strategies all have fair \disj{}. And they all 
+perform badly in the \texttt{very-recursiveo} benchmark. However, the drawback 
+of having fair \disj{} alone (i.e. fDFS) is not shown elsewhere. Fair \conj{} 
+impose overhead constantly except in \texttt{appendo}. The reason might be that 
+strategies with fair \conj{} tend to keep more intermediate states in the 
+memory. Among the BFSs, our version performs better in most cases, and equally 
+well elsewhere. 
 
 \begin{table}
 \begin{tabular}{|c|c|c|c|c|c|c|}
@@ -254,23 +433,31 @@ In general, only iDFS and biDFS constantly perform well. Among them, biDFS seems
 	                & 297 & 476 & 146 & 49 & 186 & 322 \\ 
 	\hline 
 \end{tabular}
-\caption{The results of a quantitative evaluation: running times of benchmarks in milliseconds}
+\caption{The results of a quantitative evaluation: running times of benchmarks 
+in milliseconds}
 \label{compare-efficiency}
 \end{table}
 
 \section{related works}
 
-Edward points out a disjunct complex would be `fair' if it is a full and balanced tree \citep{yang2010adventures}.
+Edward points out a disjunct complex would be `fair' if it is a full and 
+balanced tree \citep{yang2010adventures}.
 
-Silvija et al \citep{seres1999algebra} also describe a breadth-first search strategy. We proof their BFS is equivalent to ours. However, ours looks simpler and performs better in comparison with a straightforward translation of their Haskell code.
+Silvija et al \citep{seres1999algebra} also describe a breadth-first search 
+strategy. We proof their BFS is equivalent to ours. However, ours looks simpler 
+and performs better in comparison with a straightforward translation of their 
+Haskell code.
 
 \section{conclusion}
 
 %TODO contributions
 
-% We devise a new search strategy, balanced interleaving DFS. The key idea is to make disjunct trees balanced. Changing the search strategy from iDFS to biDFS is not hard: 2 new functions and 1 modified macro. 
+% We devise a new search strategy, balanced interleaving DFS. The key idea is 
+%to make disjunct trees balanced. Changing the search strategy from iDFS to 
+%biDFS is not hard: 2 new functions and 1 modified macro. 
 
-% We also devise breadth-first search, whose intuition is similar to Seres's BFS. And we have proved their equivalence. We optimize our BFS with a queue.
+% We also devise breadth-first search, whose intuition is similar to Seres's 
+%BFS. And we have proved their equivalence. We optimize our BFS with a queue.
 
 \section*{acknowledgments}
 

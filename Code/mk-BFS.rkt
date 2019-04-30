@@ -1,13 +1,6 @@
 #lang racket
 (provide (all-defined-out))
-#| mk-bd |#
-#|
-
-based on mk-0
-
-balanced disjunction
-
-|#
+#| mk-BFS |#
 
 (define var (lambda (x) (vector x)))
 (define var? (lambda (x) (vector? x)))
@@ -61,16 +54,26 @@ balanced disjunction
 
 (define (disj2 g1 g2)
   (lambda (s)
-    (append-inf (g1 s) (g2 s))))
+    (append-inf/fair (g1 s) (g2 s))))
 
-(define (append-inf s-inf t-inf)
+; 1/2 CHANGES
+(define (append-inf/fair s-inf t-inf)
+  (append-inf/fair^ #t s-inf t-inf))
+
+; 2/2 CHANGES
+; Argument s? means whether s∞ and t∞ have been swapped.
+; First 2 lines recur on the mature part of s-inf. When
+; both immature parts are thunks, they are combined as a
+; new λ in the last line.
+(define (append-inf/fair^ s? s-inf t-inf)
   (cond
-    ((null? s-inf) t-inf)
     ((pair? s-inf)
      (cons (car s-inf)
-       (append-inf (cdr s-inf) t-inf)))
+       (append-inf/fair^ s? (cdr s-inf) t-inf)))
+    ((null? s-inf) t-inf)
+    (s? (append-inf/fair^ #f t-inf s-inf))
     (else (lambda ()
-            (append-inf t-inf (s-inf))))))
+            (append-inf/fair (t-inf) (s-inf))))))
 
 (define (take-inf n s-inf)
   (cond
@@ -90,7 +93,7 @@ balanced disjunction
   (cond
     ((null? s-inf) '())
     ((pair? s-inf)
-     (append-inf (g (car s-inf))
+     (append-inf/fair (g (car s-inf))
        (append-map-inf g (cdr s-inf))))
     (else (lambda () 
             (append-map-inf g (s-inf))))))
@@ -162,28 +165,14 @@ balanced disjunction
         (else (lambda ()
                 (loop (s-inf))))))))
 
-(define (split ls k)
-  (cond
-    [(null? ls) (k '() '())]
-    [else (split (cdr ls)
-            (λ (l1 l2)
-              (k (cons (car ls) l2) l1)))]))
-
-(define (disj* gs)
-  (cond
-    [(null? (cdr gs)) (car gs)]
-    [else
-     (split gs
-       (lambda (gs1 gs2)
-         (disj2 (disj* gs1)
-                (disj* gs2))))]))
 
 ;;; Here are the key parts of Appendix A
 
 (define-syntax disj
   (syntax-rules ()
-    [(disj) fail]
-    [(disj g ...) (disj* (list g ...))]))
+    ((disj) fail)
+    ((disj g) g)
+    ((disj g0 g ...) (disj2 g0 (disj g ...)))))
 
 (define-syntax conj
   (syntax-rules ()

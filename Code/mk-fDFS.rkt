@@ -1,11 +1,6 @@
 #lang racket
 (provide (all-defined-out))
-#| mk-1 |#
-#|
-
-Change the search strategy to BFS.
-
-|#
+#| mk-fDFS |#
 
 (define var (lambda (x) (vector x)))
 (define var? (lambda (x) (vector? x)))
@@ -59,26 +54,35 @@ Change the search strategy to BFS.
 
 (define (disj2 g1 g2)
   (lambda (s)
-    (append-inf (g1 s) (g2 s))))
+    (append-inf/fair (g1 s) (g2 s))))
+
+(define (append-inf s-inf t-inf)
+  (cond
+    ((null? s-inf) t-inf)
+    ((pair? s-inf)
+     (cons (car s-inf)
+       (append-inf (cdr s-inf) t-inf)))
+    (else (lambda () 
+            (append-inf t-inf (s-inf))))))
 
 ; 1/2 CHANGES
-(define (append-inf s-inf t-inf)
-  (append-inf^ #t s-inf t-inf))
+(define (append-inf/fair s-inf t-inf)
+  (append-inf/fair^ #t s-inf t-inf))
 
 ; 2/2 CHANGES
 ; Argument s? means whether s∞ and t∞ have been swapped.
 ; First 2 lines recur on the mature part of s-inf. When
 ; both immature parts are thunks, they are combined as a
 ; new λ in the last line.
-(define (append-inf^ s? s-inf t-inf)
+(define (append-inf/fair^ s? s-inf t-inf)
   (cond
     ((pair? s-inf)
      (cons (car s-inf)
-       (append-inf^ s? (cdr s-inf) t-inf)))
+       (append-inf/fair^ s? (cdr s-inf) t-inf)))
     ((null? s-inf) t-inf)
-    (s? (append-inf^ #f t-inf s-inf))
+    (s? (append-inf/fair^ #f t-inf s-inf))
     (else (lambda ()
-            (append-inf (t-inf) (s-inf))))))
+            (append-inf/fair (t-inf) (s-inf))))))
 
 (define (take-inf n s-inf)
   (cond

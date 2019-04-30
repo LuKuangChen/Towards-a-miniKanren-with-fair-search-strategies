@@ -1,13 +1,19 @@
 #lang racket
 (provide (all-defined-out))
-#| mk-bd |#
-#|
+#| mk-BFS-opt |#
 
-based on mk-0
+(define (unit s) `((,s) . #f))
+(define (none)   `(()   . #f))
+(define (step f) `(()   . ,f))
 
-balanced disjunction
-
-|#
+(define (elim s-inf ks kf)
+  (let ([ss (car s-inf)]
+        [f (cdr s-inf)])
+    (cond
+      [(and (null? ss) f)
+       (step (lambda () (elim (f) ks kf)))]
+      [(null? ss) (kf)]
+      [else (ks (car ss) (cons (cdr ss) f))])))
 
 (define var (lambda (x) (vector x)))
 (define var? (lambda (x) (vector? x)))
@@ -49,51 +55,52 @@ balanced disjunction
 (define (== u v)
   (lambda (s)
     (let ((s (unify u v s)))
-      (if s `(,s) '()))))
+      (if s (unit s) (none)))))
 
 (define succeed
-  (lambda (s)
-    `(,s)))
+  (lambda (s) (unit s)))
  
 (define fail
-  (lambda (s)
-    '()))
+  (lambda (s) (none)))
 
 (define (disj2 g1 g2)
   (lambda (s)
-    (append-inf (g1 s) (g2 s))))
+    (append-inf/fair (g1 s) (g2 s))))
 
-(define (append-inf s-inf t-inf)
-  (cond
-    ((null? s-inf) t-inf)
-    ((pair? s-inf)
-     (cons (car s-inf)
-       (append-inf (cdr s-inf) t-inf)))
-    (else (lambda ()
-            (append-inf t-inf (s-inf))))))
+; 1/2 CHANGES
+(define (append-inf/fair s-inf t-inf)
+  (cons (append (car s-inf) (car t-inf))
+    (let ([t1 (cdr s-inf)]
+          [t2 (cdr t-inf)])
+      (cond
+        [(not t1) t2]
+        [(not t2) t1]
+        [else (lambda () (append-inf/fair (t1) (t2)))]))))
 
 (define (take-inf n s-inf)
-  (cond
-    ((and n (zero? n)) '())
-    ((null? s-inf) '())
-    ((pair? s-inf) 
-     (cons (car s-inf)
-       (take-inf (and n (sub1 n))
-         (cdr s-inf))))
-    (else (take-inf n (s-inf)))))
+  (let loop ([n n]
+             [ss (car s-inf)])
+    (cond
+      ((and n (zero? n)) '())
+      ((pair? ss)
+       (cons (car ss)
+         (loop (and n (sub1 n)) (cdr ss))))
+      (else
+       (let ([f (cdr s-inf)])
+         (if f (take-inf n (f)) '()))))))
 
 (define (conj2 g1 g2)
   (lambda (s)
-    (append-map-inf g2 (g1 s))))
+    (append-map-inf/fair g2 (g1 s))))
 
-(define (append-map-inf g s-inf)
-  (cond
-    ((null? s-inf) '())
-    ((pair? s-inf)
-     (append-inf (g (car s-inf))
-       (append-map-inf g (cdr s-inf))))
-    (else (lambda () 
-            (append-map-inf g (s-inf))))))
+(define (append-map-inf/fair g s-inf)
+  (foldr
+    (lambda (s t-inf)
+      (append-inf/fair (g s) t-inf))
+    (let ([f (cdr s-inf)])
+      (step (and f
+              (lambda () (append-map-inf/fair g (f))))))
+    (car s-inf)))
 
 (define (call/fresh name f)
   (f (var name)))
@@ -142,48 +149,47 @@ balanced disjunction
 (define (run-goal n g)
   (take-inf n (g empty-s)))
 
+;(define (ifte g1 g2 g3)
+;  (lambda (s)
+;    (let loop ((s-inf (g1 s)))
+;      (cond
+;        ((null? s-inf) (g3 s))
+;        ((pair? s-inf)
+;         (append-map-inf g2 s-inf))
+;        (else (lambda ()
+;                (loop (s-inf))))))))
+
 (define (ifte g1 g2 g3)
   (lambda (s)
-    (let loop ((s-inf (g1 s)))
-      (cond
-        ((null? s-inf) (g3 s))
-        ((pair? s-inf)
-         (append-map-inf g2 s-inf))
-        (else (lambda ()
-                (loop (s-inf))))))))
+    (elim (g1 s)
+      (lambda (s0 s-inf)
+        (append-map-inf/fair g2
+          (append-inf/fair (unit s0) s-inf)))
+      (lambda () (g3 s)))))
+
+;(define (once g)
+;  (lambda (s)
+;    (let loop ((s-inf (g s)))
+;      (cond
+;        ((null? s-inf) '())
+;        ((pair? s-inf)
+;         (cons (car s-inf) '()))
+;        (else (lambda ()
+;                (loop (s-inf))))))))
 
 (define (once g)
   (lambda (s)
-    (let loop ((s-inf (g s)))
-      (cond
-        ((null? s-inf) '())
-        ((pair? s-inf)
-         (cons (car s-inf) '()))
-        (else (lambda ()
-                (loop (s-inf))))))))
-
-(define (split ls k)
-  (cond
-    [(null? ls) (k '() '())]
-    [else (split (cdr ls)
-            (λ (l1 l2)
-              (k (cons (car ls) l2) l1)))]))
-
-(define (disj* gs)
-  (cond
-    [(null? (cdr gs)) (car gs)]
-    [else
-     (split gs
-       (lambda (gs1 gs2)
-         (disj2 (disj* gs1)
-                (disj* gs2))))]))
+    (elim (g s)
+      (lambda (s0 s-inf) (unit s0))
+      (lambda () (none)))))
 
 ;;; Here are the key parts of Appendix A
 
 (define-syntax disj
   (syntax-rules ()
-    [(disj) fail]
-    [(disj g ...) (disj* (list g ...))]))
+    ((disj) fail)
+    ((disj g) g)
+    ((disj g0 g ...) (disj2 g0 (disj g ...)))))
 
 (define-syntax conj
   (syntax-rules ()
@@ -196,8 +202,9 @@ balanced disjunction
     ((defrel (name x ...) g ...)
      (define (name x ...)
        (lambda (s)
-         (lambda ()
-           ((conj g ...) s)))))))
+         (step
+           (lambda ()
+             ((conj g ...) s))))))))
 
 (define-syntax run
   (syntax-rules ()
