@@ -15,45 +15,45 @@ Warning--empty address in friedman_reasoned_2018
 Warning--empty publisher in seres1999algebra
 Warning--empty address in seres1999algebra
 Warning--no number and no volume in yang2010adventures
-You've used 4 entries,
+You've used 5 entries,
             5733 wiz_defined-function locations,
-            1315 strings with 15049 characters,
-and the built_in function-call counts, 4499 in all, are:
-= -- 559
-> -- 165
+            1322 strings with 15261 characters,
+and the built_in function-call counts, 5866 in all, are:
+= -- 768
+> -- 217
 < -- 0
-+ -- 56
-- -- 52
-* -- 317
-:= -- 460
-add.period$ -- 20
-call.type$ -- 4
-change.case$ -- 28
-chr.to.int$ -- 4
-cite$ -- 9
-duplicate$ -- 389
-empty$ -- 274
-format.name$ -- 64
-if$ -- 1086
++ -- 73
+- -- 68
+* -- 418
+:= -- 591
+add.period$ -- 25
+call.type$ -- 5
+change.case$ -- 36
+chr.to.int$ -- 5
+cite$ -- 10
+duplicate$ -- 496
+empty$ -- 350
+format.name$ -- 84
+if$ -- 1441
 int.to.chr$ -- 2
 int.to.str$ -- 1
-missing$ -- 15
-newline$ -- 70
-num.names$ -- 32
-pop$ -- 162
+missing$ -- 19
+newline$ -- 78
+num.names$ -- 40
+pop$ -- 198
 preamble$ -- 1
-purify$ -- 64
+purify$ -- 81
 quote$ -- 0
-skip$ -- 128
+skip$ -- 163
 stack$ -- 0
-substring$ -- 290
-swap$ -- 36
+substring$ -- 396
+swap$ -- 49
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 77
+type$ -- 93
 warning$ -- 5
-while$ -- 25
+while$ -- 32
 width$ -- 0
-write$ -- 104
+write$ -- 121
 (There were 5 warnings)
