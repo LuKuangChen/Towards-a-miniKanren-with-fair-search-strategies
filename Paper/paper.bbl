@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{5}
+\begin{thebibliography}{4}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -59,19 +59,6 @@
   \bibinfo{person}{Jason Hemann}.} \bibinfo{year}{2018}\natexlab{}.
 \newblock \bibinfo{booktitle}{\emph{The {Reasoned} {Schemer}, {Second}
   {Edition}}}.
-\newblock
-
-
-\bibitem[\protect\citeauthoryear{Kiselyov, Shan, Friedman, and Sabry}{Kiselyov
-  et~al\mbox{.}}{2005}]%
-        {kiselyov2005backtracking}
-\bibfield{author}{\bibinfo{person}{Oleg Kiselyov}, \bibinfo{person}{Chung-chieh
-  Shan}, \bibinfo{person}{Daniel~P Friedman}, {and} \bibinfo{person}{Amr
-  Sabry}.} \bibinfo{year}{2005}\natexlab{}.
-\newblock \showarticletitle{Backtracking, interleaving, and terminating monad
-  transformers:(functional pearl)}.
-\newblock \bibinfo{journal}{\emph{ACM SIGPLAN Notices}} \bibinfo{volume}{40},
-  \bibinfo{number}{9} (\bibinfo{year}{2005}), \bibinfo{pages}{192--203}.
 \newblock
 
 

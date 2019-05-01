@@ -53,7 +53,6 @@ states in parallel share the same chance of being explored. Again, the answers
 by iDFS is different from the expectation. We have devised three new search 
 strategies that have different level of fairness in \disj and \conj.
 
-%TODO rewrite abstract
 %The syntax of a programming language should reflect its semantics. When using 
 %a disjunctive operator in relational programming, a programmer would expect 
 %all 
@@ -224,7 +223,9 @@ Our solution is requiring a search strategy with \emph{fair} \conj{} to
 package states in bags, where each bag contains finite states, and to allocate 
 resource evenly among search spaces derived from states in the same bag. The 
 way to package depends on search strategy. And how to allocate resource among 
-search space related to different bags is intended left unspecified.
+search space related to different bags is unspecified. Our definition of fair 
+\conj{} is orthogonal with completeness. For example, a naively fair strategy 
+is fair but not complete, while BFS is fair and complete. 
 
 BFS packages states by their costs. The \emph{cost} of a state is its 
 depth in the search tree (i.e. the number of calls to relational definitions 
@@ -316,21 +317,20 @@ information is recorded subtly -- the \texttt{car}s of a search space have cost
 0 (i.e. they are in the same bag), and the costs of states in thunk are 
 computed recursively then increased by one. It is even more subtle that
 \texttt{append-inf/fair} and the \texttt{append-map-inf/fair} respects the cost 
-information. We make this facts obvious by changing the type of search space, 
-modifying related function definitions, and introducing a few more functions.
+information. We make these facts more obvious by changing the type of search 
+space, modifying related function definitions, and introducing a few more 
+functions.
 
 The new type is a pair whose \texttt{car} is a list of state (the bag), and 
 whose \texttt{cdr} is either a \texttt{\#{}f} or a thunk returning a search 
 space. A falsy \texttt{cdr} means the search space is obviously finite. 
 
 Functions related to the pure subset are listed in Fig.~\ref{BFS-opt} (the 
-others in Fig.~\ref{BFS-opt-cont}). The first three functions in 
+others in Fig.~\ref{BFS-opt-cont}). We take them apart because they are 
+compared with Seres's implementation later. The first three functions in 
 Fig.~\ref{BFS-opt} are search space constructor. \texttt{none} makes an empty 
-search space. 
-\texttt{unit} makes an space from one state. \texttt{step} makes a space from a 
-thunk. The remaining functions do the same thing as before. Now it should be 
-not hard to see that \texttt{append-inf/fair} and \texttt{append-map-inf} do 
-respect cost information.
+search space. \texttt{unit} makes an space from one state. \texttt{step} makes 
+a space from a thunk. The remaining functions do the same thing as before. 
 
 Luckily, the change in \texttt{append-inf/fair} also fixes the miserable space 
 extravagance -- the use of \texttt{append} helps us to reuse the first bag of 
@@ -348,13 +348,12 @@ respectively.
 \end{figure}
 
 Functions implementing impure features are in Fig.~\ref{BFS-opt-cont}. The 
-first function, \texttt{elim}, is used to implement \texttt{ifte} and 
-\texttt{once}. It takes a space \texttt{s-inf} and two continuations 
-\texttt{ks} and \texttt{kf}. When \texttt{s-inf} contains some states, 
-\texttt{ks} is called with the first state and the rest space. Otherwise, 
-\texttt{kf} is called with no argument. Here `s' and `f' means `succeed' and 
-`fail' respectively. This function is an eliminator of search space, whence the 
-name. The remaining functions do the same thing as before.
+first function, \texttt{elim}, takes a space \texttt{s-inf} and two 
+continuations \texttt{ks} and \texttt{kf}. When \texttt{s-inf} contains some 
+states, \texttt{ks} is called with the first state and the rest space. 
+Otherwise, \texttt{kf} is called with no argument. Here `s' and `f' means 
+`succeed' and `fail' respectively. This function is an eliminator of search 
+space, whence the name. The remaining functions do the same thing as before.
 
 \subsection{comparison with Silvija's BFS}
 
@@ -465,14 +464,19 @@ Haskell code.
 
 \section{conclusion}
 
-%TODO contributions
+We analysis the definitions of fair \disj{} and fair \conj{}, then propose a 
+new definition of fair \conj{}. Our definition is orthogonal with completeness.
 
-% We devise a new search strategy, balanced interleaving DFS. The key idea is 
-%to make disjunct trees balanced. Changing the search strategy from iDFS to 
-%biDFS is not hard: 2 new functions and 1 modified macro. 
+We devise three new search strategies: balanced interleaving DFS (biDFS), fair 
+DFS (fDFS), and BFS. biDFS has almost-fair \disj{} and unfair \conj{}. fDFS has 
+fair \disj{} and unfair \conj{}. BFS has both fair \disj{} and fair \conj{}.
 
-% We also devise breadth-first search, whose intuition is similar to Seres's 
-%BFS. And we have proved their equivalence. We optimize our BFS with a queue.
+Our quantitative evaluation shows that biDFS and fDFS are competitive 
+alternatives to iDFS, the current search strategy, and that BFS is less 
+practical.
+
+We prove our BFS is equivalent to the BFS in \citep{seres1999algebra}. Our code 
+is shorter and runs faster than a direct translation of their Haskell code.
 
 \section*{acknowledgments}
 
