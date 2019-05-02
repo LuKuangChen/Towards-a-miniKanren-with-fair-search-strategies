@@ -1,25 +1,31 @@
 #lang racket
 (require "../mk-BFS-opt.rkt")
 
-(defrel (appendo l r o)
-  (conde
-    [(== '() l) (== r o)]
-    [(fresh (a d res)
-       (== `(,a . ,d) l)
-       (== `(,a . ,res) o)
-       (appendo d r res))]))
+(defrel (nullo x)
+  (== '() x))
 
-(defrel (reverseo l o)
+(defrel (conso a d p)
+  (== `(,a . ,d) p))
+
+(defrel (appendo l t out)
   (conde
-    [(== '() l) (== '() o)]
+    [(nullo l) (== t out)]
     [(fresh (a d res)
-       (== `(,a . ,d) l)
-       (appendo res `(,a) o)
-       (reverseo d res))]))
+       (conso a d l)
+       (conso a res out)
+       (appendo d t res))]))
+
+(defrel (reverso l out)
+  (conde
+    [(nullo l) (nullo out)]
+    [(fresh (a d res)
+       (conso a d l)
+       (appendo res `(,a) out)
+       (reverso d res))]))
 
 (define (just-time n)
   (void (time (run n (p q)
-                (reverseo p q)))))
+                (reverso p q)))))
 
 (just-time 10)
 (just-time 20)
