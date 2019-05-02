@@ -243,7 +243,7 @@ the outer list. Noted that BFS produces answers in increasing order of cost.
 
 \begin{figure}
 	\lstinputlisting{Figures/balanced-disj.rkt}
-	\caption{\texttt{balanced-disj}}
+	\caption{biDFS implementation}
 	\label{balanced-disj}
 \end{figure}
 
@@ -263,7 +263,7 @@ constructs the same sort of binary tree in one of the most unbalanced forms.
 
 \begin{figure}
 	\lstinputlisting{Figures/fDFS.rkt}
-	\caption{How fDFS differs from iDFS}
+	\caption{fDFS implementation}
 	\label{fDFS}
 \end{figure}
 
@@ -308,7 +308,8 @@ We prove so in Coq. The details are in the second subsection.
 
 \begin{figure}
 	\lstinputlisting{Figures/BFS-opt.rkt}	
-	\caption{interface functions in optimized BFS (pure)}
+	\caption{new and changed functions in optimized BFS that implements pure 
+	features}
 	\label{BFS-opt}
 \end{figure}
 
@@ -343,7 +344,8 @@ respectively.
 
 \begin{figure}
 	\lstinputlisting{Figures/BFS-opt-cont.rkt}	
-	\caption{interface functions in optimized BFS (impure)}
+	\caption{new and changed functions in optimized BFS that implements impure 
+		features}
 	\label{BFS-opt-cont}
 \end{figure}
 
