@@ -72,32 +72,35 @@ strategies that have different level of fairness in \disj and \conj.
 \maketitle
 
 \section{introduction}
-\NOTE[MVC]{test}
+\NOTE[MVC]{We need clear definitions of the following: fair, almost-fair, and unfair. Either use bullet points, or definition environment. Google ``latex math definition.''}
+\NOTE[MVC]{A quick intro to miniKanren would be nice here.}
+
 
 miniKanren programs, especially relational interpreters, have been proven to be 
 useful in solving many problems \citep{byrd2017unified}. A subtlety in writing 
-relational programs having large \conde expressions, such as interpreters, is 
+relational programs having \conde expressions with large number of clauses,
+such as interpreters, is 
 that the order of \conde clauses can affect the speed considerably. When a 
 \conde expression is large enough, the left clauses consume almost all the 
-resource and the right ones are hardly explored. The unfair \disj{} of the 
-current search strategy, interleaving DFS, is the cause. Under the hood, \conde 
-uses \texttt{conj} to create a goal for each clause, and \texttt{disj} to 
-combine these goals to one. The current \texttt{disj} allocates half resource 
-to its first goal, then allocates the other half to the rest similarly, except 
-for the last clause which takes all the resource. 
+resources and the right ones are barely explored. The cause is the unfair
+search strategy, interleaving DFS(DFS$_\textrm{i}$). In a \conde expression,
+each clause takes half of the received resources and pass the other half
+to the remaining clauses, except for the last clause that takes all resources
+it receives.
 
+\NOTE[MVC]{A motivation is needed. Why do people want fairness?}
+\NOTE[MVC]{\texttt{conj} fairness is not defined.}
 Being aware of \texttt{disj} fairness, we also investigate \texttt{conj} 
 fairness. 
-
 We propose three new search strategies, balanced interleaving DFS (DFS$_\textrm{bi}$), fair 
 DFS (DFS$_\textrm{f}$), and BFS. They have different characteristics of fairness 
-(Table.~\ref{fairness}). We prove that the pure subset of our BFS and the BFS 
+(Fig.~\ref{fairness}). We prove that the pure subset of our BFS and the BFS 
 proposed by Seres et
 al~\citep{seres1999algebra} produce the same result when queried. But our code 
-is shorter and runs faster. Because the two BFSs are equivalent, we do not 
-distinguish them in most places.
+is simpler and runs faster on our benchmarks. Because the two BFSs are equivalent,
+we do not distinguish them in most places.
  
-\begin{table}
+\begin{figure}[tbp]
 	\begin{tabular}{|c|c|c|c|c|}
 		\hline 
 		fairness & DFS$_\textrm{i}$ & DFS$_\textrm{bi}$ & DFS$_\textrm{f}$ & BFS \\ 
@@ -109,7 +112,7 @@ distinguish them in most places.
 	\end{tabular} 
 	\caption{fairness of search strategies}
 	\label{fairness}
-\end{table}
+\end{figure}
 
 % Interleaving DFS, the search strategy of \conde in
 % miniKanren~\citep{friedman_reasoned_2018}, allocates computational resource
@@ -149,7 +152,7 @@ whose elements are \texttt{x} (Fig.~\ref{repeato}).
 In the following program, the three \conde clauses differ in a trivial way. So 
 we expect lists of each sort constitute $1/4$ of the answer list. However, 
 DFS$_\textrm{i}$, the current search strategy, gives us much more lists of \texttt{a} than 
-other sorts of lists. And some sorts (e.g. lists of \texttt{c}) are hardly 
+other sorts of lists. And some sorts (e.g. lists of \texttt{c}) are rarely 
 found. The situation would be worse if we add more \conde clauses.
 
 \begin{center}
@@ -191,7 +194,7 @@ In the following program, the three \conde clauses differ in a trivial way. So
 we expect lists of each sort constitute $1/4$ of the answer list. However, 
 search strategies with unfair \conj{} (e.g. DFS$_\textrm{i}$, DFS$_\textrm{f}$) give us much 
 more lists of \texttt{a} than other sorts of lists. And some sorts (e.g. lists 
-of \texttt{c}) are hardly found. Although DFS$_\textrm{i}$'s \disj{} is unfair in general, 
+of \texttt{c}) are rarely found. Although DFS$_\textrm{i}$'s \disj{} is unfair in general, 
 it is fair when there is no call to relational definition in sub-goals, 
 including this case. The situation would be worse if we add more \conde 
 clauses. The result with DFS$_\textrm{bi}$, whose \conj{} is also unfair, is similar, but 
