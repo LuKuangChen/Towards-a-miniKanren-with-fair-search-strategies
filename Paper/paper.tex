@@ -46,11 +46,11 @@
 The syntax of a programming language should reflect its semantics. When writing 
 a \conde expression in miniKanren, a programmer would expect all clauses share 
 the same chance of being explored, as these clauses are written in 
-parallel. The existing search strategy, interleaving DFS (iDFS), however, 
+parallel. The existing search strategy, interleaving DFS (DFS$_\textrm{i}$), however, 
 prioritize its clauses by the order how they are written down. Similarly, when 
 a \conde is followed by another goal conjunctively, a programmer would expect 
 states in parallel share the same chance of being explored. Again, the answers 
-by iDFS is different from the expectation. We have devised three new search 
+by DFS$_\textrm{i}$ is different from the expectation. We have devised three new search 
 strategies that have different level of fairness in \disj and \conj.
 
 %The syntax of a programming language should reflect its semantics. When using 
@@ -84,8 +84,8 @@ for the last clause which takes all the resource.
 Being aware of \texttt{disj} fairness, we also investigate \texttt{conj} 
 fairness. 
 
-We propose three new search strategies, balanced interleaving DFS (biDFS), fair 
-DFS (fDFS), and BFS. They have different characteristics of fairness 
+We propose three new search strategies, balanced interleaving DFS (DFS$_\textrm{bi}$), fair 
+DFS (DFS$_\textrm{f}$), and BFS. They have different characteristics of fairness 
 (Table.~\ref{fairness}). We prove that the pure subset of our BFS and the BFS 
 proposed by Seres et
 al~\citep{seres1999algebra} produce the same result when queried. But our code 
@@ -95,7 +95,7 @@ distinguish them in most places.
 \begin{table}
 	\begin{tabular}{|c|c|c|c|c|}
 		\hline 
-		fairness & iDFS & biDFS & fDFS & BFS \\ 
+		fairness & DFS$_\textrm{i}$ & DFS$_\textrm{bi}$ & DFS$_\textrm{f}$ & BFS \\ 
 		\hline 
 		disj & unfair & almost-fair & fair & fair \\ 
 		\hline 
@@ -121,7 +121,7 @@ distinguish them in most places.
 % the unfairness to optimize their programs. However, we believe search 
 %strategies that is less sensitive to goal order can also be useful to little 
 %miniKanreners as well as seasoned ones. We propose two such search strategies, 
-%balanced interleaving DFS (biDFS) and breadth-first search (BFS), and observe 
+%balanced interleaving DFS (DFS$_\textrm{bi}$) and breadth-first search (BFS), and observe 
 %how they affect the efficiency and the answer order of known miniKanren 
 %programs. The experiment is conducted with the miniKanren from \textit{The 
 %Reasoned Schemer, 2nd Edition}.
@@ -143,7 +143,7 @@ whose elements are \texttt{x} (Fig.~\ref{repeato}).
 
 In the following program, the three \conde clauses differ in a trivial way. So 
 we expect lists of each sort constitute $1/4$ of the answer list. However, 
-iDFS, the current search strategy, gives us much more lists of \texttt{a} than 
+DFS$_\textrm{i}$, the current search strategy, gives us much more lists of \texttt{a} than 
 other sorts of lists. And some sorts (e.g. lists of \texttt{c}) are hardly 
 found. The situation would be worse if we add more \conde clauses.
 
@@ -155,7 +155,7 @@ found. The situation would be worse if we add more \conde clauses.
 
 We borrow the definition of \emph{fair} \disj{} from \cite{seres1999algebra}: 
 search strategies with \emph{fair} \disj{} should allocate resource evenly 
-among disjunctive goals. Running the same program with fDFS and BFS give the 
+among disjunctive goals. Running the same program with DFS$_\textrm{f}$ and BFS give the 
 following result. 
 
 \begin{center}
@@ -167,7 +167,7 @@ following result.
 We conceive a middle place between fair and unfair -- search strategies with 
 \emph{almost-fair} \disj{} should allocate resource so evenly among disjunctive 
 goals\citep{seres1999algebra} that the the maximal ratio of resource is bounded 
-by a constant. Our new search strategy, biDFS, has almost-fair \disj{}. It is 
+by a constant. Our new search strategy, DFS$_\textrm{bi}$, has almost-fair \disj{}. It is 
 fair when the number of goals is a power of 2, otherwise, some goals are 
 allocated twice more resource than the others. In the previous example, it 
 gives the same result. And in the following example, where the \conde has 5 
@@ -184,12 +184,12 @@ more resource.
 
 In the following program, the three \conde clauses differ in a trivial way. So 
 we expect lists of each sort constitute $1/4$ of the answer list. However, 
-search strategies with unfair \conj{} (e.g. iDFS, fDFS) give us much 
+search strategies with unfair \conj{} (e.g. DFS$_\textrm{i}$, DFS$_\textrm{f}$) give us much 
 more lists of \texttt{a} than other sorts of lists. And some sorts (e.g. lists 
-of \texttt{c}) are hardly found. Although iDFS's \disj{} is unfair in general, 
+of \texttt{c}) are hardly found. Although DFS$_\textrm{i}$'s \disj{} is unfair in general, 
 it is fair when there is no call to relational definition in sub-goals, 
 including this case. The situation would be worse if we add more \conde 
-clauses. The result with biDFS, whose \conj{} is also unfair, is similar, but 
+clauses. The result with DFS$_\textrm{bi}$, whose \conj{} is also unfair, is similar, but 
 due to its different \disj{}, the position of \texttt{b} and \texttt{c} are 
 swapped. 
 
@@ -243,12 +243,12 @@ the outer list. Noted that BFS produces answers in increasing order of cost.
 
 \begin{figure}
 	\lstinputlisting{Figures/balanced-disj.rkt}
-	\caption{biDFS implementation}
+	\caption{DFS$_\textrm{bi}$ implementation}
 	\label{balanced-disj}
 \end{figure}
 
-Balanced interleaving DFS (biDFS) has almost-fair \disj{} and unfair \conj{}. 
-The implementation of biDFS differs from iDFS in the \disj{} macro. We list the 
+Balanced interleaving DFS (DFS$_\textrm{bi}$) has almost-fair \disj{} and unfair \conj{}. 
+The implementation of DFS$_\textrm{bi}$ differs from DFS$_\textrm{i}$ in the \disj{} macro. We list the 
 new \disj{} with its helpers in Fig.~\ref{balanced-disj}. The first helper 
 function, \texttt{split}, takes a list of goals \texttt{ls} and a procedure 
 \texttt{k}, partitions \texttt{ls} into two sub-lists of roughly equal length, 
@@ -256,19 +256,19 @@ and returns the application of \texttt{k} to the two sub-lists. \texttt{disj*}
 takes a non-empty list of goals \texttt{gs} and returns a goal. With the help 
 of \texttt{split}, it essentially constructs a \emph{balanced} binary tree 
 where leaves are elements of \texttt{gs} and nodes are \texttt{disj2}, whence 
-the name of this search strategy. In contrast, the \disj{} in iDFS essentially 
+the name of this search strategy. In contrast, the \disj{} in DFS$_\textrm{i}$ essentially 
 constructs the same sort of binary tree in one of the most unbalanced forms.
 
 \section{fair depth-first search}
 
 \begin{figure}
 	\lstinputlisting{Figures/fDFS.rkt}
-	\caption{fDFS implementation}
+	\caption{DFS$_\textrm{f}$ implementation}
 	\label{fDFS}
 \end{figure}
 
-Fair DFS (fDFS) has fair \disj{} and unfair \conj{}. The implementation of fDFS 
-differs from iDFS's in \texttt{disj2} (Fig.~\ref{fDFS}). \texttt{disj2} is 
+Fair DFS (DFS$_\textrm{f}$) has fair \disj{} and unfair \conj{}. The implementation of DFS$_\textrm{f}$ 
+differs from DFS$_\textrm{i}$'s in \texttt{disj2} (Fig.~\ref{fDFS}). \texttt{disj2} is 
 changed to call a new and fair version of \texttt{append-inf}. 
 \texttt{append-inf/fair} immediately calls its helper, 
 \texttt{append-inf/fair\^{}}, with the first argument, \texttt{s?}, set to 
@@ -288,7 +288,7 @@ produced in a more natural order.
 \section{breadth-first search}
 
 BFS is fair in both \disj{} and \conj{}. Our implementation is based on 
-fDFS (not iDFS). All we have to do is apply two trivial changes to 
+DFS$_\textrm{f}$ (not DFS$_\textrm{i}$). All we have to do is apply two trivial changes to 
 \texttt{append-map-inf}. First, rename it to \texttt{append-map-inf/fair}. 
 Second, replace its use of \texttt{append-inf} to \texttt{append-inf/fair}. 
 
@@ -385,7 +385,7 @@ for the formal proof)
 \begin{table}
 	\begin{tabular}{|c|c|c|c|c|c|c|}
 		\hline 
-		benchmark & size & iDFS & biDFS & fDFS & optimized BFS & Silvija's BFS  
+		benchmark & size & DFS$_\textrm{i}$ & DFS$_\textrm{bi}$ & DFS$_\textrm{f}$ & optimized BFS & Silvija's BFS  
 		\\
 		\hline
 		very-recursiveo & 100000 &  579 &  793 & 2131 & 1438 & 3617 \\
@@ -440,17 +440,17 @@ you)}. This benchmark is also inspired by \citep{byrd2017unified}. Again, the
 sibling benchmarks differ in the \conde clause order of their relation 
 interpreters. The first one 
 has elimination rules (i.e. application, \texttt{car}, and \texttt{cdr}) at the 
-end, while the other has them at the beginning. We conjecture that iDFS would 
+end, while the other has them at the beginning. We conjecture that DFS$_\textrm{i}$ would 
 perform badly in the second case because elimination rules complicate the 
 problem when running backward. The evaluation supports our conjecture.
 
-In general, only iDFS and biDFS constantly perform well. fDFS is just as 
+In general, only DFS$_\textrm{i}$ and DFS$_\textrm{bi}$ constantly perform well. DFS$_\textrm{f}$ is just as 
 efficient in all benchmarks but \texttt{very-recursiveo}. Both BFS have obvious 
 overhead in many cases. Among the three variants of DFS (they all have unfair 
-\conj{}), fDFS is most resistant to clause permutation, followd by biDFS then 
-iDFS. Among the two implementation of BFS, ours constantly performs as well or 
+\conj{}), DFS$_\textrm{f}$ is most resistant to clause permutation, followd by DFS$_\textrm{bi}$ then 
+DFS$_\textrm{i}$. Among the two implementation of BFS, ours constantly performs as well or 
 better. Interestingly, every strategies with fair \disj{} suffers in 
-\texttt{very-recursiveo} and fDFS performs well elsewhere. Therefore, this 
+\texttt{very-recursiveo} and DFS$_\textrm{f}$ performs well elsewhere. Therefore, this 
 benchmark might be a special case. Fair \conj{} imposes overhead constantly 
 except in \texttt{appendo}. The reason might be that strategies with fair 
 \conj{} tend to keep more intermediate states in the memory.
@@ -470,12 +470,12 @@ Haskell code.
 We analysis the definitions of fair \disj{} and fair \conj{}, then propose a 
 new definition of fair \conj{}. Our definition is orthogonal with completeness.
 
-We devise three new search strategies: balanced interleaving DFS (biDFS), fair 
-DFS (fDFS), and BFS. biDFS has almost-fair \disj{} and unfair \conj{}. fDFS has 
+We devise three new search strategies: balanced interleaving DFS (DFS$_\textrm{bi}$), fair 
+DFS (DFS$_\textrm{f}$), and BFS. DFS$_\textrm{bi}$ has almost-fair \disj{} and unfair \conj{}. DFS$_\textrm{f}$ has 
 fair \disj{} and unfair \conj{}. BFS has both fair \disj{} and fair \conj{}.
 
-Our quantitative evaluation shows that biDFS and fDFS are competitive 
-alternatives to iDFS, the current search strategy, and that BFS is less 
+Our quantitative evaluation shows that DFS$_\textrm{bi}$ and DFS$_\textrm{f}$ are competitive 
+alternatives to DFS$_\textrm{i}$, the current search strategy, and that BFS is less 
 practical.
 
 We prove our BFS is equivalent to the BFS in \citep{seres1999algebra}. Our code 
