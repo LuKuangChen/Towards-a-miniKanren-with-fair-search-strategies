@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{4}
+\begin{thebibliography}{5}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -59,6 +59,18 @@
   \bibinfo{person}{Jason Hemann}.} \bibinfo{year}{2018}\natexlab{}.
 \newblock \bibinfo{booktitle}{\emph{The {Reasoned} {Schemer}, {Second}
   {Edition}}}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Rozplokhas and Boulytchev}{Rozplokhas and
+  Boulytchev}{2018}]%
+        {rozplokhas2018improving}
+\bibfield{author}{\bibinfo{person}{Dmitri Rozplokhas} {and}
+  \bibinfo{person}{Dmitri Boulytchev}.} \bibinfo{year}{2018}\natexlab{}.
+\newblock \showarticletitle{Improving Refutational Completeness of Relational
+  Search via Divergence Test}. In \bibinfo{booktitle}{\emph{Proceedings of the
+  20th International Symposium on Principles and Practice of Declarative
+  Programming}}. ACM, \bibinfo{pages}{18}.
 \newblock
 
 

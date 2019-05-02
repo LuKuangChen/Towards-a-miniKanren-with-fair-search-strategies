@@ -359,7 +359,8 @@ space, whence the name. The remaining functions do the same thing as before.
 
 In this section, we compare the pure subset of our optimized BFS with the BFS 
 found in \citep{seres1999algebra}. We focus on the pure subset because 
-Silvija's system is pure. 
+Silvija's system is pure. Her system represents search spaces with streams of 
+lists of states, where each list is a bag.
 
 To compare efficiency, we translate her Haskell code into Racket (See 
 supplements for the translated code). The translation is fairly straightforward 
@@ -379,8 +380,6 @@ for the formal proof)
 
 \section{quantitative evaluation}
 
-;;TODO check if reverso and appendo are absolutely the same as the ones in TRS2.
-
 \begin{table}
 	\begin{tabular}{|c|c|c|c|c|c|c|}
 		\hline 
@@ -395,7 +394,7 @@ for the formal proof)
 		& 200 & 224 & 222 & 221 & 226 & 218 \\ 
 		& 300 & 617 & 634 & 593 & 631 & 622 \\ 
 		\hline 
-		reverseo & 10 &   5 &   3 &   3 &     38 &     85 \\ 
+		reverso & 10 &   5 &   3 &   3 &     38 &     85 \\ 
 		& 20 & 107 &  98 &  51 &   4862 &   5844 \\
 		& 30 & 446 & 442 & 485 & 123288 & 132159 \\ 
 		\hline
@@ -424,9 +423,11 @@ for the formal proof)
 
 In this section, we compare the efficiency of search strategies. A concise 
 description is in Table~\ref{compare-efficiency}. A hyphen means running out of 
-memory. The first three benchmarks are taken from 
-\citep{friedman_reasoned_2018}. Next two benchmarks about quine are modified 
-from a similar test case in \citep{byrd2017unified}. The modifications are made 
+memory. The first two benchmarks are taken from 
+\citep{friedman_reasoned_2018}. \texttt{reverso} is from 
+\citep{rozplokhas2018improving}. Next two benchmarks 
+about quine are modified from a similar test case in \citep{byrd2017unified}. 
+The modifications are made 
 to circumvent the need for symbolic constraints (e.g. $\neq$, 
 \texttt{absento}). Our version generates de 
 Bruijnized expressions and prevent closures getting into list. The two 
