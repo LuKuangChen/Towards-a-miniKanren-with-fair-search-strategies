@@ -53,7 +53,7 @@ the same chance of being explored, as these clauses are written in
 parallel. The existing search strategy, interleaving DFS (DFS$_\textrm{i}$), however, 
 prioritize its clauses by the order how they are written down. Similarly, when 
 a \conde is followed by another goal conjunctively, a programmer would expect 
-states in parallel share the same chance of being explored. Again, the answers 
+answers in parallel share the same chance of being explored. Again, the answers 
 by DFS$_\textrm{i}$ is different from the expectation. We have devised three new search 
 strategies that have different level of fairness in \disj and \conj.
 
@@ -135,8 +135,9 @@ we do not distinguish them in most places.
 
 \section{fairness}
 
-We demonstrate the aspects (\disj{} or \conj{}) and levels (unfair, 
-almost-fair, or fair) of fairness by running queries about \texttt{repeato}, a 
+In this section, we demonstrate the aspects (\disj{} or \conj{}) and levels
+(unfair, almost-fair, or fair) of fairness by running queries about
+\texttt{repeato}, a 
 relational definition that relates a term \texttt{x} with a non-empty list 
 whose elements are \texttt{x} (Fig.~\ref{repeato}).
 
@@ -148,11 +149,11 @@ whose elements are \texttt{x} (Fig.~\ref{repeato}).
 
 \subsection{fair \texttt{disj}}
 
-In the following program, the three \conde clauses differ in a trivial way. So 
-we expect lists of each letter constitute $1/4$ of the answer list. However, 
-DFS$_\textrm{i}$, the current search strategy, gives us much more lists of \texttt{a}s than 
-lists of other letters. And some letters (e.g. lists of \texttt{c}) are rarely 
-found. The situation would be worse if we add more \conde clauses.
+Given the following program, it is natural to expect lists of each letter
+constitute $1/4$ in the answer. However, DFS$_\textrm{i}$, the current search
+strategy, results in much more lists of \texttt{a}s than lists of other
+letters. And some letters, e.g. \texttt{c} and \texttt{d}, are rarely seen.
+The situation would be exacerbated if \conde contains more clauses.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -161,7 +162,7 @@ found. The situation would be worse if we add more \conde clauses.
 \end{center}
 
 We borrow the definition of \emph{fair} \disj{} from \cite{seres1999algebra}: 
-search strategies with \emph{fair} \disj{} should allocate resource evenly 
+search strategies with \emph{fair} \disj{} should allocate resources evenly 
 among disjunctive goals. Running the same program with DFS$_\textrm{f}$ and BFS give the 
 following result. 
 
@@ -171,15 +172,17 @@ following result.
 	\end{tabular}
 \end{center}
 
-We conceive a middle place between fair and unfair -- search strategies with 
-\emph{almost-fair} \disj{} should allocate resource so evenly among disjunctive 
-goals\citep{seres1999algebra} that the the maximal ratio of resource is bounded 
-by a constant. Our new search strategy, DFS$_\textrm{bi}$, has almost-fair \disj{}. It is 
+Now we are in a middle place between fair and unfair -- search strategies
+with  \emph{almost-fair} \disj{} should allocate resources so evenly among
+disjunctive  goals\citep{seres1999algebra} that the the maximal ratio of
+resources is bounded by a constant. Our new search strategy,
+DFS$_\textrm{bi}$, has almost-fair \disj{}. It is
 fair when the number of goals is a power of 2, otherwise, some goals are 
-allocated twice more resource than the others. In the previous example, it 
+allocated twice more resources than the others. In the previous example,
+DFS$_\textrm{bi}$
 gives the same result. And in the following example, where the \conde has 5 
 clause, the clauses of \texttt{b}, \texttt{c}, and \texttt{d} are allocated 
-more resource.
+more resources.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -216,7 +219,7 @@ lists equally frequently. Indeed, BFS does so.
 \end{center}
 
 A more interesting situation is when the first conjunctive goal produces 
-infinite many states. Consider the following example, a naive specification of 
+infinite many answers. Consider the following example, a naive specification of 
 fair \conj{} might require search strategies to produce all sorts of singleton 
 lists, but no longer ones, which makes the strategies \emph{incomplete}. 
 
@@ -227,14 +230,14 @@ lists, but no longer ones, which makes the strategies \emph{incomplete}.
 \end{center}
 
 Our solution is requiring a search strategy with \emph{fair} \conj{} to 
-package states in bags, where each bag contains finite states, and to allocate 
-resource evenly among search spaces derived from states in the same bag. The 
-way to package depends on search strategy. And how to allocate resource among 
+package answers in bags, where each bag contains finite answers, and to allocate 
+resources evenly among search spaces derived from answers in the same bag. The 
+way to package depends on search strategy. And how to allocate resources among 
 search space related to different bags is unspecified. Our definition of fair 
 \conj{} is orthogonal with completeness. For example, a naively fair strategy 
 is fair but not complete, while BFS is fair and complete. 
 
-BFS packages states by their costs. The \emph{cost} of a state is its 
+BFS packages answers by their costs. The \emph{cost} of a answer is its 
 depth in the search tree (i.e. the number of calls to relational definitions 
 required to find them) \citep{seres1999algebra}. In the following example, the 
 cost of an answer is equal to the length of the inner lists plus the length of 
@@ -300,7 +303,7 @@ DFS$_\textrm{f}$ (not DFS$_\textrm{i}$). All we have to do is apply two trivial 
 Second, replace its use of \texttt{append-inf} to \texttt{append-inf/fair}. 
 
 The implementation can be improved in two aspects. First, as we mentioned in 
-section 2.2, our BFS bag states by their cost. However, in this implementation, 
+section 2.2, our BFS bag answers by their cost. However, in this implementation, 
 it is unclear where this information is recorded. Second, 
 \texttt{append-inf/fair} is extravagant in memory usage. It makes 
 $O(n+m)$ new \texttt{cons} cells every time, where $n$ and $m$ are the 
@@ -320,16 +323,16 @@ We prove so in Coq. The details are in the second subsection.
 	\label{BFS-opt}
 \end{figure}
 
-As we mentioned in section 2.2, our BFS bag states by their cost. The bagging 
+As we mentioned in section 2.2, our BFS bag answers by their cost. The bagging 
 information is recorded subtly -- the \texttt{car}s of a search space have cost 
-0 (i.e. they are in the same bag), and the costs of states in thunk are 
+0 (i.e. they are in the same bag), and the costs of answers in thunk are 
 computed recursively then increased by one. It is even more subtle that
 \texttt{append-inf/fair} and the \texttt{append-map-inf/fair} respects the cost 
 information. We make these facts more obvious by changing the type of search 
 space, modifying related function definitions, and introducing a few more 
 functions.
 
-The new type is a pair whose \texttt{car} is a list of state (the bag), and 
+The new type is a pair whose \texttt{car} is a list of answers (the bag), and 
 whose \texttt{cdr} is either a \texttt{\#{}f} or a thunk returning a search 
 space. A falsy \texttt{cdr} means the search space is obviously finite. 
 
@@ -337,7 +340,7 @@ Functions related to the pure subset are listed in Fig.~\ref{BFS-opt} (the
 others in Fig.~\ref{BFS-opt-cont}). We take them apart because they are 
 compared with Seres's implementation later. The first three functions in 
 Fig.~\ref{BFS-opt} are search space constructor. \texttt{none} makes an empty 
-search space. \texttt{unit} makes an space from one state. \texttt{step} makes 
+search space. \texttt{unit} makes an space from one answer. \texttt{step} makes 
 a space from a thunk. The remaining functions do the same thing as before. 
 
 Luckily, the change in \texttt{append-inf/fair} also fixes the miserable space 
@@ -359,7 +362,7 @@ respectively.
 Functions implementing impure features are in Fig.~\ref{BFS-opt-cont}. The 
 first function, \texttt{elim}, takes a space \texttt{s-inf} and two 
 continuations \texttt{ks} and \texttt{kf}. When \texttt{s-inf} contains some 
-states, \texttt{ks} is called with the first state and the rest space. 
+answers, \texttt{ks} is called with the first answer and the rest space. 
 Otherwise, \texttt{kf} is called with no argument. Here `s' and `f' means 
 `succeed' and `fail' respectively. This function is an eliminator of search 
 space, whence the name. The remaining functions do the same thing as before.
@@ -369,7 +372,7 @@ space, whence the name. The remaining functions do the same thing as before.
 In this section, we compare the pure subset of our optimized BFS with the BFS 
 found in \citep{seres1999algebra}. We focus on the pure subset because 
 Silvija's system is pure. Her system represents search spaces with streams of 
-lists of states, where each list is a bag.
+lists of answers, where each list is a bag.
 
 To compare efficiency, we translate her Haskell code into Racket (See 
 supplements for the translated code). The translation is fairly straightforward 
@@ -460,7 +463,7 @@ better. Interestingly, every strategies with fair \disj{} suffers in
 \texttt{very-recursiveo} and DFS$_\textrm{f}$ performs well elsewhere. Therefore, this 
 benchmark might be a special case. Fair \conj{} imposes overhead constantly 
 except in \texttt{appendo}. The reason might be that strategies with fair 
-\conj{} tend to keep more intermediate states in the memory.
+\conj{} tend to keep more intermediate answers in the memory.
 
 \section{related works}
 
