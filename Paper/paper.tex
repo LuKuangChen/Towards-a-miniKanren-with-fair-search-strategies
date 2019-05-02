@@ -73,8 +73,7 @@ strategies that have different level of fairness in \disj and \conj.
 
 \section{introduction}
 \NOTE[MVC]{We need clear definitions of the following: fair, almost-fair, and unfair. Either use bullet points, or definition environment. Google ``latex math definition.''}
-\NOTE[MVC]{A quick intro to miniKanren would be nice here.}
-
+\NOTE[MVC]{A quick intro to miniKanren would be nice here. We should mention The Reasoned Schemer, 2nd and say DFSi is used there.}
 
 miniKanren programs, especially relational interpreters, have been proven to be 
 useful in solving many problems \citep{byrd2017unified}. A subtlety in writing 
@@ -150,9 +149,9 @@ whose elements are \texttt{x} (Fig.~\ref{repeato}).
 \subsection{fair \texttt{disj}}
 
 In the following program, the three \conde clauses differ in a trivial way. So 
-we expect lists of each sort constitute $1/4$ of the answer list. However, 
-DFS$_\textrm{i}$, the current search strategy, gives us much more lists of \texttt{a} than 
-other sorts of lists. And some sorts (e.g. lists of \texttt{c}) are rarely 
+we expect lists of each letter constitute $1/4$ of the answer list. However, 
+DFS$_\textrm{i}$, the current search strategy, gives us much more lists of \texttt{a}s than 
+lists of other letters. And some letters (e.g. lists of \texttt{c}) are rarely 
 found. The situation would be worse if we add more \conde clauses.
 
 \begin{center}
@@ -191,9 +190,9 @@ more resource.
 \subsection{fair \texttt{conj}}
 
 In the following program, the three \conde clauses differ in a trivial way. So 
-we expect lists of each sort constitute $1/4$ of the answer list. However, 
+we expect lists of each letter constitute $1/4$ of the answer list. However, 
 search strategies with unfair \conj{} (e.g. DFS$_\textrm{i}$, DFS$_\textrm{f}$) give us much 
-more lists of \texttt{a} than other sorts of lists. And some sorts (e.g. lists 
+more lists of \texttt{a}s than lists of other letters. And some letters (e.g. lists 
 of \texttt{c}) are rarely found. Although DFS$_\textrm{i}$'s \disj{} is unfair in general, 
 it is fair when there is no call to relational definition in sub-goals, 
 including this case. The situation would be worse if we add more \conde 
@@ -207,7 +206,7 @@ swapped.
 	\end{tabular}
 \end{center}
 
-Intuitively, search strategies with fair \conj{} should produce each sort of 
+Intuitively, search strategies with fair \conj{} should produce each letter of 
 lists equally frequently. Indeed, BFS does so.
 
 \begin{center}
