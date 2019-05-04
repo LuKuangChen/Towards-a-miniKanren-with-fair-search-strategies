@@ -42,6 +42,13 @@
 \newcommand{\conde}{\texttt{cond$^e$} }
 \newcommand{\conj}{\texttt{conj}}
 \newcommand{\disj}{\texttt{disj}}
+\newcommand{\clisting}[1]{
+\begin{center}
+  \begin{tabular}{c}
+	\lstinputlisting{#1}
+    \end{tabular}
+\end{center}
+}
 
 
 \newtheorem{defn}{Definition}[section]
@@ -77,11 +84,30 @@ level of fairness in \disj and \conj.
 
 \section{introduction}
 
-miniKanren is a family of relational programming languages. miniKanren 
-programs, especially relational interpreters, have been proven to be 
+miniKanren is a family of relational programming languages.
+\citet{friedman_reasoned_2018} introduce miniKanren and its implementation
+in the The Reasoned Schemer, 2nd Ed(TR2). miniKanren programs, especially
+relational interpreters, have been proven to be 
 useful in solving many problems by \citet{byrd2017unified}. 
 
-A subtlety in writing miniKanren programs with large \conde expressions, such 
+\conde is the flagship disjunction operator in miniKanren. A subtlety arises
+when a \conde contains many disjunction clauses: not every clause has the equal
+chance to contribute to the answers. As an example, consider the following
+relation \texttt{repeato} and its invocation.
+\clisting{Figures/repeato.rkt}
+Next, consider the following disjuction of invoking \texttt{repeato} with
+four different letters.
+\clisting{Figures/example.rkt}
+\conde intuitively corresponds to \texttt{or} in logic. An unsuspicious beginner
+would expect each letter to contribute equally to the result, as following. 
+\clisting{Figures/run-repeato-fair.rkt}
+The \conde in TR2, however, generates a less expected result.
+\clisting{Figures/run-repeato-idfs.rkt}
+
+
+A subtlety arises when 
+A subtlety in writing miniKanren programs with \conde expressions with many
+clauses, such 
 as relational interpreters, is that the order of \conde clauses sometimes 
 affect the speed considerably. This phenomenon appears when running with the 
 miniKanren in \citet{friedman_reasoned_2018}, one of the most well-understood 
@@ -178,13 +204,13 @@ To summarize our contribution, we
 \section{fairness}
 
 In this section, we elaborate fairness by running queries about 
-\texttt{repeato}, a relational definition that relates a term \texttt{x} with a 
+\texttt{repeato2}, a relational definition that relates a term \texttt{x} with a 
 non-empty list whose elements are \texttt{x} (Fig.~\ref{repeato}).
 
 \begin{figure}
 	\lstinputlisting{Figures/repeato.rkt}
 	\caption{\texttt{repeato} and an example run}
-	\label{repeato}
+	\label{repeato2}
 \end{figure}
 
 \subsection{fair \texttt{disj}}
