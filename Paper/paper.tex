@@ -49,6 +49,9 @@
     \end{tabular}
 \end{center}
 }
+\newcommand{\DFSi}[0]{
+  DFS$_\textrm{i}$
+}
 
 
 \newtheorem{defn}{Definition}[section]
@@ -92,31 +95,44 @@ useful in solving many problems by \citet{byrd2017unified}.
 
 \conde is the flagship disjunction operator in miniKanren. A subtlety arises
 when a \conde contains many disjunction clauses: not every clause has the equal
-chance to contribute to the answers. As an example, consider the following
+chance to contribute to the result. As an example, consider the following
 relation \texttt{repeato} and its invocation.
 \clisting{Figures/repeato.rkt}
 Next, consider the following disjuction of invoking \texttt{repeato} with
 four different letters.
 \clisting{Figures/example.rkt}
-\conde intuitively corresponds to \texttt{or} in logic. An unsuspicious beginner
-would expect each letter to contribute equally to the result, as following. 
+\conde intuitively corresponds to \texttt{or} in logic. And thus an unsuspicious
+beginner would expect each letter to contribute equally to the result, as
+following.
 \clisting{Figures/run-repeato-fair.rkt}
 The \conde in TR2, however, generates a less expected result.
 \clisting{Figures/run-repeato-idfs.rkt}
 
+\conde implements interleaving DFS(\DFSi), the cause of this unexpected result.
+In a \conde, each clause takes a half of its received computational resources
+and pass the other half to its following clauses, except for the last clause
+that takes all resources it receives. In the example above, the letters
+\texttt{c} and \texttt{d} are allocated with less resources than \texttt{a},
+and thus \texttt{c} and \texttt{d} barely contribute to the result.
 
-A subtlety arises when 
-A subtlety in writing miniKanren programs with \conde expressions with many
-clauses, such 
-as relational interpreters, is that the order of \conde clauses sometimes 
-affect the speed considerably. This phenomenon appears when running with the 
-miniKanren in \citet{friedman_reasoned_2018}, one of the most well-understood 
-implementation. This is because for all \conde expressions with more than two 
-clauses, the clauses are given different ``search priority''. Left clauses are 
-given higher priorities. This biased treatment causes 2 problems when a \conde 
-expression has many clauses: the right-most clause can hardly contribute to 
-query result; and the efficiency of the whole program might depend largely on 
-the order of these clauses.
+\DFSi is powerful for an expert. By carefully organizing the order of \conde
+clauses, a miniKanren program can explore more ``interesting'' clauses than
+those uninteresting ones, and thus use computational resources efficiently.
+A little miniKanrener, however, may beg to differ--understanding
+implementation details and fiddling with clauses order is not the first
+priority of a beginner.
+
+There is another reason that miniKanren could use more search strategies than
+just \DFSi. In many applications, there does not exist one order that serves
+for all purposes. For example, a relational dependent type checker contains
+clauses for constructors that build data and clauses for eliminators that use
+data. When this type checker is used to generate simple and shallow programs,
+the clauses of constructors should be put in the front of \conde.
+When performing proof search for complicated programs, the clauses of eliminator
+should take the focus. With \DFSi, these two uses can not be efficient at the
+same time. In fact, to make on use efficient, the other one must be drastically
+slow.
+
 
 \NOTE[LKC]{Should I explain ``state'' and ``search space'' here?}
 
