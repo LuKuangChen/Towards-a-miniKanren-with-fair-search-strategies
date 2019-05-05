@@ -4,6 +4,3 @@
       [(fresh (res)
          (== `(,x . ,res) out)
          (repeato x res))]))
-> (run 4 q
-    (repeato '* q))
-'((*) (* *) (* * *) (* * * *))
