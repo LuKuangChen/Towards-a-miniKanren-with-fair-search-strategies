@@ -168,15 +168,11 @@ is equivalent to the one by \citet{seres1999algebra}.
 In this section, we define fair \disj{}, almost-fair \disj{} and fair \conj{}. 
 Before going further into fairness, we would like to give a short review about 
 state, search space, and goal, because fairness is defined in terms of them. 
-Each \emph{state} records a way how some relations can be satisfied. Every 
-answer given by miniKanren corresponds to a state. In our case, the state is 
-just a substitution associating logic variables with terms. In more expressive 
-miniKanrens (e.g. miniKanren with with symbolic constraints 
-\citep{hemann2017framework}), states can include more information. A 
-\emph{search space} is a collection of states. And a \emph{goal} is a function 
-from a state to a search space. Goals check their input states and outputs 
-possibly extended states. A goal might fail for some inputs, in which case the 
-output search space would be empty.
+A \emph{state} is a collection of constraints. Every answer given by 
+miniKanren corresponds to a state. A \emph{search space} is a collection of 
+states. And a \emph{goal} is a function from a state to a search space. Goals 
+check their input states and outputs possibly extended states. A goal might fail 
+for some inputs, in which case the output search space would be empty.
 
 Now we elaborate fairness by running more queries about \texttt{repeato}.
 
