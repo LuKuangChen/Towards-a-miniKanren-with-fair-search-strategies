@@ -1,12 +1,10 @@
-;; iDFS
+;; DFSf
 > (run 12 q
     (conde
       ((repeato 'a q))
       ((repeato 'b q))
       ((repeato 'c q))
       ((repeato 'd q))))
-'((a) (a a) (b) (a a a)
-  (a a a a) (b b)
-  (a a a a a) (c)
-  (a a a a a a) (b b b)
-  (a a a a a a a) (d))
+'((a) (b) (c) (d)
+  (a a) (b b) (c c) (d d)
+  (a a a) (b b b) (c c c) (d d d))

@@ -1,11 +1,11 @@
-;; iDFS and fDFS (unfair conj)
+;; iDFS
 > (run 12 q
     (fresh (x)
       (conde
-        [(== 'a x)]
-        [(== 'b x)]
-        [(== 'c x)]
-        [(== 'd x)])
+        ((== 'a x))
+        ((== 'b x))
+        ((== 'c x))
+        ((== 'd x)))
       (repeato x q)))
 '((a) (a a) (b) (a a a)
   (a a a a) (b b)

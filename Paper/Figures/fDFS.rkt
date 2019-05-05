@@ -1,13 +1,13 @@
-#| Goal x Goal -> Goal |#
+#| Goal prod Goal -> Goal |#
 (define (disj2 g1 g2)
   (lambda (s)
     (append-inf/fair (g1 s) (g2 s))))
 
-#| Space x Space -> Space |#
+#| Space prod Space -> Space |#
 (define (append-inf/fair s-inf t-inf)
   (append-inf/fair^ #t s-inf t-inf))
 
-#| Bool x Space x Space -> Space |#
+#| Bool prod Space prod Space -> Space |#
 (define (append-inf/fair^ s? s-inf t-inf)
   (cond
     ((pair? s-inf)

@@ -47,11 +47,20 @@
 }
 
 @book{friedman_reasoned_2018,
-	title = {The {Reasoned} {Schemer}, {Second} {Edition}},
 	abstract = {Extending the functional language Scheme with logical constructs in order to help the functional programmer think logically and the logic programmer think functionally.},
-	language = {en-US},
-	urldate = {2018-03-11},
-	journal = {MIT Press},
 	author = {Friedman, Daniel P. and Byrd, William E. and Kiselyov, Oleg and Hemann, Jason},
-	year = {2018},
+	journal = {MIT Press},
+	language = {en-US},
+	title = {The {Reasoned} {Schemer}, {Second} {Edition}},
+	urldate = {2018-03-11},
+	year = {2018}
 }
+
+@article{yang2010adventures,
+	author = {Yang, Edward Z},
+	journal = {The Monad. Reader Issue 15},
+	pages = {11},
+	title = {Adventures in Three Monads},
+	year = {2010}
+}
+
