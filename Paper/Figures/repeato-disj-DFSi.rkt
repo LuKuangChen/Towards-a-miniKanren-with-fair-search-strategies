@@ -1,4 +1,4 @@
-;; iDFS
+;; DFSi (unfair disj)
 > (run 12 q
     (conde
       ((repeato 'a q))

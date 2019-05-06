@@ -49,9 +49,10 @@
     \end{tabular}
 \end{center}
 }
-\newcommand{\DFSi}[0]{DFS$_\textrm{i}$}
-\newcommand{\DFSf}[0]{DFS$_\textrm{f}$}
-\newcommand{\BFS }[0]{BFS}
+\newcommand{\DFSi }[0]{DFS$_\textrm{i}$}
+\newcommand{\DFSf }[0]{DFS$_\textrm{f}$}
+\newcommand{\DFSbi}[0]{DFS$_\textrm{bi}$}
+\newcommand{\BFS  }[0]{BFS}
 
 
 \newtheorem{defn}{Definition}[section]
@@ -116,7 +117,7 @@ The \conde in TR2, however, generates a less expected result.
 \clisting{Figures/run-repeato-idfs.rkt}
 
 The miniKanren in TR2 implements interleaving DFS(\DFSi), the cause of this 
-unexpected result. With this search strategy, each \conde clause takes a half 
+unexpected result. With this search strategy, each clause takes a half 
 of its received computational resources and pass the other half to its 
 following clauses, except for the last clause that takes all resources it 
 receives. In the example above, the \texttt{a} clause takes half of all 
@@ -181,21 +182,21 @@ Now we elaborate fairness by running more queries about \texttt{repeato}.
 \subsection{fair \texttt{disj}}
 
 Given the following program, it is natural to expect lists of each letter to
-constitute $1/4$ in the answer. DFS$_\textrm{i}$, the current search
+constitute $1/4$ in the answer. \DFSi, the current search
 strategy, however, results in many more lists of \texttt{a}s than lists
 of other letters. And some letters  (e.g. \texttt{c} and \texttt{d}) are
 rarely seen. The situation would be exacerbated if \conde contains more clauses.
 
 \begin{center}
 	\begin{tabular}{c}
-		\lstinputlisting{Figures/repeato-disj-iDFS.rkt}
+		\lstinputlisting{Figures/repeato-disj-DFSi.rkt}
 	\end{tabular}
 \end{center}
 
-Under the hood, the \conde here is allocating computational effort to 
+Under the hood, the \conde here is allocating computational resource to 
 four trivially different search space. The unfair \disj{} in 
-\DFSi{} allocates much more effort to the first search space. On the contrary, 
-fair \disj{} would allocate effort evenly to each search space.
+\DFSi{} allocates many more resources to the first search space. On the 
+contrary, fair \disj{} would allocate resources evenly to each search space. 
 
 \begin{center}
 	\begin{tabular}{c}
@@ -208,8 +209,8 @@ fair \disj{} would allocate effort evenly to each search space.
 \end{tabular}
 \end{center}
 
-Running the same program again with almost-fair \disj 
-(e.g. DFS$_\textrm{bi}$) gives the same result. Almost-fair, however, is not 
+Running the same program again with almost-fair \disj {} (e.g. 
+DFS$_\textrm{bi}$) gives the same result. Almost-fair, however, is not 
 completely fair, as shown by the following example. 
 
 \begin{center}
@@ -218,7 +219,7 @@ completely fair, as shown by the following example.
 	\end{tabular}
 \end{center}
 
-DFS$_\textrm{bi}$ is fair only when the number of goals is a power of 2, 
+\DFSbi{} is fair only when the number of goals is a power of 2, 
 otherwise, some goals would be allocated twice as many resources than the 
 others. In the above example, where the \conde has five clauses, the clauses of 
 \texttt{b}, \texttt{c}, and \texttt{d} are allocated more resources.
@@ -226,39 +227,39 @@ others. In the above example, where the \conde has five clauses, the clauses of
 We end this subsection with precise definitions of all levels of 
 \disj{} fairness. Our definition of \emph{fair} \disj{} is slightly generalize 
 from the one by \citet{seres1999algebra}. Their definition is for binary 
-disjunct. We generalize it to multi-arity one.
+disjunction. We generalize it to multi-arity one.
 
 \begin{defn}[fair \disj{}]
-	A \disj{} is fair iff it allocates computational resource evenly to 
-	search spaces produced by goals in the same disjunct (e.g. clauses in the 
-	same 
-	\conde).
+A \disj{} is fair iff it allocates computational resource evenly to 
+search spaces produced by goals in the same disjunction (i.e. clauses in 
+the same \conde).
 \end{defn}
 
 \begin{defn}[almost-fair \disj{}]
-	A \disj{} is almost-fair iff it allocates computational resource so 
-	evenly to search spaces produced by goals in the same disjunct that the 
-	maximal 
-	ratio of resources is bounded by a constant.
+A \disj{} is almost-fair iff it allocates computational resource so evenly to 
+search spaces produced by goals in the same disjunction that the maximal ratio 
+of resources is bounded by a constant.
 \end{defn}
 
 \begin{defn}[unfair \disj{}]
-	A \disj{} is unfair iff it is not even almost-fair.
+A \disj{} is unfair iff it is not even almost-fair.
 \end{defn}
 
 \subsection{fair \texttt{conj}}
 
-In the following program, the three \conde clauses differ in a trivial way. So 
-we expect lists of each letter constitute $1/4$ of the answer list. Search 
-strategies with unfair \conj{} (e.g. DFS$_\textrm{i}$, DFS$_\textrm{f}$), 
-however, give us many more lists of \texttt{a}s than lists of other letters. 
-And some letters (e.g. lists 
-of \texttt{c}) are rarely found. Although DFS$_\textrm{i}$'s \disj{} is unfair in general, 
-it is fair when there is no call to relational definition in sub-goals, 
-including this case. The situation would be worse if we add more \conde 
-clauses. The result with DFS$_\textrm{bi}$, whose \conj{} is also unfair, is similar, but 
-due to its different \disj{}, the position of \texttt{b} and \texttt{c} are 
-swapped. 
+Given the following program, it is natural to expect lists of each letter to
+constitute $1/4$ in the answer. Search strategies with unfair \conj{} (e.g. 
+\DFSi, \DFSbi, \DFSf), however, results in many more lists of \texttt{a}s than 
+lists of other letters. And some letters are rarely seen. The situation would 
+be exacerbated if \conde contains more clauses.
+
+\NOTE[LKC]{Should I add a footnote?
+
+``
+Although 
+DFS$_\textrm{i}$'s \disj{} is unfair in general, it is fair when there is no 
+call to relational definition in \conde{} clauses (including this case).
+''}
 
 \begin{center}
 	\begin{tabular}{c}
@@ -266,8 +267,25 @@ swapped.
 	\end{tabular}
 \end{center}
 
-Intuitively, search strategies with fair \conj{} should produce each letter of 
-lists equally frequently. Indeed, BFS does so.
+\begin{center}
+	\begin{tabular}{c}
+		\lstinputlisting{Figures/repeato-conj-DFSf.rkt}
+	\end{tabular}
+\end{center}
+
+\begin{center}
+	\begin{tabular}{c}
+		\lstinputlisting{Figures/repeato-conj-DFSbi.rkt}
+	\end{tabular}
+\end{center}
+
+Under the hood, the \conde{} and the call to \texttt{repeato} are connected by 
+\conj{}. The \conde{} goal outputs a search space including four trivially 
+different states. These states are then supplied individually to 
+\texttt{(repeato x q)} goal, producing four search spaces. In the examples 
+above, the \conj{}s are allocating more computational resources to the state of 
+\texttt{a}. On the contrary, fair \conj{} would allocate resources evenly to 
+each search space. 
 
 \begin{center}
 	\begin{tabular}{c|c}
@@ -275,12 +293,12 @@ lists equally frequently. Indeed, BFS does so.
 	\end{tabular}
 \end{center}
 
-A more interesting situation is when the first conjunctive goal produces 
-infinite many answers. Consider the following example, a naive specification of 
-fair \conj{} might require search strategies to produce all sorts of singleton 
-lists, but no longer ones, which makes the strategies \emph{incomplete}. 
-
-\NOTE[MVC]{incomplete w.r.t. what? where's the definition of incomplete?}
+A more interesting situation is when the first conjunct produces infinite many 
+answers. Consider the following example, a naive specification of fair \conj{} 
+might require search strategies to produce all sorts of singleton lists, but no 
+longer ones, which makes the strategies incomplete. A search strategy is 
+\emph{complete} iff it can find out all the answers in finite time, otherwise, 
+it is \emph{imcomplete}.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -288,21 +306,20 @@ lists, but no longer ones, which makes the strategies \emph{incomplete}.
 	\end{tabular}
 \end{center}
 
-Our solution requires a search strategy with \emph{fair} \conj{} to 
-package answers in bags, where each bag contains finite answers, and to allocate 
-resources evenly among search spaces derived from answers in the same bag. The 
-way to package depends on search strategy. And how to allocate resources among 
-search space related to different bags is unspecified. Our definition of fair 
-\conj{} is orthogonal with completeness. For example, a naively fair strategy 
-is fair but not complete, while BFS is fair and complete. 
-\NOTE[MVC]{Also here, complete w.r.t what?}
+Our solution requires a search strategy with \emph{fair} \conj{} to organize
+states in bags in search spaces, where each bag contains finite states, and 
+to allocate resources evenly among search spaces derived from states in the 
+same bag. It is up to a search strategy designer to decide by what criteria to 
+put states in the same bag, and how to allocate resources among search spaces 
+related to different bags.
 
-BFS packages answers by their costs. The \emph{cost} of a answer is its 
-depth in the search tree (i.e. the number of calls to relational definitions 
-required to find them) \citet{seres1999algebra}. In the following example, 
-every answer is a list of list of symbol. The cost of each of them is equal to 
-the length of the inner lists plus the length of the outer list. In addition to 
-being fair, BFS also produces answers in increasing order of cost.
+BFS puts states of the same cost in the same bag, and allocate resources 
+carefully among search spaces related to different bags such that answers are 
+produced in increasing order of cost. The \emph{cost} of a answer is its depth 
+in the search tree (i.e. the number of calls to relational definitions required 
+to find them) \citet{seres1999algebra}. In the following example, the cost of 
+each answer is equal to the length of the inner lists plus the length of the 
+outer list. 
 
 \begin{center}
 	\begin{tabular}{c}
@@ -310,7 +327,33 @@ being fair, BFS also produces answers in increasing order of cost.
 	\end{tabular}
 \end{center}
 
-%TODO describe DFSi here
+We end this subsection with precise definitions of all levels of \conj{} 
+fairness. 
+
+% Our definition of fair \conj{} is orthogonal with completeness. For 
+% example, a naively fair strategy is fair but not complete, while BFS is fair and 
+% complete.
+
+\begin{defn}[fair \conj{}]
+A \conj{} is fair iff it allocates computational resource evenly to 
+search spaces produced from states in the same bag. A bag is a finite 
+collection of state. And search strategies with fair \conj{} should represent 
+search spaces with possibly infinite collection of state. 
+\end{defn}
+
+\begin{defn}[unfair \conj{}]
+A \conj{} is unfair iff it is not fair.
+\end{defn}
+
+
+
+
+
+\section{interleaving depth-first search}
+
+In this section we review the implementation of interleaving depth-first search 
+(\DFSi). ... ...
+
 
 \section{balanced interleaving depth-first search}
 
@@ -330,7 +373,7 @@ takes a non-empty list of goals \texttt{gs} and returns a goal. With the help
 of \texttt{split}, it essentially constructs a \emph{balanced} binary tree 
 where leaves are elements of \texttt{gs} and nodes are \texttt{disj2}s, hence 
 the name of this search strategy. In contrast, the \disj{} in DFS$_\textrm{i}$
-constructs the binary tree with the same nodes but in the unbalanced form.
+constructs the binary tree with the same nodes but in an unbalanced form.
 
 \section{fair depth-first search}
 
@@ -343,19 +386,19 @@ constructs the binary tree with the same nodes but in the unbalanced form.
 Fair DFS (DFS$_\textrm{f}$) has fair \disj{} and unfair \conj{}. The implementation of DFS$_\textrm{f}$ 
 differs from DFS$_\textrm{i}$'s in \texttt{disj2} (Fig.~\ref{fDFS}). \texttt{disj2} is 
 changed to call a new and fair version of \texttt{append-inf}. 
-\texttt{append-inf/fair} immediately calls its helper, 
-\texttt{append-inf/fair\^{}}, with the first argument, \texttt{s?}, set to 
-\texttt{\#{}t}, which indicates that \texttt{s-inf} and \texttt{t-inf} haven't 
-been swapped. The swapping happens at the third \texttt{cond} clause in the 
-helper, where \texttt{s?} is updated accordingly. The first two \texttt{cond} 
-clauses essentially copy the \texttt{car}s and stop recursion when one of the 
-input spaces is obviously finite. The third clause, as we mentioned above, is 
-just for swapping. When the fourth and last clause runs, we know that both 
-\texttt{s-inf} and \texttt{t-inf} are ended with a thunk. In this case, a new 
-thunk is constructed. The new thunk calls the driver recursively. Here changing 
-the order of \texttt{t-inf} and \texttt{s-inf} won't hurt the fairness (though 
-it will change the order of answers). We swapped them back so that answers are 
-produced in a more natural order.
+\texttt{append-inf/fair} immediately calls its helper, \texttt{loop}, with the 
+first argument, \texttt{s?}, set to \texttt{\#{}t}, which indicates that 
+\texttt{s-inf} and \texttt{t-inf} haven't been swapped. The swapping happens at 
+the third \texttt{cond} clause in the helper, where \texttt{s?} is updated 
+accordingly. The first two \texttt{cond} clauses essentially copy the 
+\texttt{car}s and stop recursion when one of the input spaces is obviously 
+finite. The third clause, as we mentioned above, is just for swapping. When the 
+fourth and last clause runs, we know that both \texttt{s-inf} and \texttt{t-inf} 
+are ended with a thunk. In this case, a new thunk is constructed. The new thunk 
+calls the driver recursively. Here changing the order of \texttt{t-inf} and 
+\texttt{s-inf} won't hurt the fairness (though it will change the order of 
+answers). We swapped them back so that answers are produced in a more natural 
+order.
 
 
 \section{breadth-first search}
@@ -387,10 +430,6 @@ We prove so in Coq. The details are in the second subsection.
 	features}
 	\label{BFS-opt}
 \end{figure}
-
-\NOTE[MVC]{Though bag is well known, people rarely say ``bagging''. How about putting information in a bag, or something better?}
-\NOTE[MVC]{What is the bagging information?}
-\NOTE[LKC]{It's just cost... You're right. I should have be more direct.}
 
 As mentioned in section 2.2, BFS puts answers in bags and answers of the 
 same cost are in the same bag. The cost

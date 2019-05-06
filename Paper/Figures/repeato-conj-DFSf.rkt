@@ -1,4 +1,4 @@
-;; DFSi (unfair conj)
+;; DFSf (unfair conj)
 > (run 12 q
     (fresh (x)
       (conde
