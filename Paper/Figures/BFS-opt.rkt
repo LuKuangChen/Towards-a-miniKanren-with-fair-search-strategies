@@ -2,6 +2,7 @@
 (define (unit s) `((,s) . #f))
 (define (step f) `(()   . ,f))
 
+#| Space x Space -> Space |#
 (define (append-inf/fair s-inf t-inf)
   (cons (append (car s-inf) (car t-inf))
     (let ([t1 (cdr s-inf)]
@@ -11,6 +12,7 @@
         [(not t2) t1]
         [else (lambda () (append-inf/fair (t1) (t2)))]))))
 
+#| Goal x Space -> Space |#
 (define (append-map-inf/fair g s-inf)
   (foldr
     (lambda (s t-inf)
@@ -19,6 +21,7 @@
       (step (and f (lambda () (append-map-inf/fair g (f))))))
     (car s-inf)))
 
+#| option Nat x Space -> [State] |#
 (define (take-inf n s-inf)
   (let loop ([n n]
              [vs (car s-inf)])

@@ -1,5 +1,3 @@
-#lang racket
-
 #| Goal x Goal -> Goal |#
 (define (disj2 g1 g2)
   (lambda (s)

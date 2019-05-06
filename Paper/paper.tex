@@ -72,6 +72,8 @@ explored. Again, the answers by \DFSi{} is different from the
 expectation. We have devised three new search strategies that have different 
 level of fairness in \disj{} and \conj{}.
 
+\NOTE[LKC]{\disj{} and \conj{} occurs free in the abstract.}
+
 %The syntax of a programming language should reflect its semantics. When using 
 %a disjunctive operator in relational programming, a programmer would expect 
 %all 
@@ -90,25 +92,25 @@ level of fairness in \disj{} and \conj{}.
 
 miniKanren is a family of relational programming languages.
 \citet{friedman_reasoned_2018} introduce miniKanren and its implementation
-in the The Reasoned Schemer, 2nd Ed(TR2). miniKanren programs, especially
+in \emph{The Reasoned Schemer, 2nd Ed} (TR2). miniKanren programs, especially
 relational interpreters, have been proven to be useful in solving many problems 
 by \citet{byrd2017unified}. 
 
 % \conde is the flagship disjunction operator in miniKanren.
-A subtlety arises when a \conde contains many clauses: not every clause has the 
+A subtlety arises when a \conde contains many clauses: not every clause has an 
 equal chance to contribute to the result. As an example, consider the following 
 relation \texttt{repeato} and its invocation. 
 
 \clisting{Figures/repeato.rkt}
 
-Next, consider the following disjuction of invoking \texttt{repeato} with four 
+Next, consider the following disjunction of invoking \texttt{repeato} with four 
 different letters.
 
 \clisting{Figures/example.rkt}
 
 \conde intuitively relates its clauses with logical \texttt{or}. And thus an 
 unsuspicious beginner would expect each letter to contribute equally to the 
-result, as following.
+result, as follows.
 
 \clisting{Figures/run-repeato-fair.rkt}
 
@@ -117,7 +119,7 @@ The \conde in TR2, however, generates a less expected result.
 \clisting{Figures/run-repeato-idfs.rkt}
 
 The miniKanren in TR2 implements interleaving DFS(\DFSi), the cause of this 
-unexpected result. With this search strategy, each clause takes a half 
+unexpected result. With this search strategy, each clause takes half 
 of its received computational resources and pass the other half to its 
 following clauses, except for the last clause that takes all resources it 
 receives. In the example above, the \texttt{a} clause takes half of all 
@@ -139,24 +141,24 @@ There is another reason that miniKanren could use more search strategies than
 just \DFSi. In many applications, there does not exist one order that serves
 for all purposes. For example, a relational dependent type checker contains
 clauses for constructors that build data and clauses for eliminators that use
-data. When this type checker is used to generate simple and shallow programs,
+data. When the type checker is used to generate simple and shallow programs,
 the clauses of constructors should be put in the front of \conde.
-When performing proof search for complicated programs, the clauses of eliminator
-should take the focus. With \DFSi, these two uses can not be efficient at the
-same time. In fact, to make one use efficient, the other one must be drastically
-slow.
+When performing proof searches for complicated programs, the clauses of 
+eliminator should take the focus. With \DFSi, these two uses cannot be 
+efficient at the same time. In fact, to make one use efficient, the other one 
+must be drastically slow.
 
 The specification that every clause in the same \conde{} is given equal 
 ``search priority'' is called fair \disj{}. And search strategies with 
-almost-fair \disj{} give every clauses in the same \conde{} similar priority. 
+almost-fair \disj{} give every clause in the same \conde{} similar priority. 
 Fair \conj{}, a related concept, is more complicated. We defer it to the next 
 section.
 
 To summarize our contribution, we
 \begin{itemize}
 	\item propose and implement balanced interleaving depth-first search 
-	(DFS$_\textrm{bi}$), a new search strategy with almost-fair \disj{}.
-	\item propose and implement fair depth-first search (DFS$_\textrm{f}$), a 
+	(\DFSbi{}), a new search strategy with almost-fair \disj{}.
+	\item propose and implement fair depth-first search (\DFSf{}), a 
 	new search strategy with fair \disj{}.
 	\item implement in a new way breath-first search (BFS), a search strategy 
 	with fair \disj{} and fair \conj{}. (our code runs faster in all 
@@ -169,9 +171,9 @@ is equivalent to the one by \citet{seres1999algebra}.
 In this section, we define fair \disj{}, almost-fair \disj{} and fair \conj{}. 
 Before going further into fairness, we would like to give a short review about 
 state, search space, and goal, because fairness is defined in terms of them. 
-A \emph{state} is a collection of constraints. Every answer given by 
-miniKanren corresponds to a state. A \emph{search space} is a collection of 
-states. And a \emph{goal} is a function from a state to a search space. 
+A \emph{state} is a collection of constraints. Every answer corresponds to a 
+state. A \emph{search space} is a collection of states. And a \emph{goal} is a 
+function from a state to a search space. 
 
 % Goals check their input states and outputs possibly extended states. A goal 
 % might fail for some inputs, in which case the output search space would be 
@@ -230,22 +232,25 @@ from the one by \citet{seres1999algebra}. Their definition is for binary
 disjunction. We generalize it to multi-arity one.
 
 \begin{defn}[fair \disj{}]
-A \disj{} is fair iff it allocates computational resource evenly to 
+A \disj{} is fair if and only if it allocates computational resource evenly to 
 search spaces produced by goals in the same disjunction (i.e. clauses in 
 the same \conde).
 \end{defn}
 
 \begin{defn}[almost-fair \disj{}]
-A \disj{} is almost-fair iff it allocates computational resource so evenly to 
+A \disj{} is almost-fair if and only if it allocates computational resource so 
+evenly to 
 search spaces produced by goals in the same disjunction that the maximal ratio 
 of resources is bounded by a constant.
 \end{defn}
 
 \begin{defn}[unfair \disj{}]
-A \disj{} is unfair iff it is not even almost-fair.
+A \disj{} is unfair if and only if it is not even almost-fair.
 \end{defn}
 
 \subsection{fair \texttt{conj}}
+
+\NOTE[LKC]{Checked grammer of text before this line}
 
 Given the following program, it is natural to expect lists of each letter to
 constitute $1/4$ in the answer. Search strategies with unfair \conj{} (e.g. 
@@ -288,7 +293,7 @@ above, the \conj{}s are allocating more computational resources to the state of
 each search space. 
 
 \begin{center}
-	\begin{tabular}{c|c}
+	\begin{tabular}{c}
 		\lstinputlisting{Figures/repeato-conj-fair.rkt}
 	\end{tabular}
 \end{center}
@@ -352,8 +357,32 @@ A \conj{} is unfair iff it is not fair.
 \section{interleaving depth-first search}
 
 In this section we review the implementation of interleaving depth-first search 
-(\DFSi). ... ...
+(\DFSi). This review is for comparison with other search strategies in this 
+paper. Thus we focus on parts that are changed later. TRS2 
+\citep{friedman_reasoned_2018} provides a comprehensive description of the 
+whole miniKanren implementation.
 
+\begin{figure}
+    \lstinputlisting{Figures/DFSi.rkt}
+    \caption{implementation of \DFSi}
+    \label{DFSi}
+\end{figure}
+
+Fig.~\ref{DFSi} shows part of the implementation of \DFSi{}. We follow a
+convention to name variables bound to states with `s', to name variables bound 
+to goals with `g', and to name variables bound to search spaces with a suffix 
+`-inf'. The first function, \texttt{disj2}, implements binary disjunction. 
+\texttt{append-inf} is its helper, which compose two disjunctive search spaces. 
+The following function, \texttt{conj2}, implements binary conjunction. It applys 
+the \emph{first} goal to the input state, then applys the second goal to 
+states in the resulting search space. The latter process is done with a helper 
+function. \texttt{append-map-inf} applys its input goal to states in its input 
+search spaces and compose the resulting search spaces. It reuse 
+\texttt{append-inf} for search space composition. The following three 
+definitions introduces syntactic sugars that miniKanren users are more familiar 
+with. The first two definitions say disjunction and disjunction are 
+right-associative. The next and last definition says \conde{} relates its 
+clauses disjunctively, and goals in the same clause conjunctively.
 
 \section{balanced interleaving depth-first search}
 
@@ -363,17 +392,19 @@ In this section we review the implementation of interleaving depth-first search
 	\label{balanced-disj}
 \end{figure}
 
-Balanced interleaving DFS (DFS$_\textrm{bi}$) has almost-fair \disj{} and unfair \conj{}. 
-The implementation of DFS$_\textrm{bi}$ differs from DFS$_\textrm{i}$ in the \disj{} macro. We list the 
-new \disj{} with its helpers in Fig.~\ref{balanced-disj}. The first helper 
-function, \texttt{split}, takes a list of goals \texttt{ls} and a procedure 
-\texttt{k}, partitions \texttt{ls} into two sub-lists of roughly equal length, 
-and returns the application of \texttt{k} to the two sub-lists. \texttt{disj*} 
-takes a non-empty list of goals \texttt{gs} and returns a goal. With the help 
-of \texttt{split}, it essentially constructs a \emph{balanced} binary tree 
-where leaves are elements of \texttt{gs} and nodes are \texttt{disj2}s, hence 
-the name of this search strategy. In contrast, the \disj{} in DFS$_\textrm{i}$
-constructs the binary tree with the same nodes but in an unbalanced form.
+Balanced interleaving DFS (DFS$_\textrm{bi}$) has almost-fair \disj{} and unfair 
+\conj{}. The implementation of DFS$_\textrm{bi}$ differs from DFS$_\textrm{i}$ 
+in the \disj{} macro. We list the new \disj{} with its helpers in 
+Fig.~\ref{balanced-disj}. The first helper function, \texttt{split}, takes a 
+list of goals \texttt{ls} and a procedure \texttt{k}, partitions \texttt{ls} 
+into two sub-lists of roughly equal length, and returns the application of 
+\texttt{k} to the two sub-lists. \texttt{disj*} takes a non-empty list of goals 
+\texttt{gs} and returns a goal. With the help of \texttt{split}, it essentially 
+constructs a \emph{balanced} binary tree where leaves are elements of 
+\texttt{gs} and nodes are \texttt{disj2}s, hence the name of this search 
+strategy. In contrast, the \disj{} in DFS$_\textrm{i}$ constructs the binary 
+tree with the same collection of leaf nodes but in a particularly unbalanced 
+form.
 
 \section{fair depth-first search}
 
@@ -383,11 +414,12 @@ constructs the binary tree with the same nodes but in an unbalanced form.
 	\label{fDFS}
 \end{figure}
 
-Fair DFS (DFS$_\textrm{f}$) has fair \disj{} and unfair \conj{}. The implementation of DFS$_\textrm{f}$ 
-differs from DFS$_\textrm{i}$'s in \texttt{disj2} (Fig.~\ref{fDFS}). \texttt{disj2} is 
-changed to call a new and fair version of \texttt{append-inf}. 
-\texttt{append-inf/fair} immediately calls its helper, \texttt{loop}, with the 
-first argument, \texttt{s?}, set to \texttt{\#{}t}, which indicates that 
+Fair DFS (\DFSf) has fair \disj{} and unfair \conj{}. The 
+implementation of \DFSf{} differs from \DFSi{}'s in 
+\texttt{disj2} (Fig.~\ref{fDFS}). \texttt{disj2} is changed to call a new and 
+fair version of \texttt{append-inf}. \texttt{append-inf/fair} immediately calls 
+its helper, \texttt{loop}, with the first argument, \texttt{s?}, set to 
+\texttt{\#{}t}, which indicates that 
 \texttt{s-inf} and \texttt{t-inf} haven't been swapped. The swapping happens at 
 the third \texttt{cond} clause in the helper, where \texttt{s?} is updated 
 accordingly. The first two \texttt{cond} clauses essentially copy the 
@@ -397,24 +429,24 @@ fourth and last clause runs, we know that both \texttt{s-inf} and \texttt{t-inf}
 are ended with a thunk. In this case, a new thunk is constructed. The new thunk 
 calls the driver recursively. Here changing the order of \texttt{t-inf} and 
 \texttt{s-inf} won't hurt the fairness (though it will change the order of 
-answers). We swapped them back so that answers are produced in a more natural 
+answers). We swap them back so that answers are produced in a more natural 
 order.
 
 
 \section{breadth-first search}
 
 BFS has both fair \disj{} and fair \conj{}. Our implementation is based on 
-DFS$_\textrm{f}$ (not DFS$_\textrm{i}$). To implement \BFS{} based on \DFSf{} 
-all we have to do is renaming 
-\texttt{append-map-inf} to \texttt{append-map-inf/fair}, then replacing its use 
-of \texttt{append-inf} to \texttt{append-inf/fair}. 
+DFS$_\textrm{f}$ (not DFS$_\textrm{i}$). To implement \BFS{} based on \DFSf{}, 
+we need \texttt{append-map-inf/fair} in addition to \texttt{append-inf/fair}. 
+The only difference between \texttt{append-map-inf/fair} and 
+\texttt{append-map-inf} is that the former calls \texttt{append-inf/fair} 
+instead of \texttt{append-inf}.
 
 The implementation can be improved in two ways. First, as mentioned in 
 section 2.2, BFS puts answers in bags and answers of the same cost are in the 
 same bag. In this implementation, however, it is unclear where this information 
-is recorded. Second, 
-\texttt{append-inf/fair} is extravagant in memory usage. It makes 
-$O(n+m)$ new \texttt{cons} cells every time, where $n$ and $m$ are the 
+is recorded. Second, \texttt{append-inf/fair} is extravagant in memory usage. It 
+makes $O(n+m)$ new \texttt{cons} cells every time, where $n$ and $m$ are the 
 ``length''s of input search spaces. We address these issues in the first 
 subsection.
 
