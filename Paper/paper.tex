@@ -302,7 +302,8 @@ A more interesting situation is when the first conjunct produces infinite many
 answers. Consider the following example, a naive specification of fair \conj{} 
 might require search strategies to produce all sorts of singleton lists, but no 
 longer ones, which makes the strategies incomplete. A search strategy is 
-\emph{complete} iff it can find out all the answers in finite time, otherwise, 
+\emph{complete} iff it can find out all the answers within finite time, 
+otherwise, 
 it is \emph{imcomplete}.
 
 \begin{center}
@@ -356,7 +357,8 @@ A \conj{} is unfair iff it is not fair.
 
 \section{interleaving depth-first search}
 
-In this section we review the implementation of interleaving depth-first search 
+In this section, we review the implementation of interleaving depth-first 
+search 
 (\DFSi). This review is for comparison with other search strategies in this 
 paper. Thus we focus on parts that are changed later. TRS2 
 \citep{friedman_reasoned_2018} provides a comprehensive description of the 
@@ -373,13 +375,14 @@ convention to name variables bound to states with `s', to name variables bound
 to goals with `g', and to name variables bound to search spaces with a suffix 
 `-inf'. The first function, \texttt{disj2}, implements binary disjunction. 
 \texttt{append-inf} is its helper, which compose two disjunctive search spaces. 
-The following function, \texttt{conj2}, implements binary conjunction. It applys 
-the \emph{first} goal to the input state, then applys the second goal to 
+The following function, \texttt{conj2}, implements binary conjunction. It 
+applies 
+the \emph{first} goal to the input state, then applies the second goal to 
 states in the resulting search space. The latter process is done with a helper 
 function. \texttt{append-map-inf} applys its input goal to states in its input 
 search spaces and compose the resulting search spaces. It reuse 
 \texttt{append-inf} for search space composition. The following three 
-definitions introduces syntactic sugars that miniKanren users are more familiar 
+definitions introduce syntactic sugars that miniKanren users are more familiar 
 with. The first two definitions say disjunction and disjunction are 
 right-associative. The next and last definition says \conde{} relates its 
 clauses disjunctively, and goals in the same clause conjunctively.
