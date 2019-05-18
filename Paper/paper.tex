@@ -398,10 +398,12 @@ clauses disjunctively, and goals in the same clause conjunctively.
 Balanced interleaving DFS (DFS$_\textrm{bi}$) has almost-fair \disj{} and unfair 
 \conj{}. The implementation of DFS$_\textrm{bi}$ differs from DFS$_\textrm{i}$ 
 in the \disj{} macro. We list the new \disj{} with its helper in 
-Fig.~\ref{balanced-disj}. The helper \code{disj+} builds a balanced binary tree 
-whose leaves are the goals and whose nodes are \code{disj2}, hence the name of 
+Fig.~\ref{balanced-disj}. The helper \texttt{disj+} builds a balanced binary 
+tree 
+whose leaves are the goals and whose nodes are \texttt{disj2}, hence the name 
+of 
 this search strategy. The first argument 
-to \code{disj+} is the goals. And the next two arguments accumulate goals in 
+to \texttt{disj+} is the goals. And the next two arguments accumulate goals in 
 the left and right subtrees. The first clause says that when there is one goal, 
 the tree is the goal itself. When there is more goals, they are partitioned 
 into two sub-lists. The partition is done by repetitively dispatch the first 
