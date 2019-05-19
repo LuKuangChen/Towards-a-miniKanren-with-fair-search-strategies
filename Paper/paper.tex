@@ -64,7 +64,8 @@
 The syntax of a programming language should reflect its semantics. When writing 
 a \conde{} expression in miniKanren, a programmer would expect all clauses 
 share the same chance of being explored, as these clauses are written in 
-parallel. The existing search strategy, interleaving \DFSi{}, 
+parallel. The existing search strategy, interleaving depth-first search 
+(\DFSi{}), 
 however, prioritize its clauses by the order how they are written down. 
 Similarly, when a \conde{} is followed by another goal conjunctively, a 
 programmer would expect answers in parallel share the same chance of being 
@@ -118,7 +119,7 @@ The \conde in TR2, however, generates a less expected result.
 
 \clisting{Figures/run-repeato-idfs.rkt}
 
-The miniKanren in TR2 implements interleaving DFS(\DFSi), the cause of this 
+The miniKanren in TR2 implements interleaving DFS (\DFSi), the cause of this 
 unexpected result. With this search strategy, each clause takes half 
 of its received computational resources and pass the other half to its 
 following clauses, except for the last clause that takes all resources it 
@@ -223,8 +224,8 @@ completely fair, as shown by the following example.
 
 \DFSbi{} is fair only when the number of goals is a power of 2, 
 otherwise, some goals would be allocated twice as many resources than the 
-others. In the above example, where the \conde has five clauses, the clauses of 
-\texttt{b}, \texttt{c}, and \texttt{d} are allocated more resources.
+others. In the above example, where the \conde{} has five clauses, the clauses 
+of \texttt{b}, \texttt{c}, and \texttt{d} are allocated more resources.
 
 We end this subsection with precise definitions of all levels of 
 \disj{} fairness. Our definition of \emph{fair} \disj{} is slightly generalize 
@@ -286,11 +287,11 @@ call to relational definition in \conde{} clauses (including this case).
 
 Under the hood, the \conde{} and the call to \texttt{repeato} are connected by 
 \conj{}. The \conde{} goal outputs a search space including four trivially 
-different states. These states are then supplied individually to 
-\texttt{(repeato x q)} goal, producing four search spaces. In the examples 
-above, the \conj{}s are allocating more computational resources to the state of 
-\texttt{a}. On the contrary, fair \conj{} would allocate resources evenly to 
-each search space. 
+different states. Then the next conjunctive goal, \texttt{(repeato x q)}, is 
+applied to each of these states, producing four trivially different search 
+spaces. In the examples above, the \conj{}s are allocating more computational 
+resources to the search space of \texttt{a}. On the contrary, fair \conj{} 
+would allocate resources evenly to each search space. 
 
 \begin{center}
 	\begin{tabular}{c}
@@ -302,9 +303,8 @@ A more interesting situation is when the first conjunct produces infinite many
 answers. Consider the following example, a naive specification of fair \conj{} 
 might require search strategies to produce all sorts of singleton lists, but no 
 longer ones, which makes the strategies incomplete. A search strategy is 
-\emph{complete} iff it can find out all the answers within finite time, 
-otherwise, 
-it is \emph{imcomplete}.
+\emph{complete} if and only if it can find out all the answers within finite 
+time, otherwise, it is \emph{incomplete}.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -323,7 +323,7 @@ BFS puts states of the same cost in the same bag, and allocate resources
 carefully among search spaces related to different bags such that answers are 
 produced in increasing order of cost. The \emph{cost} of a answer is its depth 
 in the search tree (i.e. the number of calls to relational definitions required 
-to find them) \citet{seres1999algebra}. In the following example, the cost of 
+to find them) \citep{seres1999algebra}. In the following example, the cost of 
 each answer is equal to the length of the inner lists plus the length of the 
 outer list. 
 
@@ -341,14 +341,14 @@ fairness.
 % complete.
 
 \begin{defn}[fair \conj{}]
-A \conj{} is fair iff it allocates computational resource evenly to 
+A \conj{} is fair if and only if it allocates computational resource evenly to 
 search spaces produced from states in the same bag. A bag is a finite 
 collection of state. And search strategies with fair \conj{} should represent 
 search spaces with possibly infinite collection of state. 
 \end{defn}
 
 \begin{defn}[unfair \conj{}]
-A \conj{} is unfair iff it is not fair.
+A \conj{} is unfair if and only if it is not fair.
 \end{defn}
 
 
@@ -374,13 +374,14 @@ Fig.~\ref{DFSi} shows part of the implementation of \DFSi{}. We follow a
 convention to name variables bound to states with `s', to name variables bound 
 to goals with `g', and to name variables bound to search spaces with a suffix 
 `-inf'. The first function, \texttt{disj2}, implements binary disjunction. 
-\texttt{append-inf} is its helper, which compose two disjunctive search spaces. 
+\texttt{append-inf} is its helper, which composes two disjunctive search 
+spaces. 
 The following function, \texttt{conj2}, implements binary conjunction. It 
 applies 
 the \emph{first} goal to the input state, then applies the second goal to 
 states in the resulting search space. The latter process is done with a helper 
-function. \texttt{append-map-inf} applys its input goal to states in its input 
-search spaces and compose the resulting search spaces. It reuse 
+function. \texttt{append-map-inf} applies its input goal to states in its input 
+search spaces and compose the resulting search spaces. It reuses 
 \texttt{append-inf} for search space composition. The following three 
 definitions introduce syntactic sugars that miniKanren users are more familiar 
 with. The first two definitions say disjunction and disjunction are 
@@ -391,26 +392,28 @@ clauses disjunctively, and goals in the same clause conjunctively.
 
 \begin{figure}
 	\lstinputlisting{Figures/balanced-disj.rkt}
-	\caption{DFS$_\textrm{bi}$ implementation}
+	\caption{implementation of DFS$_\textrm{bi}$}
 	\label{balanced-disj}
 \end{figure}
 
 Balanced interleaving DFS (DFS$_\textrm{bi}$) has almost-fair \disj{} and unfair 
-\conj{}. The implementation of DFS$_\textrm{bi}$ differs from DFS$_\textrm{i}$ 
+\conj{}. The implementation of DFS$_\textrm{bi}$ differs from 
+DFS$_\textrm{i}$'s 
 in the \disj{} macro. We list the new \disj{} with its helper in 
 Fig.~\ref{balanced-disj}. The helper \texttt{disj+} builds a balanced binary 
 tree 
-whose leaves are the goals and whose nodes are \texttt{disj2}, hence the name 
+whose leaves are the goals and whose nodes are \texttt{disj2}s, hence the name 
 of 
 this search strategy. The first argument 
-to \texttt{disj+} is the goals. And the next two arguments accumulate goals in 
+to \texttt{disj+} is a list of all goals. And the next two arguments accumulate 
+goals in 
 the left and right subtrees. The first clause says that when there is one goal, 
-the tree is the goal itself. When there is more goals, they are partitioned 
-into two sub-lists. The partition is done by repetitively dispatch the first 
-two goals (the last clause), until no goal remains (the second clause) or one 
-goal remains (the third clause). In contrast, the \disj{} in DFS$_\textrm{i}$ 
-constructs the binary tree with the same collection of leaf nodes but in a 
-particularly unbalanced form.
+the tree is the goal itself. When there are more goals, the first argument is 
+partitioned into two sub-lists. The partition is done by repetitively 
+dispatching the first two goals (the last clause), until no goal remains (the 
+second clause) or one goal remains (the third clause). In contrast, the \disj{} 
+in DFS$_\textrm{i}$ constructs the binary tree with the same collection of leaf 
+nodes but in a particularly unbalanced form.
 
 
 % The first helper function, \texttt{split}, takes a 
@@ -426,7 +429,7 @@ particularly unbalanced form.
 
 \begin{figure}
 	\lstinputlisting{Figures/fDFS.rkt}
-	\caption{DFS$_\textrm{f}$ implementation}
+	\caption{implementation of DFS$_\textrm{f}$}
 	\label{fDFS}
 \end{figure}
 
@@ -507,8 +510,9 @@ extravagance -- the use of \texttt{append} helps us to reuse the first bag of
 
 \citet{kiselyov2005backtracking} has shown that a \emph{MonadPlus} hides in 
 implementations of logic programming system. Our BFS implementation is not an 
-exception: \texttt{none}, \texttt{unit}, \texttt{append-map-inf}, and 
-\texttt{append-inf} correspond to \texttt{mzero}, \texttt{unit}, \texttt{bind}, 
+exception: \texttt{append-map-inf/fair} is like \texttt{bind}, 
+but takes arguments in reversed order; \texttt{none}, \texttt{unit}, and 
+\texttt{append-inf/fair} correspond to \texttt{mzero}, \texttt{unit}, 
 and \texttt{mplus} respectively.
 
 \begin{figure}
@@ -523,8 +527,9 @@ first function, \texttt{elim}, takes a space \texttt{s-inf} and two
 continuations \texttt{ks} and \texttt{kf}. When \texttt{s-inf} contains some 
 answers, \texttt{ks} is called with the first answer and the rest space. 
 Otherwise, \texttt{kf} is called with no argument. Here `s' and `f' means 
-`succeed' and `fail' respectively. This function is an eliminator of search 
-space, hence the name. The remaining functions do the same thing as before.
+`succeed' and `fail' respectively. This function is like an eliminator of 
+search space, hence the name. The remaining functions do the same thing as 
+before.
 
 \subsection{comparison with the BFS of \citet{seres1999algebra}}
 
@@ -536,7 +541,8 @@ lists of answers, where each list is a bag.
 To compare efficiency, we translate her Haskell code into Racket (See 
 supplements for the translated code). The translation is direct 
 due to the similarity in both logic programming systems and search space 
-representations. The translated code is longer and slower. Details about 
+representations. The translated code is longer and slower than our BFS 
+implementation. Details about 
 difference in efficiency are in section 6.
 
 We prove in Coq that the two BFSs are equivalent, i.e. \texttt{(run n g)} 
@@ -633,9 +639,12 @@ Haskell code.
 We analysis the definitions of fair \disj{} and fair \conj{}, then propose a 
 new definition of fair \conj{}. Our definition is orthogonal with completeness.
 
-We devise three new search strategies: balanced interleaving DFS (DFS$_\textrm{bi}$), fair 
-DFS (DFS$_\textrm{f}$), and BFS. DFS$_\textrm{bi}$ has almost-fair \disj{} and unfair \conj{}. DFS$_\textrm{f}$ has 
-fair \disj{} and unfair \conj{}. BFS has both fair \disj{} and fair \conj{}.
+We devise two new search strategies (i.e. balanced interleaving DFS 
+(DFS$_\textrm{bi}$) and fair DFS (DFS$_\textrm{f}$)) and devise a new 
+implementation of BFS. These strategies have different features 
+in fairness: $_\textrm{bi}$ has almost-fair \disj{} and unfair \conj{}. 
+DFS$_\textrm{f}$ has fair \disj{} and unfair \conj{}. BFS has both fair \disj{} 
+and fair \conj{}.
 
 Our quantitative evaluation shows that DFS$_\textrm{bi}$ and DFS$_\textrm{f}$ are competitive 
 alternatives to DFS$_\textrm{i}$, the current search strategy, and that BFS is less 
