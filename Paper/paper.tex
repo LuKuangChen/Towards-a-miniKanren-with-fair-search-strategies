@@ -12,15 +12,16 @@
 \lstset{
   language=Scheme,
   basicstyle=\ttfamily,
-  morekeywords={run,conde,run*,defrel,==,fresh},
+  morekeywords={run,conde,run*,defrel,==,fresh,disj,conj,disj+},
   alsodigit={!\$\%&*+-./:<=>?@^_~},
   morecomment=[l]{;,\#{}lang},
   mathescape=true,
-  literate={-inf}{{$^\infty$}}1 {/fair}{{$_{fair}$}}3
-  		   {→}{{$\rightarrow$}}1
-  		   {×}{{$\times$}}1
-  		   {conde}{{cond$^e$}}4
-  		   {repeato}{{repeat$^o$}}6
+  literate={-inf}{{$^\infty$}}{1} {/fair}{{$_{fair}$}}{3}
+  		   {→}{{$\rightarrow$}}{1}
+  		   {×}{{$\times$}}{1}
+  		   {==}{{$\equiv$}}{1}
+  		   {conde}{{\textcolor[rgb]{0,.3,.7}{\textbf{cond$^e$}}}}{4}
+  		   {repeato}{{repeat$^o$}}{6}
 }
 %% scheme-list .
 
