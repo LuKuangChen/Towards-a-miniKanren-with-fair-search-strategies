@@ -289,7 +289,7 @@ different states. Then the next conjunctive goal, \texttt{(repeato x q)}, is
 applied to each of these states, producing four trivially different search 
 spaces. In the examples above, the \conj{}s are allocating more computational 
 resources to the search space of \texttt{a}. On the contrary, fair \conj{} 
-would allocate resources evenly to each search space.
+would allocate resources evenly to each search space. For example,
 
 \begin{center}
 	\begin{tabular}{c}
@@ -298,7 +298,7 @@ would allocate resources evenly to each search space.
 \end{center}
 
 A more interesting situation is when the first conjunct produces infinite many 
-answers. Consider the following example, a naive specification of fair \conj{} 
+states. Consider the following example, a naive specification of fair \conj{} 
 might require search strategies to produce all sorts of singleton lists, but no 
 longer ones, which makes the strategies incomplete. A search strategy is 
 \emph{complete} if and only if it can find out all the answers within finite 
@@ -321,9 +321,10 @@ BFS puts states of the same cost in the same bag, and allocate resources
 carefully among search spaces related to different bags such that answers are 
 produced in increasing order of cost. The \emph{cost} of a answer is its depth 
 in the search tree (i.e. the number of calls to relational definitions required 
-to find them) \citep{seres1999algebra}. In the following example, the cost of 
-each answer is equal to the length of the inner lists plus the length of the 
-outer list. 
+to find them) \citep{seres1999algebra}. In the following example, every answer 
+is a list of list of symbols, where inner lists are the same. Here the 
+cost of each answer is equal to the length of its inner lists plus the length 
+of its outer list. 
 
 \begin{center}
 	\begin{tabular}{c}
@@ -342,7 +343,7 @@ fairness.
 A \conj{} is fair if and only if it allocates computational resource evenly to 
 search spaces produced from states in the same bag. A bag is a finite 
 collection of state. And search strategies with fair \conj{} should represent 
-search spaces with possibly infinite collection of state. 
+search spaces with possibly infinite collection of bags. 
 \end{defn}
 
 \begin{defn}[unfair \conj{}]
@@ -356,35 +357,39 @@ A \conj{} is unfair if and only if it is not fair.
 \section{interleaving depth-first search}
 
 In this section, we review the implementation of interleaving depth-first 
-search 
-(\DFSi). This review is for comparison with other search strategies in this 
-paper. Thus we focus on parts that are changed later. TRS2 
+search (\DFSi). We focus on parts that are relevant to this paper. TRS2 
 \citep{friedman_reasoned_2018} provides a comprehensive description of the 
 whole miniKanren implementation.
 
 \begin{figure}
-    \lstinputlisting{Figures/DFSi.rkt}
-    \caption{implementation of \DFSi}
-    \label{DFSi}
+	\lstinputlisting{Figures/conde.rkt}
+	\caption{implementation of \conde}
+	\label{conde}
 \end{figure}
 
-Fig.~\ref{DFSi} shows part of the implementation of \DFSi{}. We follow a
-convention to name variables bound to states with `s', to name variables bound 
-to goals with `g', and to name variables bound to search spaces with a suffix 
-`-inf'. The first function, \texttt{disj2}, implements binary disjunction. 
+The definition of \conde{} (Fig.~\ref{conde}) is shared by all search 
+strategies. It relates clauses disjunctively, and goals in the same 
+clause conjunctively.
+
+\begin{figure}
+	\lstinputlisting{Figures/DFSi.rkt}
+	\caption{implementation of \DFSi}
+	\label{DFSi}
+\end{figure}
+
+Fig.~\ref{DFSi} shows parts that are later compared with other search 
+strategies. We follow some conventions to name variables: variables bound to 
+states are named \texttt{s}; variables bound to goals are named `g' (possibly 
+with subscript); variables bound to search spaces have names ending with 
+$^\infty$. The first function, \texttt{disj2}, implements binary disjunction. 
 \texttt{append-inf} is its helper, which composes two disjunctive search 
-spaces. 
-The following function, \texttt{conj2}, implements binary conjunction. It 
-applies 
-the \emph{first} goal to the input state, then applies the second goal to 
-states in the resulting search space. The latter process is done with a helper 
-function. \texttt{append-map-inf} applies its input goal to states in its input 
-search spaces and compose the resulting search spaces. It reuses 
-\texttt{append-inf} for search space composition. The following three 
-definitions introduce syntactic sugars that miniKanren users are more familiar 
-with. The first two definitions say disjunction and disjunction are 
-right-associative. The next and last definition says \conde{} relates its 
-clauses disjunctively, and goals in the same clause conjunctively.
+spaces. The following function, \texttt{conj2}, implements binary conjunction. 
+It applies the \emph{first} goal to the input state, then applies the second 
+goal to states in the resulting search space. The latter process is done with a 
+helper function. \texttt{append-map-inf} applies its input goal to states in 
+its input search spaces and compose the resulting search spaces. It reuses 
+\texttt{append-inf} for search space composition. The following two definitions 
+say disjunctive operator and conjunctive operator are right-associative.
 
 \section{balanced interleaving depth-first search}
 

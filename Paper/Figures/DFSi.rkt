@@ -39,8 +39,3 @@
     ((conj) succeed)
     ((conj g) g)
     ((conj g0 g ...) (conj2 g0 (conj g ...)))))
-
-(define-syntax conde
-  (syntax-rules ()
-    ((conde (g ...) ...)
-     (disj (conj g ...) ...))))
