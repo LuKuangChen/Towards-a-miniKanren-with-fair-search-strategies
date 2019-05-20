@@ -2,8 +2,8 @@
 > (run 6 q
     (fresh (xs)
       (conde
-        [(repeato 'a xs)]
-        [(repeato 'b xs)])
+        ((repeato 'a xs))
+        ((repeato 'b xs)))
       (repeato xs q)))
 '(((a)) ((b))
   ((a a)) ((b b))

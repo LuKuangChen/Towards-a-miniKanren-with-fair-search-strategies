@@ -2,10 +2,10 @@
 > (run 12 q
     (fresh (x)
       (conde
-        [(== 'a x)]
-        [(== 'b x)]
-        [(== 'c x)]
-        [(== 'd x)])
+        ((== 'a x))
+        ((== 'b x))
+        ((== 'c x))
+        ((== 'd x)))
       (repeato x q)))
 '((a) (b) (c) (d)
   (a a) (b b) (c c) (d d)

@@ -66,9 +66,9 @@ a \conde{} expression in miniKanren, a programmer would expect all clauses
 share the same chance of being explored, as these clauses are written in 
 parallel. The existing search strategy, interleaving depth-first search 
 (\DFSi{}), 
-however, prioritize its clauses by the order how they are written down. 
+however, prioritizes its clauses by the order how they are written down. 
 Similarly, when a \conde{} is followed by another goal conjunctively, a 
-programmer would expect answers in parallel share the same chance of being 
+programmer would expect states in parallel share the same chance of being 
 explored. Again, the answers by \DFSi{} is different from the 
 expectation. We have devised three new search strategies that have different 
 level of fairness in \disj{} and \conj{}.
@@ -95,10 +95,15 @@ miniKanren is a family of relational programming languages.
 \citet{friedman_reasoned_2018} introduce miniKanren and its implementation
 in \emph{The Reasoned Schemer, 2nd Ed} (TR2). miniKanren programs, especially
 relational interpreters, have been proven to be useful in solving many problems 
-by \citet{byrd2017unified}. 
+by \citet{byrd2017unified}.
 
-% \conde is the flagship disjunction operator in miniKanren.
-A subtlety arises when a \conde contains many clauses: not every clause has an 
+\NOTE[LKC]{Shall we delete the sentence about relational interpreters? It is 
+misleading: it is emphasizing relational interpreters, but we say nothing 
+further about them later.}
+
+% \conde{} is the flagship disjunction operator in miniKanren.
+A subtlety arises 
+when a \conde{} contains many clauses: not every clause has an 
 equal chance to contribute to the result. As an example, consider the following 
 relation \texttt{repeato} and its invocation. 
 
@@ -109,13 +114,13 @@ different letters.
 
 \clisting{Figures/example.rkt}
 
-\conde intuitively relates its clauses with logical \texttt{or}. And thus an 
+\conde{} intuitively relates its clauses with logical \texttt{or}. And thus an 
 unsuspicious beginner would expect each letter to contribute equally to the 
 result, as follows.
 
 \clisting{Figures/run-repeato-fair.rkt}
 
-The \conde in TR2, however, generates a less expected result.
+The \conde{} in TR2, however, generates a less expected result.
 
 \clisting{Figures/run-repeato-idfs.rkt}
 
@@ -151,7 +156,7 @@ must be drastically slow.
 
 The specification that every clause in the same \conde{} is given equal 
 ``search priority'' is called fair \disj{}. And search strategies with 
-almost-fair \disj{} give every clause in the same \conde{} similar priority. 
+almost-fair \disj{} give every clause similar priority. 
 Fair \conj{}, a related concept, is more complicated. We defer it to the next 
 section.
 
@@ -162,9 +167,9 @@ To summarize our contribution, we
 	\item propose and implement fair depth-first search (\DFSf{}), a 
 	new search strategy with fair \disj{}.
 	\item implement in a new way breath-first search (BFS), a search strategy 
-	with fair \disj{} and fair \conj{}. (our code runs faster in all 
-benchmarks and is simpler). And we prove formally that our BFS implementation 
-is equivalent to the one by \citet{seres1999algebra}.
+	with fair \disj{} and fair \conj{}. And we prove formally that our BFS 
+implementation is equivalent to the one by \citet{seres1999algebra}. Our code 
+runs faster in all benchmarks and is simpler. 
 \end{itemize}
 
 \section{search strategies and fairness}
@@ -185,10 +190,11 @@ Now we elaborate fairness by running more queries about \texttt{repeato}.
 \subsection{fair \texttt{disj}}
 
 Given the following program, it is natural to expect lists of each letter to
-constitute $1/4$ in the answer. \DFSi, the current search
+constitute $1/4$ in the query result. \DFSi, the current search
 strategy, however, results in many more lists of \texttt{a}s than lists
 of other letters. And some letters  (e.g. \texttt{c} and \texttt{d}) are
-rarely seen. The situation would be exacerbated if \conde contains more clauses.
+rarely seen. The situation would be exacerbated if \conde{} contains more 
+clauses.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -196,7 +202,7 @@ rarely seen. The situation would be exacerbated if \conde contains more clauses.
 	\end{tabular}
 \end{center}
 
-Under the hood, the \conde here is allocating computational resource to 
+Under the hood, the \conde{} here is allocating computational resource to 
 four trivially different search space. The unfair \disj{} in 
 \DFSi{} allocates many more resources to the first search space. On the 
 contrary, fair \disj{} would allocate resources evenly to each search space. 
@@ -257,7 +263,7 @@ Given the following program, it is natural to expect lists of each letter to
 constitute $1/4$ in the answer. Search strategies with unfair \conj{} (e.g. 
 \DFSi, \DFSbi, \DFSf), however, results in many more lists of \texttt{a}s than 
 lists of other letters. And some letters are rarely seen. The situation would 
-be exacerbated if \conde contains more clauses.
+be exacerbated if \conde{} contains more clauses.
 
 \NOTE[LKC]{Should I add a footnote?
 
@@ -291,11 +297,11 @@ different states. Then the next conjunctive goal, \texttt{(repeato x q)}, is
 applied to each of these states, producing four trivially different search 
 spaces. In the examples above, the \conj{}s are allocating more computational 
 resources to the search space of \texttt{a}. On the contrary, fair \conj{} 
-would allocate resources evenly to each search space. 
+would allocate resources evenly to each search space.
 
 \begin{center}
 	\begin{tabular}{c}
-		\lstinputlisting{Figures/repeato-conj-fair.rkt}
+		\lstinputlisting{Figures/repeato-conj-BFS.rkt}
 	\end{tabular}
 \end{center}
 
@@ -391,8 +397,8 @@ clauses disjunctively, and goals in the same clause conjunctively.
 \section{balanced interleaving depth-first search}
 
 \begin{figure}
-	\lstinputlisting{Figures/balanced-disj.rkt}
-	\caption{implementation of DFS$_\textrm{bi}$}
+	\lstinputlisting{Figures/DFSbi.rkt}
+	\caption{implementation of \DFSbi{}}
 	\label{balanced-disj}
 \end{figure}
 
@@ -428,8 +434,8 @@ nodes but in a particularly unbalanced form.
 \section{fair depth-first search}
 
 \begin{figure}
-	\lstinputlisting{Figures/fDFS.rkt}
-	\caption{implementation of DFS$_\textrm{f}$}
+	\lstinputlisting{Figures/DFSf.rkt}
+	\caption{implementation of \DFSf{}}
 	\label{fDFS}
 \end{figure}
 
@@ -601,11 +607,12 @@ The modifications are made
 to circumvent the need for symbolic constraints (e.g. $\neq$, 
 \texttt{absento}). Our version generates de 
 Bruijnized expressions and prevent closures getting into list. The two 
-benchmarks differ in the \conde clause order of their relational interpreters. 
+benchmarks differ in the \conde{} clause order of their relational 
+interpreters. 
 The last two 
 benchmarks are about synthesizing expressions that evaluate to \texttt{'(I love 
 you)}. This benchmark is also inspired by \citet{byrd2017unified}. Again, the 
-sibling benchmarks differ in the \conde clause order of their relational 
+sibling benchmarks differ in the \conde{} clause order of their relational 
 interpreters. The first one 
 has elimination rules (i.e. application, \texttt{car}, and \texttt{cdr}) at the 
 end, while the other has them at the beginning. We conjecture that DFS$_\textrm{i}$ would 

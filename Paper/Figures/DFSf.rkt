@@ -5,9 +5,9 @@
 
 #| Space x Space -> Space |#
 (define (append-inf/fair s-inf t-inf)
-  (let loop ([s? #t]
-             [s-inf s-inf]
-             [t-inf t-inf])
+  (let loop ((s? #t)
+             (s-inf s-inf)
+             (t-inf t-inf))
     (cond
       ((pair? s-inf)
        (cons (car s-inf)
