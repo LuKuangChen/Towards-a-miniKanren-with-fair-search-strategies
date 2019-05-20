@@ -1,3 +1,4 @@
+#| Space × (State × Space → Space) × (→ Space) → Space |#
 (define (elim s-inf ks kf)
   (let ((ss (car s-inf))
         (f (cdr s-inf)))
@@ -7,6 +8,7 @@
       ((null? ss) (kf))
       (else (ks (car ss) (cons (cdr ss) f))))))
 
+#| Goal × Goal × Goal → Goal |#
 (define (ifte g1 g2 g3)
   (lambda (s)
     (elim (g1 s)
@@ -15,6 +17,7 @@
           (append-inf/fair (unit s0) s-inf)))
       (lambda () (g3 s)))))
 
+#| Goal → Goal |#
 (define (once g)
   (lambda (s)
     (elim (g s)

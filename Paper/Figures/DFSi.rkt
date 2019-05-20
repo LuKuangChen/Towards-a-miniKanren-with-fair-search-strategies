@@ -1,9 +1,9 @@
-#| Goal x Goal -> Goal |#
+#| Goal × Goal → Goal |#
 (define (disj2 g1 g2)
   (lambda (s)
     (append-inf (g1 s) (g2 s))))
 
-#| Space x Space -> Space |#
+#| Space × Space → Space |#
 (define (append-inf s-inf t-inf)
   (cond
     ((null? s-inf) t-inf)
@@ -13,12 +13,12 @@
     (else (lambda () 
             (append-inf t-inf (s-inf))))))
 
-#| Goal x Goal -> Goal |#
+#| Goal × Goal → Goal |#
 (define (conj2 g1 g2)
   (lambda (s)
     (append-map-inf g2 (g1 s))))
 
-#| Goal x Space -> Space |#
+#| Goal × Space → Space |#
 (define (append-map-inf g s-inf)
   (cond
     ((null? s-inf) '())

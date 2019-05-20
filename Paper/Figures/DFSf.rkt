@@ -1,9 +1,9 @@
-#| Goal x Goal -> Goal |#
+#| Goal × Goal → Goal |#
 (define (disj2 g1 g2)
   (lambda (s)
     (append-inf/fair (g1 s) (g2 s))))
 
-#| Space x Space -> Space |#
+#| Space × Space → Space |#
 (define (append-inf/fair s-inf t-inf)
   (let loop ((s? #t)
              (s-inf s-inf)

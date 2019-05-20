@@ -15,7 +15,12 @@
   morekeywords={run,conde,run*,defrel,==,fresh},
   alsodigit={!\$\%&*+-./:<=>?@^_~},
   morecomment=[l]{;,\#{}lang},
-  mathescape=true
+  mathescape=true,
+  literate={-inf}{{$^\infty$}}1 {/fair}{{$_{fair}$}}3
+  		   {→}{{$\rightarrow$}}1
+  		   {×}{{$\times$}}1
+  		   {conde}{{cond$^e$}}4
+  		   {repeato}{{repeat$^o$}}6
 }
 %% scheme-list .
 
@@ -208,14 +213,10 @@ four trivially different search space. The unfair \disj{} in
 contrary, fair \disj{} would allocate resources evenly to each search space. 
 
 \begin{center}
-	\begin{tabular}{c}
-		\lstinputlisting{Figures/repeato-disj-DFSf.rkt}
+	\begin{tabular}{l|r}
+		\lstinputlisting{Figures/repeato-disj-DFSf.rkt} &
+		\lstinputlisting{Figures/repeato-disj-BFS.rkt}
 	\end{tabular}
-\end{center}
-\begin{center}
-\begin{tabular}{c}
-	\lstinputlisting{Figures/repeato-disj-BFS.rkt}
-\end{tabular}
 \end{center}
 
 Running the same program again with almost-fair \disj {} (e.g. 
@@ -274,21 +275,11 @@ call to relational definition in \conde{} clauses (including this case).
 ''}
 
 \begin{center}
-	\begin{tabular}{c}
-		\lstinputlisting{Figures/repeato-conj-DFSi.rkt}
-	\end{tabular}
-\end{center}
-
-\begin{center}
-	\begin{tabular}{c}
-		\lstinputlisting{Figures/repeato-conj-DFSf.rkt}
-	\end{tabular}
-\end{center}
-
-\begin{center}
-	\begin{tabular}{c}
-		\lstinputlisting{Figures/repeato-conj-DFSbi.rkt}
-	\end{tabular}
+\begin{tabular}{l|c|r}
+    \lstinputlisting{Figures/repeato-conj-DFSi.rkt} &
+    \lstinputlisting{Figures/repeato-conj-DFSf.rkt} &
+    \lstinputlisting{Figures/repeato-conj-DFSbi.rkt} \\
+\end{tabular}
 \end{center}
 
 Under the hood, the \conde{} and the call to \texttt{repeato} are connected by 
