@@ -1,0 +1,25 @@
+\begin{ZZZZschemedisplay}%
+\texttt{\#{}|} \va{Goal} $\times$ \va{Goal} $\rightarrow$ \va{Goal} \texttt{|\#{}}\\%
+(\sy{define} (\va{disj2} $g_1$ $g_2$)\\%
+\PRN \HL \=(\sy{lambda} (\va{s})\\%
+  \>\PRN \HL (append$^\infty_f$ ($g_1$ \va{s}) ($g_2$ \va{s}))))
+\end{ZZZZschemedisplay}
+
+\begin{ZZZZschemedisplay}%
+\texttt{\#{}|} \va{Space} $\times$ \va{Space} $\rightarrow$ \va{Space} \texttt{|\#{}}\\%
+(\sy{define} (append$^\infty_f$ s$^\infty$ t$^\infty$)\\%
+\PRN \HL (append$^\infty_f$\textasciicircum \dt{\#t} s$^\infty$ t$^\infty$))
+\end{ZZZZschemedisplay}
+
+\begin{ZZZZschemedisplay}%
+\texttt{\#{}|} \va{Bool} $\times$ \va{Space} $\times$ \va{Space} $\rightarrow$ \va{Space} \texttt{|\#{}}\\%
+(\sy{define} (append$^\infty_f$\textasciicircum \va{s?} s$^\infty$ t$^\infty$)\\%
+\PRN \HL \=(\sy{cond}\\%
+  \>\PRN \HL \=((\va{pair?} s$^\infty$)\\%
+  \>  \>\PRN \=(\va{cons} (\va{car} s$^\infty$)\\%
+  \>  \> \>\PRN \HL (append$^\infty_f$\textasciicircum \va{s?} (\va{cdr} s$^\infty$) t$^\infty$)))\\%
+  \>  \>((\va{null?} s$^\infty$) t$^\infty$)\\%
+  \>  \>(\va{s?} (append$^\infty_f$\textasciicircum \dt{\#f} t$^\infty$ s$^\infty$))\\%
+  \>  \>(\sy{else} \=(\sy{lambda} ()\\%
+  \>  \>      \>\PRN \HL (append$^\infty_f$ (t$^\infty$) (s$^\infty$))))))%
+\end{ZZZZschemedisplay}

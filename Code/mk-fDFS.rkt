@@ -65,24 +65,27 @@
     (else (lambda () 
             (append-inf t-inf (s-inf))))))
 
-; 1/2 CHANGES
 (define (append-inf/fair s-inf t-inf)
-  (append-inf/fair^ #t s-inf t-inf))
-
-; 2/2 CHANGES
-; Argument s? means whether s∞ and t∞ have been swapped.
-; First 2 lines recur on the mature part of s-inf. When
-; both immature parts are thunks, they are combined as a
-; new λ in the last line.
-(define (append-inf/fair^ s? s-inf t-inf)
+  (let loop ([s? #t]
+             [s-inf s-inf]
+             [t-inf t-inf])
+    (cond
+      ((pair? s-inf)
+       (cons (car s-inf)
+         (loop s? (cdr s-inf) t-inf)))
+      ((null? s-inf) t-inf)
+      (s? (loop #f t-inf s-inf))
+      (else (lambda () (loop #t (t-inf) (s-inf)))))))
+#;
+(define (append-inf/fair s-inf t-inf)
   (cond
-    ((pair? s-inf)
-     (cons (car s-inf)
-       (append-inf/fair^ s? (cdr s-inf) t-inf)))
-    ((null? s-inf) t-inf)
-    (s? (append-inf/fair^ #f t-inf s-inf))
-    (else (lambda ()
-            (append-inf/fair (t-inf) (s-inf))))))
+    [(null? s-inf) t-inf]
+    [(null? t-inf) s-inf]
+    [(pair? s-inf) (cons (car s-inf)
+                     (append-inf/fair (cdr s-inf) t-inf))]
+    [(pair? t-inf) (cons (car t-inf)
+                     (append-inf/fair s-inf (cdr t-inf)))]
+    [else (lambda () (append-inf/fair (s-inf) (t-inf)))]))
 
 (define (take-inf n s-inf)
   (cond

@@ -1,0 +1,15 @@
+    \begin{ZZZZschemedisplay}%
+;; BFS (fair conj)\\%
+\va{$\gt$} \=(\sy{run} \dt{12} \va{q}\\%
+  \>\PRN \HL \=(\sy{fresh} (\va{x})\\%
+  \>  \>\PRN \HL \=(\textbf{cond$^e$}\\%
+  \>  \>  \>\PRN \HL \=[($\equiv$ '\cn{a} \va{x})]\\%
+  \>  \>  \>  \>[($\equiv$ '\cn{b} \va{x})]\\%
+  \>  \>  \>  \>[($\equiv$ '\cn{c} \va{x})]\\%
+  \>  \>  \>  \>[($\equiv$ '\cn{d} \va{x})])\\%
+  \>  \>  \>(repeat$^o$ \va{x} \va{q})))\\%
+'\=((\cn{a}) (\cn{b}) (\cn{c}) (\cn{d})\\%
+ \>\PRN \=(\cn{a} \cn{a}) (\cn{b} \cn{b}) (\cn{c} \cn{c}) (\cn{d} \cn{d})\\%
+ \> \>(\cn{a} \cn{a} \cn{a}) (\cn{b} \cn{b} \cn{b}) (\cn{c} \cn{c} \cn{c}) (\cn{d} \cn{d} \cn{d}))
+\end{ZZZZschemedisplay}
+	

@@ -1,0 +1,28 @@
+\begin{ZZZZschemedisplay}%
+\texttt{\#{}|} [\va{Goal}] \va{x} ([\va{Goal}] \va{x} [\va{Goal}] $\rightarrow$ \va{Goal}) $\rightarrow$ \va{Goal} \texttt{|\#{}}\\%
+(\sy{define} (\va{split} \va{ls} \va{k})\\%
+\PRN \HL \=(\sy{cond}\\%
+  \>\PRN \HL \=[(\va{null?} \va{ls}) (\va{k} '() '())]\\%
+  \>  \>[\sy{else} \=(\va{split} (\va{cdr} \va{ls})\\%
+  \>  \>      \>\PRN \HL \=(\sy{lambda} (\va{l1} \va{l2})\\%
+  \>  \>      \>  \>\PRN \HL (\va{k} (\va{cons} (\va{car} \va{ls}) \va{l2}) \va{l1})))]))
+\end{ZZZZschemedisplay}
+
+\begin{ZZZZschemedisplay}%
+\texttt{\#{}|} [\va{Goal}] $\rightarrow$ \va{Goal} \texttt{|\#{}}\\%
+(\sy{define} (\va{disj$\ast$} \va{gs})\\%
+\PRN \HL \=(\sy{cond}\\%
+  \>\PRN \HL \=[(\va{null?} (\va{cdr} \va{gs})) (\va{car} \va{gs})]\\%
+  \>  \>[\sy{else}\\%
+  \>  \>\BKT \=(\va{split} \va{gs}\\%
+  \>  \> \>\PRN \HL \=(\sy{lambda} ($gs_1$ $gs_2$)\\%
+  \>  \> \>  \>\PRN \HL \=(\va{disj2} \=(\va{disj$\ast$} $gs_1$)\\%
+  \>  \> \>  \>  \>       \>(\va{disj$\ast$} $gs_2$))))]))
+\end{ZZZZschemedisplay}
+
+\begin{ZZZZschemedisplay}%
+(\sy{define-syntax} \sy{disj}\\%
+\PRN \HL \=(\sy{syntax-rules} ()\\%
+  \>\PRN \HL \=[(\sy{disj}) \va{fail}]\\%
+  \>  \>[(\sy{disj} \va{g} {\dots}) (\va{disj$\ast$} (\va{list} \va{g} {\dots}))]))%
+\end{ZZZZschemedisplay}

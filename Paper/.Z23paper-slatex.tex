@@ -1,0 +1,11 @@
+\begin{ZZZZschemedisplay}%
+\va{$\gt$} \=(\sy{defrel} (repeat$^o$ \va{x} \va{out})\\%
+  \>\PRN \HL \=(\textbf{cond$^e$}\\%
+  \>  \>\PRN \HL \=[($\equiv$ `(,\va{x}) \va{out})]\\%
+  \>  \>  \>[\=(\sy{fresh} (\va{res})\\%
+  \>  \>  \> \>\PRN \HL \=($\equiv$ `(,\va{x} . ,\va{res}) \va{out})\\%
+  \>  \>  \> \>  \>(repeat$^o$ \va{x} \va{res}))]))\\%
+\va{$\gt$} \=(\sy{run} \dt{4} \va{q}\\%
+  \>\PRN \HL (repeat$^o$ '\cn{$\ast$} \va{q}))\\%
+'((\cn{$\ast$}) (\cn{$\ast$} \cn{$\ast$}) (\cn{$\ast$} \cn{$\ast$} \cn{$\ast$}) (\cn{$\ast$} \cn{$\ast$} \cn{$\ast$} \cn{$\ast$}))%
+\end{ZZZZschemedisplay}

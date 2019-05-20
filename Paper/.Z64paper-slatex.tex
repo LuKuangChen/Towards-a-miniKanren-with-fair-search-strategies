@@ -1,0 +1,13 @@
+    \begin{ZZZZschemedisplay}%
+;; naively fair conj\\%
+\va{$\gt$} \=(\sy{run} \dt{6} \va{q}\\%
+  \>\PRN \HL \=(\sy{fresh} (\va{xs})\\%
+  \>  \>\PRN \HL \=(\textbf{cond$^e$}\\%
+  \>  \>  \>\PRN \HL \=[(repeat$^o$ '\cn{a} \va{xs})]\\%
+  \>  \>  \>  \>[(repeat$^o$ '\cn{b} \va{xs})])\\%
+  \>  \>  \>(repeat$^o$ \va{xs} \va{q})))\\%
+'\=(((\cn{a})) ((\cn{b}))\\%
+ \>\PRN \=((\cn{a} \cn{a})) ((\cn{b} \cn{b}))\\%
+ \> \>((\cn{a} \cn{a} \cn{a})) ((\cn{b} \cn{b} \cn{b})))
+\end{ZZZZschemedisplay}
+	
