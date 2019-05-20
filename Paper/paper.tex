@@ -379,17 +379,19 @@ clause conjunctively.
 
 Fig.~\ref{DFSi} shows parts that are later compared with other search 
 strategies. We follow some conventions to name variables: variables bound to 
-states are named \texttt{s}; variables bound to goals are named `g' (possibly 
-with subscript); variables bound to search spaces have names ending with 
-$^\infty$. The first function, \texttt{disj2}, implements binary disjunction. 
-\texttt{append-inf} is its helper, which composes two disjunctive search 
-spaces. The following function, \texttt{conj2}, implements binary conjunction. 
+states are named \texttt{s}; variables bound to goals are named \texttt{g} 
+(possibly with subscript); variables bound to search spaces have names ending 
+with $^\infty$. The first function, \texttt{disj2}, implements binary 
+disjunction. if and only if is its helper, which composes two disjunctive 
+search spaces. The following function, \texttt{conj2}, implements binary 
+conjunction. 
 It applies the \emph{first} goal to the input state, then applies the second 
 goal to states in the resulting search space. The latter process is done with a 
-helper function. \texttt{append-map-inf} applies its input goal to states in 
-its input search spaces and compose the resulting search spaces. It reuses 
-\texttt{append-inf} for search space composition. The following two definitions 
-say disjunctive operator and conjunctive operator are right-associative.
+helper function. \texttt{append-map$^\infty$} applies its input goal to states 
+in its input search spaces and compose the resulting search spaces. It reuses 
+\texttt{append$^\infty$} for search space composition. The following and last 
+two definitions say disjunctive operator and conjunctive operator are 
+right-associative.
 
 \section{balanced interleaving depth-first search}
 
@@ -401,22 +403,21 @@ say disjunctive operator and conjunctive operator are right-associative.
 
 Balanced interleaving DFS (DFS$_\textrm{bi}$) has almost-fair \disj{} and unfair 
 \conj{}. The implementation of DFS$_\textrm{bi}$ differs from 
-DFS$_\textrm{i}$'s 
-in the \disj{} macro. We list the new \disj{} with its helper in 
-Fig.~\ref{balanced-disj}. The helper \texttt{disj+} builds a balanced binary 
-tree 
-whose leaves are the goals and whose nodes are \texttt{disj2}s, hence the name 
-of 
-this search strategy. The first argument 
-to \texttt{disj+} is a list of all goals. And the next two arguments accumulate 
-goals in 
-the left and right subtrees. The first clause says that when there is one goal, 
-the tree is the goal itself. When there are more goals, the first argument is 
-partitioned into two sub-lists. The partition is done by repetitively 
-dispatching the first two goals (the last clause), until no goal remains (the 
-second clause) or one goal remains (the third clause). In contrast, the \disj{} 
-in DFS$_\textrm{i}$ constructs the binary tree with the same collection of leaf 
-nodes but in a particularly unbalanced form.
+DFS$_\textrm{i}$'s in the \disj{} macro. We list the new \disj{} with its 
+helper in Fig.~\ref{balanced-disj}. When there are one or more disjunctive 
+goals, \disj{} builds a balanced binary tree whose leaves are the goals and 
+whose nodes are \texttt{disj2}s, hence the name of this search strategy. 
+The first ``argument'' to \texttt{disj+} is the goals. And the next two 
+``arguments'' accumulate goals to be put in the left and right subtrees. When 
+there is only one goal, the tree is the goal itself. This case is handled in 
+the first clause. When there are more goals, we partition the list of goals 
+into two sublists of roughly equal lengths and recur on the two sublists. The 
+partition is done by repetitively dispatching the first two goals in the list 
+to the accumulators, until only 
+zero or one goal remains. The two base cases of the partition are handled by 
+the second and the third clauses respectively. And the dispatching is done at 
+the fourth and last clause. In contrast, the \disj{} in \DFSi{} constructs the 
+binary tree in a particularly unbalanced form.
 
 
 % The first helper function, \texttt{split}, takes a 
@@ -439,35 +440,39 @@ nodes but in a particularly unbalanced form.
 Fair DFS (\DFSf) has fair \disj{} and unfair \conj{}. The 
 implementation of \DFSf{} differs from \DFSi{}'s in 
 \texttt{disj2} (Fig.~\ref{fDFS}). \texttt{disj2} is changed to call a new and 
-fair version of \texttt{append-inf}. \texttt{append-inf/fair} immediately calls 
+fair version of \texttt{append$^\infty$}. \texttt{append$^\infty_{fair}$} 
+immediately 
+calls 
 its helper, \texttt{loop}, with the first argument, \texttt{s?}, set to 
 \texttt{\#{}t}, which indicates that 
-\texttt{s-inf} and \texttt{t-inf} haven't been swapped. The swapping happens at 
+\texttt{s$^\infty$} and \texttt{t$^\infty$} haven't been swapped. The swapping 
+happens at 
 the third \texttt{cond} clause in the helper, where \texttt{s?} is updated 
 accordingly. The first two \texttt{cond} clauses essentially copy the 
 \texttt{car}s and stop recursion when one of the input spaces is obviously 
 finite. The third clause, as we mentioned above, is just for swapping. When the 
-fourth and last clause runs, we know that both \texttt{s-inf} and \texttt{t-inf} 
-are ended with a thunk. In this case, a new thunk is constructed. The new thunk 
-calls the driver recursively. Here changing the order of \texttt{t-inf} and 
-\texttt{s-inf} won't hurt the fairness (though it will change the order of 
-answers). We swap them back so that answers are produced in a more natural 
-order.
-
+fourth and last clause runs, we know that both \texttt{s$^\infty$} and 
+\texttt{t$^\infty$} are ended with a thunk and they have been swapped. In this 
+case, a new thunk is constructed. Here changing the order of 
+\texttt{t$^\infty$} and \texttt{s$^\infty$} won't hurt the fairness (though it 
+will change the order of answers). We swap them back so that answers are 
+produced in a more natural order.
 
 \section{breadth-first search}
 
 BFS has both fair \disj{} and fair \conj{}. Our implementation is based on 
 DFS$_\textrm{f}$ (not DFS$_\textrm{i}$). To implement \BFS{} based on \DFSf{}, 
-we need \texttt{append-map-inf/fair} in addition to \texttt{append-inf/fair}. 
-The only difference between \texttt{append-map-inf/fair} and 
-\texttt{append-map-inf} is that the former calls \texttt{append-inf/fair} 
-instead of \texttt{append-inf}.
+we need \texttt{append-map$^\infty_{fair}$} in addition to 
+\texttt{append$^\infty_{fair}$}. 
+The only difference between \texttt{append-map$^\infty$} and 
+\texttt{append-map$^\infty_{fair}$} is that the latter calls 
+\texttt{append$^\infty_{fair}$} instead of \texttt{append$^\infty$}.
 
 The implementation can be improved in two ways. First, as mentioned in 
 section 2.2, BFS puts answers in bags and answers of the same cost are in the 
 same bag. In this implementation, however, it is unclear where this information 
-is recorded. Second, \texttt{append-inf/fair} is extravagant in memory usage. It 
+is recorded. Second, \texttt{append$^\infty_{fair}$} is extravagant in memory 
+usage. It 
 makes $O(n+m)$ new \texttt{cons} cells every time, where $n$ and $m$ are the 
 ``length''s of input search spaces. We address these issues in the first 
 subsection.
@@ -490,7 +495,9 @@ same cost are in the same bag. The cost
 information is recorded subtly -- the \texttt{car}s of a search space have cost 
 0 (i.e. they are in the same bag), and the costs of answers in thunk are 
 computed recursively then increased by one. It is even more subtle that
-\texttt{append-inf/fair} and the \texttt{append-map-inf/fair} respects the cost 
+\texttt{append$^\infty_{fair}$} and the \texttt{append-map$^\infty_{fair}$} 
+respects 
+the cost 
 information. We make these facts more obvious by changing the type of search 
 space, modifying related function definitions, and introducing a few more 
 functions.
@@ -501,21 +508,22 @@ space. A falsy \texttt{cdr} means the search space is obviously finite.
 
 Functions related to the pure subset are listed in Fig.~\ref{BFS-opt} (the 
 others in Fig.~\ref{BFS-opt-cont}). They are compared with 
-\citeauthor{seres1999algebra}'s implementation later. The first three functions 
-in Fig.~\ref{BFS-opt} are search space constructors. \texttt{none} makes an 
-empty search space; \texttt{unit} makes a space from one answer; and 
+\citeauthor{seres1999algebra}'s implementation in our proof. The first three 
+functions in Fig.~\ref{BFS-opt} are search space constructors. \texttt{none} 
+makes an empty search space; \texttt{unit} makes a space from one answer; and 
 \texttt{step} makes a space from a thunk. The remaining functions do the same 
 thing as before. 
 
-Luckily, the change in \texttt{append-inf/fair} also fixes the miserable space 
+Luckily, the change in \texttt{append$^\infty_{fair}$} also fixes the miserable 
+space 
 extravagance -- the use of \texttt{append} helps us to reuse the first bag of 
-\texttt{t-inf}.
+\texttt{t$^\infty$}.
 
 \citet{kiselyov2005backtracking} has shown that a \emph{MonadPlus} hides in 
 implementations of logic programming system. Our BFS implementation is not an 
-exception: \texttt{append-map-inf/fair} is like \texttt{bind}, 
+exception: \texttt{append-map$^\infty_{fair}$} is like \texttt{bind}, 
 but takes arguments in reversed order; \texttt{none}, \texttt{unit}, and 
-\texttt{append-inf/fair} correspond to \texttt{mzero}, \texttt{unit}, 
+\texttt{append$^\infty_{fair}$} correspond to \texttt{mzero}, \texttt{unit}, 
 and \texttt{mplus} respectively.
 
 \begin{figure}
@@ -526,8 +534,9 @@ and \texttt{mplus} respectively.
 \end{figure}
 
 Functions implementing impure features are in Fig.~\ref{BFS-opt-cont}. The 
-first function, \texttt{elim}, takes a space \texttt{s-inf} and two 
-continuations \texttt{ks} and \texttt{kf}. When \texttt{s-inf} contains some 
+first function, \texttt{elim}, takes a space \texttt{s$^\infty$} and two 
+continuations \texttt{ks} and \texttt{kf}. When \texttt{s$^\infty$} contains 
+some 
 answers, \texttt{ks} is called with the first answer and the rest space. 
 Otherwise, \texttt{kf} is called with no argument. Here `s' and `f' means 
 `succeed' and `fail' respectively. This function is like an eliminator of 
@@ -538,10 +547,10 @@ before.
 
 In this section, we compare the pure subset of our optimized BFS with the BFS 
 found in \citet{seres1999algebra}. We focus on the pure subset because 
-Silvija's system is pure. Their system represents search spaces with streams of 
+their system is pure. Their system represents search spaces with streams of 
 lists of answers, where each list is a bag.
 
-To compare efficiency, we translate her Haskell code into Racket (See 
+To compare efficiency, we translate their Haskell code into Racket (See 
 supplements for the translated code). The translation is direct 
 due to the similarity in both logic programming systems and search space 
 representations. The translated code is longer and slower than our BFS 
@@ -602,7 +611,7 @@ memory. The first two benchmarks are taken from
 about quine are modified from a similar test case in \citet{byrd2017unified}. 
 The modifications are made 
 to circumvent the need for symbolic constraints (e.g. $\neq$, 
-\texttt{absento}). Our version generates de 
+\texttt{absent$^o$}). Our version generates de 
 Bruijnized expressions and prevent closures getting into list. The two 
 benchmarks differ in the \conde{} clause order of their relational 
 interpreters. 
@@ -624,9 +633,9 @@ DFS$_\textrm{i}$. Among the two implementation of BFS, ours constantly performs 
 better. Interestingly, every strategies with fair \disj{} suffers in 
 \texttt{very-recursiveo} and DFS$_\textrm{f}$ performs well elsewhere. 
 Therefore, this 
-benchmark might be a special case. Fair \conj{} imposes overhead constantly 
-except in \texttt{appendo}. The reason might be that strategies with fair 
-\conj{} tend to keep more intermediate answers in the memory.
+benchmark might be a special case. Fair \conj{} imposes considerable overhead 
+constantly except in \texttt{appendo}. The reason might be that strategies with 
+fair \conj{} tend to keep more intermediate answers in the memory.
 
 \section{related works}
 
@@ -634,7 +643,7 @@ Edward points out a disjunct complex would be `fair' if it is a full and
 balanced tree \citet{yang2010adventures}.
 
 Silvija et al \citet{seres1999algebra} also describe a breadth-first search 
-strategy. We proof their BFS is equivalent to ours. But our code looks simpler 
+strategy. We proof their BFS is equivalent to ours. But our code is shorter
 and performs better in comparison with a straightforward translation of their 
 Haskell code.
 

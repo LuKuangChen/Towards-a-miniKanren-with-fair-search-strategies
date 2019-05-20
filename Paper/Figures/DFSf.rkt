@@ -15,4 +15,4 @@
       ((null? s-inf) t-inf)
       (s? (loop #f t-inf s-inf))
       (else (lambda ()
-              (append-inf/fair (t-inf) (s-inf)))))))
+              (loop #t (t-inf) (s-inf)))))))
