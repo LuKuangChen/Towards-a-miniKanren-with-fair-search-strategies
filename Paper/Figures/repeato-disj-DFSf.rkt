@@ -1,4 +1,4 @@
-;; DFSf (fair disj)
+;; \DFSf{} (fair disj)
 > (run 12 q
     (conde
       ((repeato 'a q))

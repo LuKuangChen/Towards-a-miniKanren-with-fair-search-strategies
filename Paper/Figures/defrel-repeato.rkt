@@ -1,6 +1,6 @@
 (defrel (repeato x out)
   (conde
-    [(== '() out)]
-    [(fresh (res)
+    ((== '() out))
+    ((fresh (res)
        (== `(,x . ,res) out)
-       (repeato x res))]))
+       (repeato x res)))))

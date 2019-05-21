@@ -1,4 +1,4 @@
-;; biDFS (almost-fair disj)
+;; DFSbi (almost-fair disj)
 > (run 16 q
     (conde
       ((repeato 'a q))

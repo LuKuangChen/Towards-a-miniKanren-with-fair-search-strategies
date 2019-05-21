@@ -1,4 +1,4 @@
-;; BFS (fair disj)
+;; BFSser (fair disj)
 > (run 12 q
     (conde
       ((repeato 'a q))

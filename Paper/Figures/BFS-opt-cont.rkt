@@ -1,7 +1,6 @@
 #| Space × (State × Space → Space) × (→ Space) → Space |#
 (define (elim s-inf ks kf)
-  (let ((ss (car s-inf))
-        (f (cdr s-inf)))
+  (let ((ss (car s-inf)) (f (cdr s-inf)))
     (cond
       ((and (null? ss) f)
        (step (lambda () (elim (f) ks kf))))
