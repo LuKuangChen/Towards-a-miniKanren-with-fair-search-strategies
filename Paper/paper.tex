@@ -59,19 +59,30 @@
 
 \begin{abstract}
 
-The syntax of a programming language should reflect its semantics. When writing 
-a \conde{} expression in miniKanren, a programmer would expect all clauses 
-share the same chance of being explored, as these clauses are written in 
-parallel. The existing search strategy, interleaving depth-first search 
-(\DFSi{}), 
-however, prioritizes its clauses by the order how they are written down. 
-Similarly, when a \conde{} is followed by another goal conjunctively, a 
-programmer would expect states in parallel share the same chance of being 
-explored. Again, the answers by \DFSi{} is different from the 
-expectation. We have devised three new search strategies that have different 
-level of fairness in \disj{} and \conj{}.
+We describe fairness levels in disjunction implementation and conjunction 
+implementation. Specifically, a disjunction implementation can be fair, 
+almost-fair, or unfair. And a conjunction implementation can be fair or unfair. 
+We compare the fairness level of four search strategies: interleaving 
+depth-first search (DFSi), balanced interleaving depth-first search (DFSbi), 
+fair depth-first search (DFSf), and breadth-first search (BFS). DFSi is one of 
+the best-understood search strategies in miniKanren community. DFSbi and DFSf 
+are new. And we present a new implementation of BFS. We demonstrate by a 
+quantitative evaluation that DFSbi and DFSf are competitive alternatives to 
+DFSi, and that BFS is less practical.
 
-\NOTE[LKC]{\disj{} and \conj{} occurs free in the abstract.}
+% The syntax of a programming language should reflect its semantics. When writing 
+% a \conde{} expression in miniKanren, a programmer would expect all clauses 
+% share the same chance of being explored, as these clauses are written in 
+% parallel. The existing search strategy, interleaving depth-first search 
+% (\DFSi{}), 
+% however, prioritizes its clauses by the order how they are written down. 
+% Similarly, when a \conde{} is followed by another goal conjunctively, a 
+% programmer would expect states in parallel share the same chance of being 
+% explored. Again, the answers by \DFSi{} is different from the 
+% expectation. We have devised three new search strategies that have different 
+% level of fairness in \disj{} and \conj{}.
+% 
+% \NOTE[LKC]{\disj{} and \conj{} occurs free in the abstract.}
 
 %The syntax of a programming language should reflect its semantics. When using 
 %a disjunctive operator in relational programming, a programmer would expect 
