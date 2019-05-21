@@ -1,11 +1,9 @@
 #lang racket
 (provide (all-defined-out))
-#| mk-bd |#
+#| mk-DFSi |#
 #|
 
-based on mk-0
-
-balanced disjunction
+miniKanren in TRS2
 
 |#
 
@@ -69,7 +67,7 @@ balanced disjunction
     ((pair? s-inf)
      (cons (car s-inf)
        (append-inf (cdr s-inf) t-inf)))
-    (else (lambda ()
+    (else (lambda () 
             (append-inf t-inf (s-inf))))))
 
 (define (take-inf n s-inf)
@@ -162,30 +160,28 @@ balanced disjunction
         (else (lambda ()
                 (loop (s-inf))))))))
 
+
 ;;; Here are the key parts of Appendix A
 
 (define-syntax disj
   (syntax-rules ()
-    [(disj) fail]
-    [(disj g ...) (disj+ (g ...) () ())]))
+    ((disj) (fail))
+    ((disj g0 g ...) (disj+ g0 g ...))))
 
 (define-syntax disj+
   (syntax-rules ()
-    [(disj+ (g) () ()) g]
-    [(disj+ () (gl ...) (gr ...))
-     (disj2 (disj+ (gl ...) () ())
-            (disj+ (gr ...) () ()))]
-    [(disj+ (g0) (gl ...) (gr ...))
-     (disj2 (disj+ (gl ... g0) () ())
-            (disj+ (gr ...) () ()))]
-    [(disj+ (g0 g1 g ...) (gl ...) (gr ...))
-     (disj+ (g ...) (gl ... g0) (gr ... g1))]))
+    ((disj+ g) g)
+    ((disj+ g0 g1 g ...) (disj2 g0 (disj+ g1 g ...)))))
 
 (define-syntax conj
   (syntax-rules ()
-    ((conj) succeed)
-    ((conj g) g)
-    ((conj g0 g ...) (conj2 g0 (conj g ...)))))
+    ((conj) (fail))
+    ((conj g0 g ...) (conj+ g0 g ...))))
+
+(define-syntax conj+
+  (syntax-rules ()
+    ((conj+ g) g)
+    ((conj+ g0 g1 g ...) (conj2 g0 (conj+ g1 g ...)))))
 
 (define-syntax defrel
   (syntax-rules ()

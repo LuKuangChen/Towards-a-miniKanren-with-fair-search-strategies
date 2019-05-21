@@ -364,26 +364,35 @@ strategies. It relates clauses disjunctively, and goals in the same
 clause conjunctively.
 
 \begin{figure}
-	\lstinputlisting{Figures/DFSi.rkt}
-	\caption{implementation of \DFSi}
-	\label{DFSi}
+	\lstinputlisting{Figures/DFSi-0.rkt}
+	\caption{implementation of \DFSi{} (Part I)}
+	\label{DFSi-0}
 \end{figure}
 
-Fig.~\ref{DFSi} shows parts that are later compared with other search 
+\begin{figure}
+	\lstinputlisting{Figures/DFSi-1.rkt}
+	\caption{implementation of \DFSi{} (Part II)}
+	\label{DFSi-1}
+\end{figure}
+
+Fig.~\ref{DFSi-0} and Fig.~\ref{DFSi-1} shows parts that are later compared 
+with other search 
 strategies. We follow some conventions to name variables: variables bound to 
 states are named \texttt{s}; variables bound to goals are named \texttt{g} 
 (possibly with subscript); variables bound to search spaces have names ending 
-with $^\infty$. The first function, \texttt{disj2}, implements binary 
-disjunction. if and only if is its helper, which composes two disjunctive 
-search spaces. The following function, \texttt{conj2}, implements binary 
-conjunction. 
+with $^\infty$. Fig.~\ref{DFSi-0} shows the implementation of disjunction. The 
+first function, \texttt{disj2}, implements binary disjunction. It applies the 
+two disjunctive goals to the input state \texttt{s} and composes the two 
+resulting search spaces with \texttt{append$^\infty$}. The following syntax 
+definitions say disjunctive operator is right-associative. Fig.~\ref{DFSi-1} 
+shows the implementation of conjunction. The first function, \texttt{conj2}, 
+implements binary conjunction. 
 It applies the \emph{first} goal to the input state, then applies the second 
 goal to states in the resulting search space. The latter process is done with a 
 helper function. \texttt{append-map$^\infty$} applies its input goal to states 
 in its input search spaces and compose the resulting search spaces. It reuses 
-\texttt{append$^\infty$} for search space composition. The following and last 
-two definitions say disjunctive operator and conjunctive operator are 
-right-associative.
+\texttt{append$^\infty$} for search space composition. The following syntax 
+definitions say conjunctive operator is also right-associative.
 
 \section{balanced interleaving depth-first search}
 
@@ -399,27 +408,16 @@ DFS$_\textrm{i}$'s in the \disj{} macro. We list the new \disj{} with its
 helper in Fig.~\ref{balanced-disj}. When there are one or more disjunctive 
 goals, \disj{} builds a balanced binary tree whose leaves are the goals and 
 whose nodes are \texttt{disj2}s, hence the name of this search strategy. 
-The first ``argument'' to \texttt{disj+} is the goals. And the next two 
-``arguments'' accumulate goals to be put in the left and right subtrees. When 
-there is only one goal, the tree is the goal itself. This case is handled in 
-the first clause. When there are more goals, we partition the list of goals 
-into two sublists of roughly equal lengths and recur on the two sublists. The 
-partition is done by repetitively dispatching the first two goals in the list 
-to the accumulators, until only 
-zero or one goal remains. The two base cases of the partition are handled by 
-the second and the third clauses respectively. And the dispatching is done at 
-the fourth and last clause. In contrast, the \disj{} in \DFSi{} constructs the 
+The new helper, \texttt{disj+}, takes two additional `arguments'. They 
+accumulate goals to be put in the left and right subtrees. The first clause 
+handles the case where there is only one goal. In this case, the tree is the 
+goal itself. When there are more goals, we partition the list of goals 
+into two sublists of roughly equal lengths and recur on the two sublists. Goals 
+are moved to the accumulators in the fourth and last clause. As we are moving 
+two goals each time, there are two base cases: (1) no goal remains; (2) one 
+goal remains. These two base cases are handled in the second clause and the 
+third clause respectively. In contrast, the \disj{} in \DFSi{} constructs the 
 binary tree in a particularly unbalanced form.
-
-
-% The first helper function, \texttt{split}, takes a 
-% list of goals \texttt{ls} and a procedure \texttt{k}, partitions \texttt{ls} 
-% into two sub-lists of roughly equal length, and returns the application of 
-% \texttt{k} to the two sub-lists. \texttt{disj*} takes a non-empty list of goals 
-% \texttt{gs} and returns a goal. With the help of \texttt{split}, it essentially 
-% constructs a \emph{balanced} binary tree where leaves are elements of 
-% \texttt{gs} and nodes are \texttt{disj2}s, hence the name of this search 
-% strategy. 
 
 \section{fair depth-first search}
 

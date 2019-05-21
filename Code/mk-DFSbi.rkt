@@ -1,6 +1,13 @@
 #lang racket
 (provide (all-defined-out))
-#| mk-fDFS |#
+#| mk-bd |#
+#|
+
+based on mk-0
+
+balanced disjunction
+
+|#
 
 (define var (lambda (x) (vector x)))
 (define var? (lambda (x) (vector? x)))
@@ -54,7 +61,7 @@
 
 (define (disj2 g1 g2)
   (lambda (s)
-    (append-inf/fair (g1 s) (g2 s))))
+    (append-inf (g1 s) (g2 s))))
 
 (define (append-inf s-inf t-inf)
   (cond
@@ -62,30 +69,8 @@
     ((pair? s-inf)
      (cons (car s-inf)
        (append-inf (cdr s-inf) t-inf)))
-    (else (lambda () 
+    (else (lambda ()
             (append-inf t-inf (s-inf))))))
-
-(define (append-inf/fair s-inf t-inf)
-  (let loop ([s? #t]
-             [s-inf s-inf]
-             [t-inf t-inf])
-    (cond
-      ((pair? s-inf)
-       (cons (car s-inf)
-         (loop s? (cdr s-inf) t-inf)))
-      ((null? s-inf) t-inf)
-      (s? (loop #f t-inf s-inf))
-      (else (lambda () (loop #t (t-inf) (s-inf)))))))
-#;
-(define (append-inf/fair s-inf t-inf)
-  (cond
-    [(null? s-inf) t-inf]
-    [(null? t-inf) s-inf]
-    [(pair? s-inf) (cons (car s-inf)
-                     (append-inf/fair (cdr s-inf) t-inf))]
-    [(pair? t-inf) (cons (car t-inf)
-                     (append-inf/fair s-inf (cdr t-inf)))]
-    [else (lambda () (append-inf/fair (s-inf) (t-inf)))]))
 
 (define (take-inf n s-inf)
   (cond
@@ -177,20 +162,34 @@
         (else (lambda ()
                 (loop (s-inf))))))))
 
-
 ;;; Here are the key parts of Appendix A
 
 (define-syntax disj
   (syntax-rules ()
-    ((disj) fail)
-    ((disj g) g)
-    ((disj g0 g ...) (disj2 g0 (disj g ...)))))
+    [(disj) fail]
+    [(disj g0 g ...) (disj+ () () g0 g ...)]))
+
+(define-syntax disj+
+  (syntax-rules ()
+    [(disj+ () () g) g]
+    [(disj+ (gl ...) (gr ...))
+     (disj2 (disj+ () () gl ...)
+            (disj+ () () gr ...))]
+    [(disj+ (gl ...) (gr ...) g0)
+     (disj2 (disj+ () () gl ... g0)
+            (disj+ () () gr ...))]
+    [(disj+ (gl ...) (gr ...) g0 g1 g ...)
+     (disj+ (gl ... g0) (gr ... g1) g ...)]))
 
 (define-syntax conj
   (syntax-rules ()
-    ((conj) succeed)
-    ((conj g) g)
-    ((conj g0 g ...) (conj2 g0 (conj g ...)))))
+    ((conj) (fail))
+    ((conj g0 g ...) (conj+ g0 g ...))))
+
+(define-syntax conj+
+  (syntax-rules ()
+    ((conj+ g) g)
+    ((conj+ g0 g1 g ...) (conj2 g0 (conj+ g1 g ...)))))
 
 (define-syntax defrel
   (syntax-rules ()

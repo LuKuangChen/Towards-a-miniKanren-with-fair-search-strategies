@@ -1,6 +1,6 @@
 #lang racket
 #| test cases from Chapter 6 of TRS2|#
-(require "../mk-fDFS.rkt")
+(require "../mk-BFS-opt.rkt")
 
 ; frame 1
 (defrel (alwayso)
@@ -154,4 +154,4 @@
     [(nevero)]))
 
 ;; the number is 1000000 in TRS2
-(length (run 1000000 q (very-recursiveo)))
+(length (run 10000 q (very-recursiveo)))

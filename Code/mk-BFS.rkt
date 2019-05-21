@@ -170,15 +170,23 @@
 
 (define-syntax disj
   (syntax-rules ()
-    ((disj) fail)
-    ((disj g) g)
-    ((disj g0 g ...) (disj2 g0 (disj g ...)))))
+    ((disj) (fail))
+    ((disj g0 g ...) (disj+ g0 g ...))))
+
+(define-syntax disj+
+  (syntax-rules ()
+    ((disj+ g) g)
+    ((disj+ g0 g1 g ...) (disj2 g0 (disj+ g1 g ...)))))
 
 (define-syntax conj
   (syntax-rules ()
-    ((conj) succeed)
-    ((conj g) g)
-    ((conj g0 g ...) (conj2 g0 (conj g ...)))))
+    ((conj) (fail))
+    ((conj g0 g ...) (conj+ g0 g ...))))
+
+(define-syntax conj+
+  (syntax-rules ()
+    ((conj+ g) g)
+    ((conj+ g0 g1 g ...) (conj2 g0 (conj+ g1 g ...)))))
 
 (define-syntax defrel
   (syntax-rules ()
