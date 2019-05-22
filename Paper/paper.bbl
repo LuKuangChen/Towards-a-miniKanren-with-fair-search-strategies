@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{6}
+\begin{thebibliography}{7}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -49,6 +49,18 @@
   Languages}} \bibinfo{volume}{1}, \bibinfo{number}{ICFP}
   (\bibinfo{year}{2017}).
 \newblock
+
+
+\bibitem[\protect\citeauthoryear{Friedman, Byrd, and Kiselyov}{Friedman
+  et~al\mbox{.}}{2005}]%
+        {Friedman:2005:RS:1121583}
+\bibfield{author}{\bibinfo{person}{Daniel~P. Friedman},
+  \bibinfo{person}{William~E. Byrd}, {and} \bibinfo{person}{Oleg Kiselyov}.}
+  \bibinfo{year}{2005}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{The Reasoned Schemer}}.
+\newblock \bibinfo{publisher}{The MIT Press}.
+\newblock
+\showISBNx{0262562146}
 
 
 \bibitem[\protect\citeauthoryear{Friedman, Byrd, Kiselyov, and Hemann}{Friedman

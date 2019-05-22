@@ -11,6 +11,7 @@ Reallocated global_strs (elt_size=20001) to 20 items from 10.
 Reallocated glb_str_end (elt_size=4) to 20 items from 10.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Warning--page numbers missing in both pages and numpages fields in byrd2017unified
+Warning--empty address in Friedman:2005:RS:1121583
 Warning--empty publisher in friedman_reasoned_2018
 Warning--empty address in friedman_reasoned_2018
 Warning--empty publisher in rozplokhas2018improving
@@ -18,45 +19,45 @@ Warning--empty address in rozplokhas2018improving
 Warning--empty publisher in seres1999algebra
 Warning--empty address in seres1999algebra
 Warning--no number and no volume in yang2010adventures
-You've used 6 entries,
+You've used 7 entries,
             5733 wiz_defined-function locations,
-            1327 strings with 15510 characters,
-and the built_in function-call counts, 6942 in all, are:
-= -- 875
-> -- 255
+            1333 strings with 15660 characters,
+and the built_in function-call counts, 7812 in all, are:
+= -- 956
+> -- 296
 < -- 0
-+ -- 86
-- -- 84
-* -- 487
-:= -- 702
-add.period$ -- 30
-call.type$ -- 6
-change.case$ -- 42
-chr.to.int$ -- 6
-cite$ -- 14
-duplicate$ -- 605
-empty$ -- 425
-format.name$ -- 104
-if$ -- 1689
++ -- 101
+- -- 96
+* -- 562
+:= -- 807
+add.period$ -- 36
+call.type$ -- 7
+change.case$ -- 49
+chr.to.int$ -- 7
+cite$ -- 16
+duplicate$ -- 682
+empty$ -- 479
+format.name$ -- 120
+if$ -- 1874
 int.to.chr$ -- 2
 int.to.str$ -- 1
-missing$ -- 24
-newline$ -- 85
-num.names$ -- 48
-pop$ -- 249
+missing$ -- 26
+newline$ -- 94
+num.names$ -- 56
+pop$ -- 279
 preamble$ -- 1
-purify$ -- 96
+purify$ -- 112
 quote$ -- 0
-skip$ -- 204
+skip$ -- 230
 stack$ -- 0
-substring$ -- 457
-swap$ -- 57
+substring$ -- 513
+swap$ -- 64
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 123
-warning$ -- 8
-while$ -- 40
+type$ -- 138
+warning$ -- 9
+while$ -- 44
 width$ -- 0
-write$ -- 137
-(There were 8 warnings)
+write$ -- 155
+(There were 9 warnings)
