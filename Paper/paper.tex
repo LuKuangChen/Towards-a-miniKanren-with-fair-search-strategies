@@ -23,11 +23,6 @@
   		   {==}{{$\equiv$}}{1}
   		   {conde}{{\textcolor[rgb]{0,.3,.7}{\textbf{cond$^e$}}}}{4}
   		   {repeato}{{repeat$^o$}}{6}
-  		   {g0}{{g$_0$}}{1}
-  		   {g1}{{g$_1$}}{1}
-  		   {g2}{{g$_2$}}{1}
-  		   {gl}{{g$_l$}}{1}
-  		   {gr}{{g$_r$}}{1}
 }
 %% scheme-list .
 
@@ -62,13 +57,6 @@
 
 
 \newcommand{\BFSser}[0]{BFS$_\textrm{ser}$}
-
-
-
-\newcommand{\veryrecursiveo}[0]{\texttt{very-recursive$^o$}}
-\newcommand{\appendo}[0]{\texttt{append$^o$}}
-\newcommand{\reverso}[0]{\texttt{revers$^o$}}
-
 \newtheorem{defn}{Definition}[section]
 
 \begin{document}
@@ -217,9 +205,8 @@ To summarize our contribution, we
 	\item implement in a new way breath-first search (\BFSopt), 
         a search strategy 
 	with fair \disj{} and fair \conj{}. And we prove formally that our 
-\BFSopt{} implementation is semantically equivalent to the one 
-by \citet{seres1999algebra}, however, Our code 
-runs faster in all benchmarks and we believe it is simpler.
+\BFSopt{} implementation is semantically equivalent to \BFSser
+however, Our code runs faster in all benchmarks and we believe it is simpler.
 \end{itemize}
 
 \section{search strategies and fairness}
@@ -228,9 +215,13 @@ In this section, we define fair \disj{}, almost-fair \disj{} and fair \conj{}.
 Before going further into fairness, we give a short review of the terms:
 \emph{state}, search \emph{space}, \emph{goal}.
 A \emph{state} is a collection of constraints. (Here, we restrict 
-constraints to unification constraints.) Every answer corresponds to a 
-state. A \emph{space} is a collection of states. And a \emph{goal} is a 
+constraints to unification constraints. Every answer corresponds to a 
+state. A space is a collection of states. And a \emph{goal} is a 
 function from a state to a space.
+
+% Goals check their input states and outputs possibly extended states. A goal 
+% might fail for some inputs, in which case the output search space would be 
+% empty.
 
 Now we elaborate fairness by running more queries about \texttt{repeato}.
 
@@ -306,9 +297,15 @@ Given the following program, it is natural to expect lists of each letter to
 constitute $1/4$ in the answer. Search strategies with unfair \conj{} (e.g. 
 \DFSi, \DFSbi, \DFSf), however, results in many more lists of \texttt{a}s than 
 lists of other letters. And some letters are rarely seen. The situation would 
-be exacerbated if \conde{} were to contain more clauses. Although 
+be exacerbated if \conde{} were to contain more clauses.
+
+\NOTE[LKC]{Should I add a footnote?}
+
+``
+Although 
 DFS$_\textrm{i}$'s \disj{} is unfair in general, it is fair when there is no 
-call to a relational definition in \conde{} clauses (including this case).
+call to a relational definition 
+in \conde{} clauses (including this case).
 
 \begin{center}
 \begin{tabular}{l|c|r}
@@ -334,10 +331,13 @@ would allocate resources evenly to each search space. For example,
 
 A more interesting situation is when the first conjunct produces an unbounded
 number of states. Consider the following example, a naive specification of fair \conj{} 
-might require search strategies to produce all sorts of singleton lists, but no 
-longer ones, which makes the strategies incomplete. A search strategy is 
-\emph{complete} if and only if it can determine all the answers within finite 
+might require search strategies to produce all sorts of singleton lists, but there
+would not be any lists of length two or longer, which makes the strategies incomplete. 
+A search strategy is \emph{complete} if and only if it can determine all the answers within finite 
 time, otherwise, it is \emph{incomplete}.
+
+\NOTE[DPF]{Does this assume that we never use run*, since in fact, the paper does not
+include and uses of run*.  Something should be mentioned around here.}
 
 \begin{center}
 	\begin{tabular}{c}
@@ -357,9 +357,9 @@ resources carefully among search spaces related to different bags such
 that answers are produced in increasing order of cost. The \emph{cost}
 of an answer is its depth in the search tree (i.e., the number of
 calls to relations required to find them) \citep{seres1999algebra}. In
-the following example, every answer is a list of list of symbols,
+the following example, every answer is a list of a list of symbols,
 where inner lists are the same. Here the cost of each answer is equal
-to the length of its inner lists plus the length of its outer list.
+to the length of its inner list plus the length of its outer list.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -392,9 +392,11 @@ A \conj{} is unfair if and only if it is not fair.
 \section{interleaving depth-first search}
 
 In this section, we review the implementation of interleaving depth-first 
-search (\DFSi). We focus on parts that are relevant to this paper. TRS2 
-\citep{friedman_reasoned_2018} provides a comprehensive description of the 
-whole miniKanren implementation.
+search (\DFSi). We focus on parts that are relevant to this paper. TRS2,
+chapter 10 and the appendix, ``Connecting the wires,'' 
+provides a comprehensive description of the 
+miniKanren 
+implementation but limited to unification constraints ($\equiv$).
 
 \begin{figure}
 	\lstinputlisting{Figures/conde.rkt}
@@ -467,8 +469,7 @@ binary tree in a particularly unbalanced form.
 
 \section{fair depth-first search}
 
-\NOTE[DPF]{Why does the pair? case precede the null? case? Is it simply more 
-efficient? It shouldn't be?}
+\NOTE[DPF]{Why does the pair? case precede the null? case? Is it simply more efficient? It shouldn't be}
 
 \begin{figure}
 	\lstinputlisting{Figures/DFSf.rkt}
@@ -492,18 +493,12 @@ accordingly. The first two \texttt{cond} clauses essentially copy the
 finite. The third clause, as we mentioned above, is just for swapping. When the 
 fourth and last clause runs, we know that both \texttt{s$^\infty$} and 
 \texttt{t$^\infty$} are ended with a thunk and they have been swapped. In this 
-case, a new thunk is constructed. 
-The new thunk swapped two search spaces back before recursion. This is 
-unnecessary for fairness. We do it such that answers are produced in a more 
-natural order.
-
-% Here changing the order of 
-% \texttt{t$^\infty$} and \texttt{s$^\infty$} won't hurt the fairness (though it 
-% changes the order of answers). We swap them back so that answers are 
-% produced in a more natural order.
+case, a new thunk is constructed. Here changing the order of 
+\texttt{t$^\infty$} and \texttt{s$^\infty$} won't hurt the fairness (though it 
+changes the order of answers). We swap them back so that answers are 
+produced in a more natural order.
 
 \NOTE[DPF]{When or where do you swap them back?}
-\NOTE[LKC]{fixed}
 
 \section{breadth-first search}
 
@@ -553,7 +548,7 @@ changing the type of search space, modifying related function definitions,
 and introducing a few more functions.
 
 The new type is a pair whose \texttt{car} is a list of answers (the bag), and 
-whose \texttt{cdr} is either a \texttt{\#{}f} or a thunk returning a search 
+whose \texttt{cdr} is either \texttt{\#{}f} or a thunk returning a search 
 space. A falsy \texttt{cdr} means the search space is obviously finite. 
 
 Functions related to the pure subset are listed in Fig.~\ref{BFS-opt} (the 
@@ -586,27 +581,26 @@ Functions implementing impure features are in Fig.~\ref{BFS-opt-cont}. The
 first function, \texttt{elim}, takes a space \texttt{s$^\infty$} and two 
 continuations \texttt{ks} and \texttt{kf}. When \texttt{s$^\infty$} contains 
 some 
-answers, \texttt{ks} is called with the first answer and the rest space. 
+answers, \texttt{ks} is called with the first answer and the rest of the space. 
 Otherwise, \texttt{kf} is called with no argument. Here `s' and `f' means 
 `succeed' and `fail' respectively. This function is like an eliminator of 
-search space, hence the name. The remaining functions do the same thing as 
+search spaces, hence the name. The remaining functions do the same thing as 
 before.
 
 \subsection{comparison with the BFSser and BFSopt}
 
-In this section, we compare the pure subset of \BFSopt{} with the BFS 
-found in \citet{seres1999algebra}. We focus on the pure subset because 
-their system is pure. Their system represents search spaces with streams of 
+In this section, we compare the pure subset of \BFSopt{} with the 
+\BFSser{}. We focus on the pure subset because \BFSser{} is pure.
+and represents search spaces with streams of 
 lists of answers, where each list is a bag.
 
-To compare efficiency, we translate their Haskell code into Racket (See 
-supplements for the translated code). The translation is direct 
+To compare efficiency, we translate \BFSser{}'s Haskell code into Racket (See supplements for the translated code). The translation is direct 
 due to the similarity in both logic programming systems and search space 
-representations. The translated code is longer and slower than BFSopt
-implementation. Details about 
-difference in efficiency are in section 7.
+representations. The translated code is longer and slower than \BFSopt{}'s implementation. Details about 
+differences in efficiency are in the table below.
 
-We prove in Coq that \BFSser{} and \BFSopt{} are semantically equivalent, i.e. \texttt{(run n ? g)} 
+We use Coq to show that \BFSser{} and \BFSopt{} are 
+semantically equivalent, (i.e., \texttt{(run n ? g)} 
 produces the same result (See supplements for the formal proof).
 
 \section{quantitative evaluation}
@@ -617,15 +611,15 @@ produces the same result (See supplements for the formal proof).
 		benchmark & size & DFS$_\textrm{i}$ & DFS$_\textrm{bi}$ & DFS$_\textrm{f}$ & BFS$_\textrm{opt}$ & BFS$_\textrm{ser}$  
 		\\
 		\hline
-		\veryrecursiveo{} & 100000 &  579 &  793 & 2131 & 1438 & 3617 \\
+		very-recursiveo & 100000 &  579 &  793 & 2131 & 1438 & 3617 \\
 		& 200000 & 1283 & 1610 & 3602 & 2803 & 4212 \\
 		& 300000 & 2160 & 2836 &    - & 6137 &    - \\
 		\hline 
-		\appendo{}  & 100 &  31 &  41 &  42 &  31 &  68 \\ 
+		appendo  & 100 &  31 &  41 &  42 &  31 &  68 \\ 
 		& 200 & 224 & 222 & 221 & 226 & 218 \\ 
 		& 300 & 617 & 634 & 593 & 631 & 622 \\ 
 		\hline 
-		\reverso{} & 10 &   5 &   3 &   3 &     38 &     85 \\ 
+		reverso & 10 &   5 &   3 &   3 &     38 &     85 \\ 
 		& 20 & 107 &  98 &  51 &   4862 &   5844 \\
 		& 30 & 446 & 442 & 485 & 123288 & 132159 \\ 
 		\hline
@@ -655,13 +649,13 @@ produces the same result (See supplements for the formal proof).
 Here we compare the efficiency of search strategies. A concise 
 description is in Table~\ref{compare-efficiency}. A hyphen means ``running out of 
 memory.'' The first two benchmarks are taken from 
-TRS2. \reverso{} is from 
+TRS2. \texttt{reverso} is from 
 \citet{rozplokhas2018improving}. The next two benchmarks 
 about quine are modified from a similar test case in \citet{byrd2017unified}. 
 The modifications are made 
 to circumvent the need for symbolic constraints (e.g. $\neq$, 
 \texttt{absent$^o$}). Our version generates de 
-Bruijnized expressions and prevent closures getting into list. The two 
+Bruijnized expressions and prevents closures from being inside a list. The two 
 benchmarks differ in the \conde{} clause order of their relational 
 interpreters. 
 The last two 
@@ -674,26 +668,30 @@ end, while the other has them at the beginning. We conjecture that DFS$_\textrm{
 perform badly in the second case because elimination rules complicate the 
 problem when synthesizing (i.e., our evaluation supports our conjecture.)
 
+\NOTE[DPF]{Below, veryrecursiveo (if possible, should have its o raised.)
+One way to do this is to have a different macro.  In the table there are
+other occurrences that need their names with a different macro.}
+
 In general, only DFS$_\textrm{i}$ and DFS$_\textrm{bi}$ constantly perform well. DFS$_\textrm{f}$ is just as 
-efficient in all benchmarks but \veryrecursiveo{}. Both BFS have obvious 
+efficient in all benchmarks but \texttt{very-recursiveo}. Both BFS have obvious 
 overhead in many cases. Among the three variants of DFS (they all have unfair 
 \conj{}), DFS$_\textrm{f}$ is most resistant to clause permutation, followed by DFS$_\textrm{bi}$ then 
 DFS$_\textrm{i}$. Among the two implementation of BFS, ours constantly performs as well or 
 better. Interestingly, every strategy with fair \disj{} suffers in 
-\veryrecursiveo{} and DFS$_\textrm{f}$ performs well elsewhere. 
+\texttt{very-recursiveo} and DFS$_\textrm{f}$ performs well elsewhere. 
 Therefore, this 
 benchmark might be a special case. Fair \conj{} imposes considerable overhead 
-constantly except in \appendo{}. The reason might be that strategies with 
+constantly except in \texttt{appendo}. The reason might be that strategies with 
 fair \conj{} tend to keep more intermediate answers in the memory.
 
 \section{related works}
 
-Yang \citet{yang2010adventures} points out a disjunct complex would be `fair' 
-if it were a full and balanced tree .
+\citet{yang2010adventures} points out a disjunct complex would be `fair' 
+if it were a full and balanced tree.
 
-Seres et al \citet{seres1999algebra} also describe a breadth-first search 
-strategy. We prove \BFSser{} is semantically equivalent to \BFSopt. But our codeis shorter and performs better in comparison with a straightforward 
-translation of their Haskell code.
+\citet{seres1999algebra} also describe a breadth-first search 
+strategy. We prove \BFSser{} is semantically equivalent to \BFSopt. But,
+The implementation of \BFSopt is shorter and performs better in comparison with a straightforward translation of their Haskell code.
 
 \section{conclusion}
 
@@ -709,13 +707,19 @@ DFS$_\textrm{f}$ has fair \disj{} and unfair \conj{}. \BFSopt{} has both fair
 
 Our quantitative evaluation shows that DFS$_\textrm{bi}$ and DFS$_\textrm{f}$ are competitive 
 alternatives to DFS$_\textrm{i}$, the current search strategy, and that 
-\BFSopt is less practical than other search strategies.
-\NOTE[DPF]{what}
-\NOTE[LKC]{fixed}
+\BFSopt is less practical than 
+\NOTE[DPF]{what?}
 
-We prove that \BFSopt{} is equivalent to \BFSser in \citet{seres1999algebra}. 
+We prove that \BFSopt{} is equivalent to \BFSser. 
 Our optimized code is shorter and runs faster than a direct translation 
 of their Haskell code.
+
+% We acknowledge that we are making large claims about efficiency given
+% that we have just a few benchmarks, but our intuition is based on
+% sound principles.
+
+\NOTE[DPF]{Finish this paragraph with a clarification and you may
+place this anywhere in the conclusion. This may require some consultation with Weixi.}
 
 \section*{acknowledgments}
 
