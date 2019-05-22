@@ -1,6 +1,0 @@
-;; biDFS (almost fair disj)
-'((b) (a)
-  (b b) (c)
-  (b b b) (a a)
-  (b b b b) (c c)
-  (b b b b b))
