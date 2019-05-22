@@ -72,8 +72,9 @@
   strategies: the standard miniKanren interleaving depth-first search (\DFSi),
   the balanced interleaving depth-first search (\DFSbi), the fair depth-first
   search (\DFSf), and the standard breadth-first search (\BFSser).  
-  \DFSbi{} and \DFSf{} are new. And we present a new implementation of 
-  \BFSser. Using a quantitative evaluation, we argue that
+  \DFSbi{} and \DFSf{} are new. And we present a new, more efficient
+  and simpler implementation of \BFSser. Using quantitative evaluation, 
+  we argue that
   \DFSbi{} and \DFSf{} are competitive alternatives to \DFSi, 
   and that \BFSopt{} is more efficient than the standard \BFSser.
 
@@ -101,8 +102,6 @@
 %clauses are written down. We have devised two new search strategies that 
 %allocate computational effort more fairly in all clauses.
 
-\NOTE[DPF]{We should reference the earliest paper (See Will Byrd vita)
-
 \end{abstract}
 
 \maketitle
@@ -124,6 +123,8 @@ many problems as in miniKanren.org.\citet{byrd2017unified}.
 
 \NOTE[DPF]{I think that the abbreviations for the search strategies
 should not come up until the Introduction.}
+
+\NOTE[DPF]{We should reference the earliest paper (See Will Byrd vita)}
 
 \NOTE[DPF]{When we talk about complete and incomplete, I think we should
 make it explicit that we are only talking about (run n (x y z) g ...) and
@@ -159,9 +160,9 @@ The \conde{} in TR2, however, generates a less expected result.
 
 \clisting{Figures/run-repeato-idfs.rkt}
 
-The miniKanren in TR2 implements interleaving DFS (\DFSi), the cause of this 
+The miniKanren in TRS2 implements interleaving DFS (\DFSi), the cause of this 
 unexpected result. With this search strategy, each clause takes half 
-of its received computational resources and pass the other half to its 
+of its received computational resources and passes the other half to its 
 following clauses, except for the last clause that takes all resources it 
 receives. In the example above, the \texttt{a} clause takes half of all 
 resourses. And the \texttt{b} clause takes a quarter. Thus \texttt{c} and 
@@ -179,21 +180,21 @@ implementation details and fiddling with clause order is not the first
 priority of a beginner.
 
 There is another reason that miniKanren could use more search strategies than
-just \DFSi. In many applications, there does not exist one order that serves
-for all purposes. For example, a relational dependent type checker contains
+just \DFSi. In many applications, there does not exist one order that serves all purposes. For example, a relational dependent type checker contains
 clauses for constructors that build data and clauses for eliminators that use
 data. When the type checker is used to generate simple and shallow programs,
-the clauses of constructors should be put in the front of \conde.
-When performing proof searches for complicated programs, the clauses of 
-eliminator should take the focus. With \DFSi, these two uses cannot be 
+the clauses for constructors should be put at the top of the
+\conde{} clauses.
+When performing proof searches for complicated programs, the clauses for 
+eliminators should be put at the top of \conde{} clauses. With \DFSi, these two uses cannot be 
 efficient at the same time. In fact, to make one use efficient, the other one 
-must be drastically slow.
+must be more sluggish.
 
 The specification that every clause in the same \conde{} is given equal 
 ``search priority'' is called fair \disj{}. And search strategies with 
 almost-fair \disj{} give every clause similar priority. 
-Fair \conj{}, a related concept, is more subtle. We defer it to the next 
-section.
+Fair \conj{}, a related concept, is more subtle. The discussion of fair
+\conj{} is covered in the next section.
 
 To summarize our contribution, we
 \begin{itemize}
@@ -212,11 +213,12 @@ runs faster in all benchmarks and we believe it is simpler.
 \section{search strategies and fairness}
 
 In this section, we define fair \disj{}, almost-fair \disj{} and fair \conj{}. 
-Before going further into fairness, we would like to give a short review about 
-state, search space, and goal, because fairness is defined in terms of them. 
-A \emph{state} is a collection of constraints. Every answer corresponds to a 
-state. A \emph{search space} is a collection of states. And a \emph{goal} is a 
-function from a state to a search space. 
+Before going further into fairness, we give a short review of the terms:
+\emph{state}, search \emph{space}, \emph{goal}.
+A \emph{state} is a collection of constraints. (Here, we restrict 
+constraints to unification constraints. Every answer corresponds to a 
+state. A space is a collection of states. And a \emph{goal} is a 
+function from a state to a space.
 
 % Goals check their input states and outputs possibly extended states. A goal 
 % might fail for some inputs, in which case the output search space would be 
@@ -230,8 +232,8 @@ Given the following program, it is natural to expect lists of each letter to
 constitute $1/4$ in the query result. \DFSi, the current search
 strategy, however, results in many more lists of \texttt{a}s than lists
 of other letters. And some letters  (e.g. \texttt{c} and \texttt{d}) are
-rarely seen. The situation would be exacerbated if \conde{} contains more 
-clauses.
+rarely seen. The situation would be exacerbated if \conde{} would have
+contained more clauses.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -240,7 +242,7 @@ clauses.
 \end{center}
 
 Under the hood, the \conde{} here is allocating computational resources to 
-four trivially different search space. The unfair \disj{} in 
+four trivially different search spaces. The unfair \disj{} in 
 \DFSi{} allocates many more resources to the first search space. On the 
 contrary, fair \disj{} would allocate resources evenly to each search space. 
 
@@ -267,14 +269,15 @@ others. In the above example, where the \conde{} has five clauses, the clauses
 of \texttt{b}, \texttt{c}, and \texttt{d} are allocated more resources.
 
 We end this subsection with precise definitions of all levels of 
-\disj{} fairness. Our definition of \emph{fair} \disj{} is slightly generalize 
-from the one by \citet{seres1999algebra}. Their definition is for binary 
-disjunction. We generalize it to a multi-arity one.
+\disj{} fairness. Our definition of \emph{fair} \disj{} is slightly 
+more general
+than the one in \citet{seres1999algebra}. Their definition is only
+for binary disjunction. We generalize it to a multi-arity one.
 
 \begin{defn}[fair \disj{}]
 A \disj{} is fair if and only if it allocates computational resources evenly to 
-search spaces produced by goals in the same disjunction (i.e. clauses in 
-the same \conde).
+search spaces produced by goals in the same disjunction 
+(i.e., clauses in the same \conde).
 \end{defn}
 
 \begin{defn}[almost-fair \disj{}]
@@ -284,7 +287,7 @@ the maximal ratio of resources is bounded by a constant.
 \end{defn}
 
 \begin{defn}[unfair \disj{}]
-A \disj{} is unfair if and only if it is not even almost-fair.
+A \disj{} is unfair if and only if it is not almost-fair.
 \end{defn}
 
 \subsection{fair \texttt{conj}}
@@ -295,15 +298,15 @@ Given the following program, it is natural to expect lists of each letter to
 constitute $1/4$ in the answer. Search strategies with unfair \conj{} (e.g. 
 \DFSi, \DFSbi, \DFSf), however, results in many more lists of \texttt{a}s than 
 lists of other letters. And some letters are rarely seen. The situation would 
-be exacerbated if \conde{} contains more clauses.
+be exacerbated if \conde{} were to contain more clauses.
 
-\NOTE[LKC]{Should I add a footnote?
+\NOTE[LKC]{Should I add a footnote?}
 
 ``
 Although 
 DFS$_\textrm{i}$'s \disj{} is unfair in general, it is fair when there is no 
-call to relational definition in \conde{} clauses (including this case).
-''}
+call to a relational definition 
+in \conde{} clauses (including this case).
 
 \begin{center}
 \begin{tabular}{l|c|r}
