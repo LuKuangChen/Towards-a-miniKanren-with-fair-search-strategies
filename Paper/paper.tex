@@ -57,6 +57,13 @@
 
 
 \newcommand{\BFSser}[0]{BFS$_\textrm{ser}$}
+
+
+
+\newcommand{\veryrecursiveo}[0]{\texttt{very-recursive$^o$}}
+\newcommand{\appendo}[0]{\texttt{append$^o$}}
+\newcommand{\reverso}[0]{\texttt{revers$^o$}}
+
 \newtheorem{defn}{Definition}[section]
 
 \begin{document}
@@ -216,13 +223,9 @@ In this section, we define fair \disj{}, almost-fair \disj{} and fair \conj{}.
 Before going further into fairness, we give a short review of the terms:
 \emph{state}, search \emph{space}, \emph{goal}.
 A \emph{state} is a collection of constraints. (Here, we restrict 
-constraints to unification constraints. Every answer corresponds to a 
-state. A space is a collection of states. And a \emph{goal} is a 
+constraints to unification constraints.) Every answer corresponds to a 
+state. A \emph{space} is a collection of states. And a \emph{goal} is a 
 function from a state to a space.
-
-% Goals check their input states and outputs possibly extended states. A goal 
-% might fail for some inputs, in which case the output search space would be 
-% empty.
 
 Now we elaborate fairness by running more queries about \texttt{repeato}.
 
@@ -298,15 +301,9 @@ Given the following program, it is natural to expect lists of each letter to
 constitute $1/4$ in the answer. Search strategies with unfair \conj{} (e.g. 
 \DFSi, \DFSbi, \DFSf), however, results in many more lists of \texttt{a}s than 
 lists of other letters. And some letters are rarely seen. The situation would 
-be exacerbated if \conde{} were to contain more clauses.
-
-\NOTE[LKC]{Should I add a footnote?}
-
-``
-Although 
+be exacerbated if \conde{} were to contain more clauses. Although 
 DFS$_\textrm{i}$'s \disj{} is unfair in general, it is fair when there is no 
-call to a relational definition 
-in \conde{} clauses (including this case).
+call to a relational definition in \conde{} clauses (including this case).
 
 \begin{center}
 \begin{tabular}{l|c|r}
@@ -608,15 +605,15 @@ produces the same result (See supplements for the formal proof).
 		benchmark & size & DFS$_\textrm{i}$ & DFS$_\textrm{bi}$ & DFS$_\textrm{f}$ & BFS$_\textrm{opt}$ & BFS$_\textrm{ser}$  
 		\\
 		\hline
-		very-recursiveo & 100000 &  579 &  793 & 2131 & 1438 & 3617 \\
+		\veryrecursiveo{} & 100000 &  579 &  793 & 2131 & 1438 & 3617 \\
 		& 200000 & 1283 & 1610 & 3602 & 2803 & 4212 \\
 		& 300000 & 2160 & 2836 &    - & 6137 &    - \\
 		\hline 
-		appendo  & 100 &  31 &  41 &  42 &  31 &  68 \\ 
+		\appendo{}  & 100 &  31 &  41 &  42 &  31 &  68 \\ 
 		& 200 & 224 & 222 & 221 & 226 & 218 \\ 
 		& 300 & 617 & 634 & 593 & 631 & 622 \\ 
 		\hline 
-		reverso & 10 &   5 &   3 &   3 &     38 &     85 \\ 
+		\reverso{} & 10 &   5 &   3 &   3 &     38 &     85 \\ 
 		& 20 & 107 &  98 &  51 &   4862 &   5844 \\
 		& 30 & 446 & 442 & 485 & 123288 & 132159 \\ 
 		\hline
@@ -646,7 +643,7 @@ produces the same result (See supplements for the formal proof).
 Here we compare the efficiency of search strategies. A concise 
 description is in Table~\ref{compare-efficiency}. A hyphen means ``running out of 
 memory.'' The first two benchmarks are taken from 
-TRS2. \texttt{reverso} is from 
+TRS2. \reverso{} is from 
 \citet{rozplokhas2018improving}. The next two benchmarks 
 about quine are modified from a similar test case in \citet{byrd2017unified}. 
 The modifications are made 
@@ -666,15 +663,15 @@ perform badly in the second case because elimination rules complicate the
 problem when synthesizing (i.e., our evaluation supports our conjecture.)
 
 In general, only DFS$_\textrm{i}$ and DFS$_\textrm{bi}$ constantly perform well. DFS$_\textrm{f}$ is just as 
-efficient in all benchmarks but \texttt{very-recursiveo}. Both BFS have obvious 
+efficient in all benchmarks but \veryrecursiveo{}. Both BFS have obvious 
 overhead in many cases. Among the three variants of DFS (they all have unfair 
 \conj{}), DFS$_\textrm{f}$ is most resistant to clause permutation, followed by DFS$_\textrm{bi}$ then 
 DFS$_\textrm{i}$. Among the two implementation of BFS, ours constantly performs as well or 
 better. Interestingly, every strategy with fair \disj{} suffers in 
-\texttt{very-recursiveo} and DFS$_\textrm{f}$ performs well elsewhere. 
+\veryrecursiveo{} and DFS$_\textrm{f}$ performs well elsewhere. 
 Therefore, this 
 benchmark might be a special case. Fair \conj{} imposes considerable overhead 
-constantly except in \texttt{appendo}. The reason might be that strategies with 
+constantly except in \appendo{}. The reason might be that strategies with 
 fair \conj{} tend to keep more intermediate answers in the memory.
 
 \section{related works}
@@ -700,8 +697,9 @@ DFS$_\textrm{f}$ has fair \disj{} and unfair \conj{}. \BFSopt{} has both fair
 
 Our quantitative evaluation shows that DFS$_\textrm{bi}$ and DFS$_\textrm{f}$ are competitive 
 alternatives to DFS$_\textrm{i}$, the current search strategy, and that 
-\BFSopt is less practical than 
+\BFSopt is less practical than other search strategies.
 \NOTE[DPF]{what}
+\NOTE[LKC]{fixed}
 
 We prove that \BFSopt{} is equivalent to \BFSser in \citet{seres1999algebra}. 
 Our optimized code is shorter and runs faster than a direct translation 
