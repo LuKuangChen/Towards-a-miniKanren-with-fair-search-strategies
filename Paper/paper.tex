@@ -492,12 +492,18 @@ accordingly. The first two \texttt{cond} clauses essentially copy the
 finite. The third clause, as we mentioned above, is just for swapping. When the 
 fourth and last clause runs, we know that both \texttt{s$^\infty$} and 
 \texttt{t$^\infty$} are ended with a thunk and they have been swapped. In this 
-case, a new thunk is constructed. Here changing the order of 
-\texttt{t$^\infty$} and \texttt{s$^\infty$} won't hurt the fairness (though it 
-changes the order of answers). We swap them back so that answers are 
-produced in a more natural order.
+case, a new thunk is constructed. 
+The new thunk swapped two search spaces back before recursion. This is 
+unnecessary for fairness. We do it such that answers are produced in a more 
+natural order.
+
+% Here changing the order of 
+% \texttt{t$^\infty$} and \texttt{s$^\infty$} won't hurt the fairness (though it 
+% changes the order of answers). We swap them back so that answers are 
+% produced in a more natural order.
 
 \NOTE[DPF]{When or where do you swap them back?}
+\NOTE[LKC]{fixed}
 
 \section{breadth-first search}
 
