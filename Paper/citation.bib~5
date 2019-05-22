@@ -1,5 +1,5 @@
 @inproceedings{seres1999algebra,
-	author = {Seres, Silvija and Spivey, J Michael and Hoare, CAR},
+	author = {Seres, Silvija and Spivey, J Michael and Hoare, C. A. R.},
 	booktitle = {ICLP},
 	pages = {184--199},
 	title = {Algebra of Logic Programming.},

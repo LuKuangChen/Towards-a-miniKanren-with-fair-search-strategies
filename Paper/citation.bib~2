@@ -72,3 +72,10 @@
 	year = {2018}
 }
 
+@article{hemann2017framework,
+	author = {Hemann, Jason and Friedman, Daniel P},
+	journal = {arXiv preprint arXiv:1701.00633},
+	title = {A framework for extending microkanren with constraints},
+	year = {2017}
+}
+
