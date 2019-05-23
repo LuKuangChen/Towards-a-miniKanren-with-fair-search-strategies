@@ -25,6 +25,8 @@
   		   {conde}{{\textcolor[rgb]{0,.3,.7}{\textbf{cond$^e$}}}}{4}
                    {appendo}{{append$^o$}}{6}
   		   {repeato}{{repeat$^o$}}{6}
+  		   {disj2}{{disj$_2$}}{4}
+  		   {conj2}{{conj$_2$}}{4}
   		   {g0}{{g$_0$}}{2}
   		   {g1}{{g$_1$}}{2}
   		   {g2}{{g$_2$}}{2}
@@ -57,6 +59,8 @@
 \end{center}
 }
 
+\newcommand{\disjtwo}{\texttt{disj$_2$}}
+\newcommand{\conjtwo}{\texttt{conj$_2$}}
 \newcommand{\veryrecursiveo}{\texttt{very-recursive$^o$}}
 \newcommand{\appendo}{\texttt{append$^o$}}
 \newcommand{\reverso}{\texttt{revers$^o$}}
@@ -66,8 +70,9 @@
 \newcommand{\DFSf }[0]{DFS$_\textrm{f}$}
 \newcommand{\DFSbi}[0]{DFS$_\textrm{bi}$}
 \newcommand{\BFS}[0]{BFS}
-\newcommand{\BFSser}[0]{BFS$_\textrm{ser}$}
+\newcommand{\BFSser}[0]{BFS$_\textrm{}$}
 \newcommand{\BFSimp}[0]{BFS$_\textrm{imp}$}
+
 
 \newtheorem{defn}{Definition}[section]
 
@@ -128,16 +133,31 @@ miniKanren is a family of relational programming languages.
 \citep{Friedman:2005:RS:1121583} \citet{friedman_reasoned_2018} introduce 
 miniKanren and its implementation in \emph{The Reasoned Schemer} 
 and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). \citet{byrd2017unified} have 
-demonstrated that miniKanren programs are useful in solving several problems.
-miniKanren.org contains the seeds of many more problems and their solutions.
+demonstrated that miniKanren programs are useful in solving several difficult
+problems. miniKanren.org contains the seeds of many difficult problems and 
+their solutions.
 
-\NOTE[DPF]{... Perhaps it should be part of the title that we have improved on 
-the the standard BFS implementation.}
-\NOTE[DPF]{When you rewrite the abstract and drop the abbreviations, remember 
-when you are rewriting the Introduction and introducing the abbreviations, that 
-you should explain the ser of BFSser using a reference.}
-\NOTE[LKC]{I have rewritten the abstract and explain the `ser' in the ending 
-paragraph of introduction, where we list contributions.}
+\NOTE[DPF]{[2,3] is the way to cite this, but I leave cleaning up this
+paragraph to you.  Mostly the point is to also include a reference to
+the two dimitris and to the first OCamren (OCanren), whatever. It is up to you
+in this paragraph.  You can refer to
+the two books like this ``Friedman et al[2,3] ... .'' This way the 
+paragraph will have only one ``Friedman''}
+
+\NOTE[DPF]{I have decided to agree with you that we should not use 
+BFSser, so I am going to remove all occurrences.  
+Also, we should say, ``Our implementation of BFS''
+and then say, shortened to ``Our BFS'' and then you can use it in the table,
+so one column should be Our BFS and the other should be BFS.}
+\NOTE[DPF]{Occurrences of BFS (without Our) mean Seres et al. (We need only say
+that once, or very occasionally}
+
+\NOTE[DPF]{I think that subscripts i, bi, and f should
+match what is in the comments above code, so it should be italic, emph,
+or math, whichever was used before.}
+
+\NOTE[DPF]{Is the spelling of reverso truly written without the last e?
+Shouldn't it be reverseo with the appropriate raising of o.}
 
 A subtlety arises 
 when a \conde{} contains many clauses: not every clause has an 
@@ -211,10 +231,11 @@ depth-first search (\DFSbi{}), a new search strategy with almost-fair \disj{}.
 a new search strategy with fair \disj{}.
 	\item implement in a new way the standard breath-first search (\BFS), a 
 search strategy with fair \disj{} and fair \conj{}. We name the current 
-implementation by \citeauthor{seres1999algebra} as \BFSser{}, and our 
-new implementation as \BFSimp{}. We prove formally that they are semantically 
-equivalent. \BFSimp{}, however, runs faster in all benchmarks and is shorter, 
-thus being an \textbf{imp}rovement. 
+implementation by \citeauthor{seres1999algebra} and refer to ``our 
+BFS implementation as the improved one. We formally prove
+that the two BFS implementations are semantically 
+equivalent, however, our BFS implementation runs faster in all 
+benchmarks and is shorter.
 \end{itemize}
 
 \section{search strategies and fairness}
@@ -353,12 +374,10 @@ otherwise, it is \emph{incomplete}. In the
 context of miniKanren, a search strategy is complete means that every correct 
 answer has a position in large enough answer lists.
 
-\NOTE[DPF]{I think that should be said as directly as in your note.}
-\NOTE[LKC]{I state this fact at the beginning of this section. 
-
-``We never use run* in this paper because fairness is only 
-interesting when we have an unbounded number of answers. However, it is 
-perfectly fine to use run* with any search strategies.''}
+\NOTE[DPF]{Was this supposed to be a note?
+``We never use \texttt{run*} in this paper because fairness is only 
+ interesting when we have an unbounded number of answers. However, it is 
+ perfectly fine to use run* with any search strategies.''}
 
 \begin{center}
 	\begin{tabular}{c}
@@ -384,11 +403,8 @@ answer is equal
 to the length of its inner list plus the length of its outer list. For example,
 the cost of \texttt{((a) (a))} is $1 + 2 = 3$.
 
-\NOTE[DPF]{Next to the last line of the above paragraph the word same
-has too many meanings.  It could be have the same cost or it could be
-failing to distinguish two list that would be the same if we substituted
-a b for an a.  It needs to be clarified.  It might help to work out
-the actual numbers}
+\NOTE[DPF]{Would the answer be the same if the list had been this ((a) (b))
+or did you mean structurally the same?}
 \NOTE[LKC]{I have rewritten the relevant sentences.}
 
 \begin{center}
@@ -441,11 +457,11 @@ strategies. We follow some conventions to name variables: \texttt{s}s name
 states; \texttt{g}s (possibly with subscript) name goals; 
 variables ending with $^\infty$ name search spaces. Fig.~\ref{DFSi-0} shows the 
 implementation of \disj. The 
-first function, \texttt{disj2}, implements binary disjunction. It applies the 
+first function, \disjtwo, implements binary disjunction. It applies the 
 two disjunctive goals to the input state \texttt{s} and composes the two 
 resulting search spaces with \texttt{append$^\infty$}. The following syntax 
 definitions say \disj{} is right-associative. Fig.~\ref{DFSi-1} 
-shows the implementation of \conj. The first function, \texttt{conj2}, 
+shows the implementation of \conj. The first function, \conjtwo{}, 
 implements binary conjunction. 
 It applies the \emph{first} goal to the input state, then applies the second 
 goal to states in the resulting search space. The helper function 
@@ -463,8 +479,7 @@ definitions say \conj{} is also right-associative.
 % strategies. It relates clauses disjunctively, and goals in the same 
 % clause conjunctively.
 
-\NOTE[DPF]{This came out fabulous. I think I spotted some missed opportunities
-later, which I will point out with additional notes.}
+\NOTE[DPF]{sure, go ahead and do it.}
 \NOTE[LKC]{I think we can simply remove \conde{} code and its accompany 
 description.}
 
@@ -481,7 +496,7 @@ Balanced interleaving DFS (\DFSbi{}) has an almost-fair \disj{} and unfair
 \DFSi{}'s in the \disj{} macro. We list the new \disj{} with its 
 helper in Fig.~\ref{balanced-disj}. When there are one or more disjunctive 
 goals, \disj{} builds a balanced binary tree whose leaves are the goals and 
-whose nodes are \texttt{disj2}s, hence the name of this search strategy. 
+whose nodes are \disjtwo{}s, hence the name of this search strategy. 
 The new helper, \texttt{disj+}, takes two additional `arguments'. They 
 accumulate goals to be put in the left and right subtrees. The first clause 
 handles the case where there is only one goal. In this case, the tree is the 
@@ -503,7 +518,7 @@ binary tree in a particularly unbalanced form.
 
 Fair DFS (\DFSf) has fair \disj{} and unfair \conj{}. The 
 implementation of \DFSf{} differs from \DFSi{}'s in 
-\texttt{disj2} (Fig.~\ref{fDFS}). The new \texttt{disj2} calls a new and 
+\disjtwo{} (Fig.~\ref{fDFS}). The new \disjtwo{} calls a new and 
 fair version of \texttt{append$^\infty$}. \texttt{append$^\infty_{fair}$} 
 immediately 
 calls 
@@ -539,8 +554,7 @@ rename \texttt{append-map$^\infty$} to \texttt{append-map$^\infty_{fair}$}.
 % \texttt{append-map$^\infty_{fair}$} is that the latter calls 
 % \texttt{append$^\infty_{fair}$} instead of \texttt{append$^\infty$}.
 
-\NOTE[LKC]{Applying the above changes won't result in \BFSser, but yet 
-another implementation of \BFS.}
+\NOTE[DPF]{I need clarification: Applying the above changes won't result in ``our \BFS,'' but yet a third implementation of \BFS?}
 
 % This implementation is improvable in two ways. First, as mentioned in 
 % \autoref{sec:fairconj}, \BFS{} puts answers in bags and answers of the same 
@@ -551,28 +565,33 @@ another implementation of \BFS.}
 
 This implementation is improvable in two ways. 
 First, as mentioned in \autoref{sec:fairconj}, \BFS{} puts answers in bags and 
-answers of the same cost are in the same bag. In this implementation, however, 
+answers of the same cost are in the same bag. In our implementation, however, 
 we manage cost information subtly---the \texttt{car}s of a search space have 
-cost 0 (i.e. they are all in the same bag), and every thunk indicates an 
+cost 0 (i.e., they are all in the same bag), and every thunk indicates an 
 increment in cost. It is even more subtle that \texttt{append$^\infty_{fair}$} 
 and the \texttt{append-map$^\infty_{fair}$} respects the cost information. 
 Second, \texttt{append$^\infty_{fair}$} is extravagant in memory usage. It 
 makes $O(n+m)$ new \texttt{cons} cells every time, where $n$ and $m$ are the 
-``length''s of input search spaces.
+``length''s of input spaces.
 
 \NOTE[LKC]{Should I point out that \DFSf{} also has the miserable space 
 extravagance?}
+\NOTE[DPF]{probably}
 
-In the following subsections, we firstly describe \BFSimp{}, an improved \BFS{} 
-implementation which manages cost information in a more clear way and is less 
-extravagant in memory usage. Then we compare \BFSimp{} with \BFSser{}, the 
+In the following subsections, we first describe our improved \BFS{}
+implementation that manages cost information in a more clear and concise
+way and is less extravagant in memory usage. 
+Then we compare our BFS{} with \BFS{}, the 
 current implementation by \citeauthor{seres1999algebra}.
+
+\NOTE[DPF]{Let's use one more line and far less horizontal space
+by use 3 linefeeds.  They will still align nicely.}
 
 \subsection{improved BFS}
 
 \begin{figure}
 	\lstinputlisting{Figures/BFSimp.rkt}	
-	\caption{new and changed functions in optimized BFS that implements pure 
+	\caption{New and changed functions in optimized BFS that implements pure 
 	features}
 	\label{BFSimp}
 \end{figure}
@@ -616,12 +635,18 @@ arguments in reversed order; \texttt{none}, \texttt{unit}, and
 \texttt{append$^\infty_{fair}$} correspond to \texttt{mzero}, \texttt{unit}, and 
 \texttt{mplus}, respectively.
 
+\NOTE[DPF]{I am not in love with the two calls to null?. I can think of at least
+two ways to fix it.  Pick one.}
+
 \begin{figure}
 	\lstinputlisting{Figures/BFSimp-cont.rkt}	
-	\caption{new and changed functions in improved BFS that implement impure 
+	\caption{New and changed functions in improved BFS that implement impure 
 		features}
 	\label{BFSimp-cont}
 \end{figure}
+
+\NOTE[DPF]{The use of the references to Fig 7 twice tells me that something
+has to change for the sake of clarity.}
 
 Functions implementing impure features are in Fig.~\ref{BFSimp-cont}. The 
 first function, \texttt{elim}, takes a space \texttt{s$^\infty$} and two 
@@ -633,16 +658,20 @@ search spaces, hence the name. The remaining functions are as before.
 
 \NOTE[LKC]{I swap \texttt{ks} and \texttt{kf} to mimic \texttt{ind-List}}
 
+\NOTE[DPF]{If we forget to use {} after \reverso, the o ends up too near
+the next word.  I fixed reverso on the second line of section 7, but there 
+may be others.}
+
 \subsection{compare \BFSimp{} with \BFSser{}}
 
-In this subsection, we compare the pure subset of \BFSimp{} with \BFSser{}. We 
-focus on the pure subset because \BFSser{} is designed for a pure 
-relational programming system. We proof in Coq that these two search strategies 
-are are semantically equivalent, (i.e., \texttt{(run n ? g)} produces the same 
-result (See supplements for the formal proof). To compare efficiency, we 
-translate \BFSser{}'s Haskell code into Racket (See supplements for the 
-translated code). The translation is direct due to the similarity in two 
-relational programming systems. The translated code is longer than \BFSimp{}. 
+In this subsection, we compare the pure subset of our BFS with \BFS{}. We 
+focus on the pure subset because \BFS{} is designed for a pure 
+relational programming system. We prove in Coq that these two search strategies 
+are are semantically equivalent, since \texttt{(run n ? g)} produces the same 
+result in both our improved \BFS{} and BFS. (See supplements for the formal proof.) To compare efficiency, we 
+translate \BFS{}'s Haskell code into Racket (See supplements for the 
+translated code). The translation is direct due to the similarity of the two 
+relational programming systems. The translated code is longer than our \BFS{}. 
 And it runs slower in all benchmarks. Details about differences in efficiency 
 are in \autoref{compare-efficiency}.
 
@@ -693,7 +722,7 @@ are in \autoref{compare-efficiency}.
 In this section, we compare the efficiency of search strategies. A concise 
 description is in Table~\ref{compare-efficiency}. A hyphen means ``running out
 of memory.'' The first two benchmarks are from 
-TRS2. \reverso is from 
+TRS2. \reverso{} is from 
 \citet{rozplokhas2018improving}. The next two benchmarks 
 about quine are modified from a similar test case in \citet{byrd2017unified}. 
 The modifications are made 
@@ -713,17 +742,23 @@ would
 perform badly in the second case because elimination rules complicate the 
 problem when synthesizing (i.e., our evaluation supports our conjecture.)
 
-In general, only \DFSi{} and \DFSbi{} constantly perform well. \DFSf{} is just 
-as efficient in all benchmarks but \veryrecursiveo. Both implementations of BFS 
-have obvious overhead in many cases. Among the three variants of DFS, which all 
-all have unfair \conj{}), \DFSf{} is most resistant to clause permutation, 
-followed by \DFSbi{} then \DFSi{}. Among the two implementation of BFS, our 
-improved \BFSimp{} constantly performs as well or better. Interestingly, every 
-strategy with fair \disj{} suffers in \veryrecursiveo{} and \DFSf{} performs 
-well elsewhere. Therefore, this benchmark might be a special case. Fair \conj{} 
-imposes considerable overhead constantly except in \appendo. The reason might be 
-that strategies with fair \conj{} tend to keep more intermediate answers in the 
-memory.
+\NOTE[DPF]{There is still some clumsiness using our improved DFS, since
+at some point, we may want to make this clearer, so have DFS not be fonted
+is a little weird.  I think both should always use ourDFS and 
+macro expand it to <our improved DFS>.  Then changes will be much easier.}
+
+In general, only \DFSi{} and \DFSbi{} constantly perform well. \DFSf{}
+is just as efficient in all benchmarks except those of \veryrecursiveo. Both
+implementations of BFS have obvious overhead in many cases. Among the
+three variants of DFS, which all have unfair \conj{}, \DFSf{} is most
+resistant to clause permutation, followed by \DFSbi{} then
+\DFSi{}. Among the two implementation of BFS, our improved \BFS{}
+constantly performs as well or better. Interestingly, every strategy
+with fair \disj{} suffers in \veryrecursiveo{} and \DFSf{} performs
+well elsewhere. Therefore, this benchmark might be a special
+case. Fair \conj{} imposes considerable overhead constantly except in
+\appendo. The reason might be that strategies with fair \conj{} tend
+to keep more intermediate answers in the memory.
 
 \section{related works}
 
@@ -734,6 +769,9 @@ if it were a full and balanced tree.
 strategy. We present another implementation. Our implementation is semantically 
 equivalent to theirs. But, ours is shorter and performs better in comparison 
 with a straightforward translation of their Haskell code.
+
+\NOTE[DPF]{We might find the reference Ocanren in the two Dmitri's paper
+and say something here about it.}
 
 \section{conclusion}
 
@@ -748,11 +786,11 @@ in fairness: \DFSbi{} has an almost-fair \disj{} and unfair \conj{}.
 \disj{} and fair \conj{}.
 
 Our quantitative evaluation shows that \DFSbi{} and \DFSf{} are competitive 
-alternatives to \DFSi{}, the current search strategy, 
+alternatives to \DFSi{}, the current search strategy miniKanren
 and that \BFS{} is less practical.
 % and that \BFSser{} is less practical than other breadth-first strategies.
 
-Our new implementation of \BFS{} is semantically equivalent to the original 
+Our improved \BFS{} is semantically equivalent to the original 
 one. But, ours is shorter and performs better in comparison with a 
 straightforward translation of their Haskell code.
 

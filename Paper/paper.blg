@@ -1,14 +1,10 @@
-This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
+This is BibTeX, Version 0.99d (TeX Live 2016)
 Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: paper.aux
 The style file: ACM-Reference-Format.bst
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 Database file #1: citation.bib
-Reallocated singl_function (elt_size=4) to 100 items from 50.
-Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
-Reallocated global_strs (elt_size=20001) to 20 items from 10.
-Reallocated glb_str_end (elt_size=4) to 20 items from 10.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Warning--page numbers missing in both pages and numpages fields in byrd2017unified
 Warning--empty address in Friedman:2005:RS:1121583
@@ -20,38 +16,38 @@ Warning--empty publisher in seres1999algebra
 Warning--empty address in seres1999algebra
 Warning--no number and no volume in yang2010adventures
 You've used 7 entries,
-            5733 wiz_defined-function locations,
-            1333 strings with 15660 characters,
-and the built_in function-call counts, 7812 in all, are:
-= -- 956
+            5706 wiz_defined-function locations,
+            1345 strings with 16382 characters,
+and the built_in function-call counts, 7117 in all, are:
+= -- 880
 > -- 296
 < -- 0
-+ -- 101
++ -- 94
 - -- 96
-* -- 562
-:= -- 807
+* -- 511
+:= -- 766
 add.period$ -- 36
 call.type$ -- 7
 change.case$ -- 49
 chr.to.int$ -- 7
 cite$ -- 16
-duplicate$ -- 682
-empty$ -- 479
+duplicate$ -- 556
+empty$ -- 409
 format.name$ -- 120
-if$ -- 1874
-int.to.chr$ -- 2
-int.to.str$ -- 1
+if$ -- 1728
+int.to.chr$ -- 1
+int.to.str$ -- 0
 missing$ -- 26
 newline$ -- 94
 num.names$ -- 56
 pop$ -- 279
 preamble$ -- 1
-purify$ -- 112
+purify$ -- 84
 quote$ -- 0
-skip$ -- 230
+skip$ -- 198
 stack$ -- 0
-substring$ -- 513
-swap$ -- 64
+substring$ -- 415
+swap$ -- 46
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
