@@ -61,6 +61,7 @@
 \newcommand{\veryrecursiveo}{\texttt{very-recursive$^o$}}
 \newcommand{\appendo}{\texttt{append$^o$}}
 \newcommand{\reverso}{\texttt{revers$^o$}}
+\newcommand{\repeato}{\texttt{repeat$^o$}}
 
 \newcommand{\DFSi }[0]{DFS$_\textrm{i}$}
 \newcommand{\DFSf }[0]{DFS$_\textrm{f}$}
@@ -79,14 +80,28 @@ We describe fairness levels in disjunction and conjunction
 implementations.  Specifically, a disjunction implementation can be
 fair, almost-fair, or unfair. And a conjunction implementation can
 be fair or unfair.  We compare the fairness level of four search
-strategies: the standard miniKanren interleaving depth-first search (\DFSi),
-the balanced interleaving depth-first search (\DFSbi), the fair depth-first
-search (\DFSf), and the standard breadth-first search (\BFSser).
-\DFSbi{} and \DFSf{} are new. And we present a new, more efficient
-and simpler implementation of \BFSser. Using quantitative evaluation, 
-we argue that
-\DFSbi{} and \DFSf{} are competitive alternatives to \DFSi, 
-and that our \BFSser{} implementation is more efficient than the current one.
+strategies: the standard miniKanren interleaving depth-first search,
+the balanced interleaving depth-first search, the fair depth-first
+search, and the standard breadth-first search.
+The two non-standard depth-first searches are new. And we present a new, more 
+efficient and simpler implementation of the standard breadth-first search. Using 
+quantitative evaluation, we argue that the two new depth-first searches are 
+competitive alternatives to the standard one, 
+and that our standard breadth-first search implementation is more efficient than 
+the current one.
+
+% We describe fairness levels in disjunction and conjunction
+% implementations.  Specifically, a disjunction implementation can be
+% fair, almost-fair, or unfair. And a conjunction implementation can
+% be fair or unfair.  We compare the fairness level of four search
+% strategies: the standard miniKanren interleaving depth-first search (\DFSi),
+% the balanced interleaving depth-first search (\DFSbi), the fair depth-first
+% search (\DFSf), and the standard breadth-first search (\BFSser).
+% \DFSbi{} and \DFSf{} are new. And we present a new, more efficient
+% and simpler implementation of \BFSser. Using quantitative evaluation, 
+% we argue that
+% \DFSbi{} and \DFSf{} are competitive alternatives to \DFSi, 
+% and that our \BFSser{} implementation is more efficient than the current one.
 
 % The syntax of a programming language should reflect its semantics. When 
 %writing 
@@ -130,11 +145,11 @@ explain the ser of BFSser using a reference.}
 A subtlety arises 
 when a \conde{} contains many clauses: not every clause has an 
 equal chance of contributing to the result. As an example, consider the following 
-relation \texttt{repeato} and its invocation. 
+relation \repeato{} and its invocation. 
 
 \clisting{Figures/repeato.rkt}
 
-Next, consider the following disjunction of invoking \texttt{repeato} with four 
+Next, consider the following disjunction of invoking \repeato{} with four 
 different letters.
 
 \clisting{Figures/example.rkt}
@@ -212,7 +227,7 @@ function from a state to a space.
 % might fail for some inputs, in which case the output search space would be 
 % empty.
 
-Now we elaborate fairness by running more queries about \texttt{repeato}.
+Now we elaborate fairness by running more queries about \repeato{}.
 
 \subsection{fair \texttt{disj}}
 
@@ -302,7 +317,7 @@ have the same behavior when there is no call to a relational definition in
 \end{tabular}
 \end{center}
 
-Under the hood, the \conde{} and the call to \texttt{repeato} are connected by 
+Under the hood, the \conde{} and the call to \repeato{} are connected by 
 \conj{}. The \conde{} goal outputs a search space including four trivially 
 different states. 
 Applying the next conjunctive goal, \texttt{(repeato x q)}, produces four 
