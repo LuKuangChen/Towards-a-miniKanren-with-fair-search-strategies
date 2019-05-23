@@ -307,8 +307,6 @@ A \disj{} is unfair if and only if it is not almost-fair.
 \subsection{fair \texttt{conj}}
 \label{sec:fairconj}
 
-\NOTE[LKC]{I change `1/4 in the answer' to `1/4 in the answer list'. }
-
 Given the following program, it is natural to expect lists of each letter to
 constitute $1/4$ in the answer list. Search strategies with unfair \conj{} 
 (e.g. 
@@ -356,10 +354,11 @@ context of miniKanren, a search strategy is complete means that every correct
 answer has a position in large enough answer lists.
 
 \NOTE[DPF]{I think that should be said as directly as in your note.}
-\NOTE[LKC]{I state this fact at the beginning of this section.}
-\NOTE[LKC]{We never use run* in this paper because fairness is only 
+\NOTE[LKC]{I state this fact at the beginning of this section. 
+
+``We never use run* in this paper because fairness is only 
 interesting when we have an unbounded number of answers. However, it is 
-perfectly fine to use run* with any search strategies.}
+perfectly fine to use run* with any search strategies.''}
 
 \begin{center}
 	\begin{tabular}{c}
@@ -635,8 +634,6 @@ search spaces, hence the name. The remaining functions are as before.
 \NOTE[LKC]{I swap \texttt{ks} and \texttt{kf} to mimic \texttt{ind-List}}
 
 \subsection{compare \BFSimp{} with \BFSser{}}
-
-\NOTE[LKC]{I have rewritten this subsection.}
 
 In this subsection, we compare the pure subset of \BFSimp{} with \BFSser{}. We 
 focus on the pure subset because \BFSser{} is designed for a pure 
