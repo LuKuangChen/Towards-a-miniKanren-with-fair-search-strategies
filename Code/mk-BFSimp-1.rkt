@@ -4,17 +4,17 @@
 
 (define (none)   '())
 (define (unit s) `((,s) . ,(lambda () '())))
-(define (step f) `(()   . ,f))
+(define (step p) `(()   . ,p))
 
-(define (elim s-inf ks kf)
+(define (elim s-inf kf ks)
   (cond
     [(null? s-inf) (kf)]
     [else
-     (let ([a (car s-inf)]
-           [d (cdr s-inf)])
+     (let ([ss (car s-inf)]
+           [p (cdr s-inf)])
        (cond
-         [(null? a) (step (lambda () (elim (d) ks kf)))]
-         [else (ks (car a) (cons (cdr a) d))]))]))
+         [(null? ss) (step (lambda () (elim (p) kf ks)))]
+         [else (ks (car ss) (cons (cdr ss) p))]))]))
 
 (define var (lambda (x) (vector x)))
 (define var? (lambda (x) (vector? x)))
@@ -73,8 +73,8 @@
     [(null? s-inf) t-inf]
     [(null? t-inf) s-inf]
     [else (cons (append (car s-inf) (car t-inf))
-            (let ([f1 (cdr s-inf)] [f2 (cdr t-inf)])
-              (lambda () (append-inf/fair (f1) (f2)))))]))
+            (let ([p1 (cdr s-inf)] [p2 (cdr t-inf)])
+              (lambda () (append-inf/fair (p1) (p2)))))]))
 
 (define (take-inf n s-inf)
   (cond
@@ -88,8 +88,8 @@
           (cons (car ss)
             (loop (and n (sub1 n)) (cdr ss))))
          (else
-          (let ([f (cdr s-inf)])
-            (take-inf n (f))))))]))
+          (let ([p (cdr s-inf)])
+            (take-inf n (p))))))]))
 
 (define (conj2 g1 g2)
   (lambda (s)
@@ -102,8 +102,8 @@
      (foldr
       (lambda (s t-inf)
         (append-inf/fair (g s) t-inf))
-      (let ([f (cdr s-inf)])
-        (step (lambda () (append-map-inf/fair g (f)))))
+      (let ([p (cdr s-inf)])
+        (step (lambda () (append-map-inf/fair g (p)))))
       (car s-inf))]))
 
 (define (call/fresh name f)
@@ -166,10 +166,10 @@
 (define (ifte g1 g2 g3)
   (lambda (s)
     (elim (g1 s)
+      (lambda () (g3 s))
       (lambda (s0 s-inf)
         (append-map-inf/fair g2
-          (append-inf/fair (unit s0) s-inf)))
-      (lambda () (g3 s)))))
+          (append-inf/fair (unit s0) s-inf))))))
 
 ;(define (once g)
 ;  (lambda (s)
@@ -184,8 +184,8 @@
 (define (once g)
   (lambda (s)
     (elim (g s)
-      (lambda (s0 s-inf) (unit s0))
-      (lambda () (none)))))
+      (lambda () (none))
+      (lambda (s0 s-inf) (unit s0)))))
 
 ;;; Here are the key parts of Appendix A
 

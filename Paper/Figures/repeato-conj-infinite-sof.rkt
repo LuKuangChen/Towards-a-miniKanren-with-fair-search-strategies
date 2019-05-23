@@ -1,4 +1,4 @@
-;; BFSser (fair conj)
+;; BFS (fair conj)
 > (run 12 q
     (fresh (xs)
       (conde

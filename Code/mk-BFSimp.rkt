@@ -1,19 +1,18 @@
 #lang racket
 (provide (all-defined-out))
-#| mk-BFS-opt |#
+#| mk-BFSimp |#
 
 (define (unit s) `((,s) . #f))
 (define (none)   `(()   . #f))
 (define (step f) `(()   . ,f))
 
-(define (elim s-inf ks kf)
-  (let ([ss (car s-inf)]
-        [f (cdr s-inf)])
+(define (elim s-inf kf ks)
+  (let ((ss (car s-inf)) (f (cdr s-inf)))
     (cond
-      [(and (null? ss) f)
-       (step (lambda () (elim (f) ks kf)))]
-      [(null? ss) (kf)]
-      [else (ks (car ss) (cons (cdr ss) f))])))
+      ((and (null? ss) f)
+       (step (lambda () (elim (f) kf ks))))
+      ((null? ss) (kf))
+      (else (ks (car ss) (cons (cdr ss) f))))))
 
 (define var (lambda (x) (vector x)))
 (define var? (lambda (x) (vector? x)))
@@ -162,10 +161,10 @@
 (define (ifte g1 g2 g3)
   (lambda (s)
     (elim (g1 s)
+      (lambda () (g3 s))
       (lambda (s0 s-inf)
         (append-map-inf/fair g2
-          (append-inf/fair (unit s0) s-inf)))
-      (lambda () (g3 s)))))
+          (append-inf/fair (unit s0) s-inf))))))
 
 ;(define (once g)
 ;  (lambda (s)
@@ -180,8 +179,8 @@
 (define (once g)
   (lambda (s)
     (elim (g s)
-      (lambda (s0 s-inf) (unit s0))
-      (lambda () (none)))))
+      (lambda () (none))
+      (lambda (s0 s-inf) (unit s0)))))
 
 ;;; Here are the key parts of Appendix A
 

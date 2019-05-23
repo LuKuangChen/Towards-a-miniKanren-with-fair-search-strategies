@@ -1,6 +1,6 @@
 #lang racket
 (provide (all-defined-out))
-#| mk-fDFS |#
+#| mk-DFSf |#
 
 (define var (lambda (x) (vector x)))
 (define var? (lambda (x) (vector? x)))
@@ -70,10 +70,10 @@
              [s-inf s-inf]
              [t-inf t-inf])
     (cond
+      ((null? s-inf) t-inf)
       ((pair? s-inf)
        (cons (car s-inf)
          (loop s? (cdr s-inf) t-inf)))
-      ((null? s-inf) t-inf)
       (s? (loop #f t-inf s-inf))
       (else (lambda () (loop #t (t-inf) (s-inf)))))))
 #;
