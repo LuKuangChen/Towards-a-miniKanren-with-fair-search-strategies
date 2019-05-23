@@ -1,5 +1,5 @@
 #lang racket
-(require "../mk-silvija.rkt")
+(require "../mk-BFSimp-1.rkt")
 
 (defrel (evalo exp val)
   (eval-expo exp '() `(quote ,val)))
@@ -30,7 +30,7 @@
        (== `(quote ,av) val)
        (eval-expo pr env `(quote (,av . ,dv)))))
     ((fresh (pr av dv)
-       (== `(car ,pr) exp)
+       (== `(cdr ,pr) exp)
        (== `(quote ,dv) val)
        (eval-expo pr env `(quote (,av . ,dv)))))))
 
