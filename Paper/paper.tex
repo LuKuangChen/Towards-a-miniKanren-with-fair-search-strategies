@@ -14,7 +14,7 @@
 \lstset{
   language=Scheme,
   basicstyle=\ttfamily,
-  morekeywords={run,conde,run*,defrel,==,fresh,disj,conj,disj+},
+  morekeywords={run,conde,run*defrel,==,fresh,disj,conj,disj+},
   alsodigit={!\$\%&*+-./:<=>?@^_~},
   morecomment=[l]{;,\#{}lang},
   mathescape=true,
@@ -74,6 +74,8 @@
 \newcommand{\BFSser}[0]{BFS}
 \newcommand{\BFSuni}[0]{our BFS}
 \newcommand{\BFSimp}[0]{our improved BFS}
+\newcommand{\runstar}{run$^*$}
+
 
 
 \newtheorem{defn}{Definition}[section]
@@ -84,44 +86,34 @@
 
 \begin{abstract}
 
+\NOTE[DPF]{Throughout the paper we have search spaces and search strategies.
+I can see leaving in the  ``search strategies'', but let's try to
+remove virtually all of the uses of ``search'' in front of spaces.}
 
-\NOTE[LKC]{
-We actually have two new BFS implementations. One is modified from DFSf with 
-two simple steps. It has been described briefly at the beginning of the BFS 
-section but was not given a name. The other is the one described with two large 
-figures and was given the name ``our improved BFS''. Both of them runs faster 
-than the current BFS.
-
-I didn't name the first one because (1) it is so simple and (2) I considered 
-it merely a stepstone to our improved BFS. Now I decided to also give the first 
-BFS implementation a name. This is because I think having a nameless impl is 
-confusing.
-
-Currently, the nameless implementation is given the name ``our BFS''. And I 
-have changed the paper accordingly.
-
-BUT, I am thinking about going further --- removing ``our improved BFS'' from 
+\NOTE[LKC]{BUT, I am thinking about going further --- removing ``our improved'' from 
 this paper. The first reason is that our BFS is actually more efficient than 
 our improved BFS in most benchmarks (see Table 1), despite its theoretical 
 space extravagence. The second reason is that DFSi, DFSf, and our BFS look nice 
 when sitting together.}
 
+\NOTE[DPF]{Does this mean that the comment about append goes away.
+I really thought that was so clever.  I thought that the way you pointed
+out the trivial changes was very clear, so that did not bother me at
+all.}
+
 We describe fairness levels in disjunction and conjunction
 implementations.  Specifically, a disjunction implementation can be
-fair, almost-fair, or unfair. And a conjunction implementation can
-be fair or unfair.  We compare the fairness level of four search
+fair, almost-fair, or unfair. And a conjunction implementation can be
+fair or unfair.  We compare the fairness level of four search
 strategies: the standard miniKanren interleaving depth-first search,
 the balanced interleaving depth-first search, the fair depth-first
-search, and the standard breadth-first search.
-The two non-standard depth-first searches are new. And we present two new, more 
-efficient and shorter implementation of the standard breadth-first search. 
-Using 
-quantitative evaluation, we argue that the two new depth-first searches are 
-competitive alternatives to the standard one, 
-and that our breadth-first search implementations are more efficient than 
-the current one.
-
-\NOTE[LKC]{``simpler'' -> ``shorter'' (more objective)}
+search, and the standard breadth-first search.  The two non-standard
+depth-first searches are new. And we present two new, more efficient
+and shorter implementations of the standard breadth-first search.
+Using quantitative evaluation, we argue that the two new depth-first
+searches are competitive alternatives to the standard one, and that
+our breadth-first search implementations are more efficient than the
+current one.
 
 % We describe fairness levels in disjunction and conjunction
 % implementations.  Specifically, a disjunction implementation can be
@@ -166,23 +158,8 @@ demonstrated that miniKanren programs are useful in solving several difficult
 problems. miniKanren.org contains the seeds of many difficult problems and 
 their solutions. 
 
-\NOTE[DPF]{...  Mostly the point is to also include a reference to
-the two dimitris and to the first OCamren (OCanren), whatever. It is up to you
-in this paragraph.  ...}
-\NOTE[LKC]{I have fixed the references to TRS and TRS2.}
-\NOTE[LKC]{I have cited OCanren in this paragraph.}
-
-\NOTE[DPF]{I have decided to agree with you that we should not use 
-BFSser, so I am going to remove all occurrences.  
-Also, we should say, ``Our implementation of BFS''
-and then say, shortened to ``Our BFS'' and then you can use it in the table,
-so one column should be Our BFS and the other should be BFS.}
-\NOTE[DPF]{Occurrences of BFS (without Our) mean Seres et al. (We need only say
-that once, or very occasionally}
-
-\NOTE[DPF]{Is the spelling of reverso truly written without the last e?
-Shouldn't it be reverseo with the appropriate raising of o.}
-\NOTE[LKC]{Yes, it is reverso instead of reverseo in Dmitris' paper.}
+\NOTE[DPF]{their BFS (or shortened to BFS). We need only say this once if we go with ``our'', which I don't like.
+I like ``the new'' or ``the improved'' and ``the current'' }
 
 A subtlety arises 
 when a \conde{} contains many clauses: not every clause has an 
@@ -191,18 +168,18 @@ relation \repeato{} and its invocation.
 
 \clisting{Figures/repeato.rkt}
 
-Next, consider the following disjunction of invoking \repeato{} with four 
+\noindent Next, consider the following disjunction of invoking \repeato{} with four 
 different letters.
 
 \clisting{Figures/example.rkt}
 
-\conde{} intuitively relates its clauses with logical \texttt{or}. And thus an 
+\noindent \conde{} intuitively relates its clauses with logical \texttt{or}. And thus an 
 unsuspicious beginner would expect each letter to contribute equally to the 
 result, as follows.
 
 \clisting{Figures/run-repeato-fair.rkt}
 
-The \conde{} in TRS2, however, generates a less expected result.
+\noindent The \conde{} in TRS2, however, generates a less expected result.
 
 \clisting{Figures/run-repeato-idfs.rkt}
 
@@ -228,7 +205,7 @@ efficiently.
 % priority of a beginner.
 
 \DFSi{} is not always the best choice. For instance, it might be less 
-desirable for little miniKanreners -- understanding implementation details and 
+desirable for novice miniKanrenuser---understanding implementation details and 
 fiddling with clause order is not their first priority. 
 There is another reason that miniKanren could use more search strategies than
 just \DFSi. In many applications, there does not exist one order that serves all
@@ -265,6 +242,12 @@ prove that \BFSimp{} and \BFSser{} are semantically equivalent, however, our
 \BFS{}s run faster in all benchmarks and are shorter.
 \end{itemize}
 
+\NOTE[DPF]{The citetseres1999algebra must be not broken:
+            You can either rewrite the sentence or
+            use a tilde called a tie that means don't break the line.
+            Sometimes using tilde does not work out elegant enough,
+            so the first idea works best.}
+
 \section{search strategies and fairness}
 
 In this section, we define fair \disj{}, almost-fair \disj{} and fair \conj{}. 
@@ -280,18 +263,17 @@ function from a state to a space.
 % empty.
 
 Now we elaborate fairness by running more queries about \repeato{}. We never 
-use \texttt{run*} in this paper because fairness is more interesting when we 
-have an unbounded number of answers. However, it is perfectly fine to use 
-\texttt{run*} with any search strategies.
+use \runstar{} in this paper because fairness is more interesting when we 
+have an unbounded number of answers. It is perfectly fine, however, to use 
+\runstar{} with any search strategies.
 
 \subsection{fair \texttt{disj}}
 
-Given the following program, it is natural to expect lists of each letter to
-constitute $1/4$ in the query result. \DFSi, the current search
-strategy, however, results in many more lists of \texttt{a}s than lists
-of other letters. And some letters  (e.g. \texttt{c} and \texttt{d}) are
-rarely seen. The situation would be exacerbated if the \conde{} would have
-contained more clauses.
+Given the following program, it is natural to expect lists of each
+letter to constitute $1/4$ in the query result. \DFSi, TRS2's search
+strategy, however, results in many more lists of \texttt{a}s than
+lists of other letters. And some letters (e.g. \texttt{c} and
+\texttt{d}) are rarely seen. The more clauses the worse the situation.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -330,7 +312,7 @@ allocates more resources to the clauses of \texttt{b}, \texttt{c}, and
 We end this subsection with precise definitions of all levels of 
 \disj{} fairness. Our definition of \emph{fair} \disj{} is slightly 
 more general
-than the one in \citet{seres1999algebra}. Their definition is only
+than the one in \citet{seres1999algebra}, which is only
 for binary disjunction. We generalize it to a multi-arity one.
 
 \begin{defn}[fair \disj{}]
@@ -353,11 +335,11 @@ A \disj{} is unfair if and only if it is not almost-fair.
 \label{sec:fairconj}
 
 Given the following program, it is natural to expect lists of each letter to
-constitute $1/4$ in the answer list. Search strategies with unfair \conj{} 
-(e.g. 
-\DFSi, \DFSbi, \DFSf), however, results in many more lists of \texttt{a}s than 
-lists of other letters. And some letters are rarely seen. The situation would 
-be exacerbated if \conde{} were to contain more clauses.
+constitute $1/4$ in the answer list. Search strategies with unfair \conj{}:
+\DFSi, \DFSbi, and \DFSf, however, results in many more lists of \texttt{a}s than 
+lists of other letters. And some letters are rarely seen. Here again, as the
+number of clauses grows, the situation worsens. 
+
 Although some strategies have a different level of fairness in \disj{}, they 
 have the same behavior when there is no call to a relational definition in 
 \conde{} clauses (including this case).
@@ -398,13 +380,6 @@ otherwise, it is \emph{incomplete}. In the
 context of miniKanren, a search strategy is complete means that every correct 
 answer has a position in large enough answer lists.
 
-\NOTE[DPF]{Was this supposed to be a note?
-``We never use \texttt{run*} in this paper because fairness is only interesting 
-when we have an unbounded number of answers. However, it is perfectly fine to 
-use run* with any search strategies.''}
-\NOTE[LKC]{I initially wrote it down as a note. I might get it wrong, but I 
-thought you suggested me to move it into the paper.}
-
 \begin{center}
 	\begin{tabular}{c}
 		\lstinputlisting{Figures/repeato-conj-infinite-naive.rkt}
@@ -429,8 +404,9 @@ answer is equal
 to the length of its inner list plus the length of its outer list. For example,
 the cost of \texttt{((a) (a))} is $1 + 2 = 3$.
 
-\NOTE[DPF]{Would the answer be the same if the list had been this ((a) (b))
-or did you mean structurally the same?}
+\NOTE[DPF]{Can you express exactly how all costs are determined?  I see that
+for this simple program, your notion of cost makes sense, but how does it
+generalize to all costs.}
 \NOTE[LKC]{I mean for all answer in the answer list, the answer's inner lists 
 are pairwise \texttt{equal?}. It is impossible to see a \texttt{((a) (b))} in 
 the answer list.}
@@ -476,14 +452,14 @@ A \conj{} is unfair if and only if it is not fair.
 In this section, we review the implementation of interleaving depth-first 
 search (\DFSi). We focus on parts that are relevant to this paper. TRS2,
 chapter 10 and the appendix, ``Connecting the wires'', 
-provides a comprehensive description of the 
+provide a comprehensive description of the 
 miniKanren 
 implementation but limited to unification constraints ($\equiv$).
 Fig.~\ref{DFSi-0} and Fig.~\ref{DFSi-1} show parts that are later compared 
 with other search 
 strategies. We follow some conventions to name variables: \texttt{s}s name 
 states; \texttt{g}s (possibly with subscript) name goals; 
-variables ending with $^\infty$ name search spaces. Fig.~\ref{DFSi-0} shows the 
+variables ending with $^\infty$ name (search) spaces. Fig.~\ref{DFSi-0} shows the 
 implementation of \disj. The 
 first function, \disjtwo, implements binary disjunction. It applies the 
 two disjunctive goals to the input state \texttt{s} and composes the two 
@@ -547,12 +523,9 @@ accordingly. The first two \texttt{cond} clauses essentially copy the
 finite. The third clause, as we mentioned above, is just for swapping. When the 
 fourth and last clause runs, we know that both \texttt{s$^\infty$} and 
 \texttt{t$^\infty$} are ended with a thunk, and that we have swapped them. In 
-this case, we construct a new thunk. The new thunk swaps two spaces back in the
-recursive call to \texttt{loop}. This is unnecessary for fairness. We do it to 
-produce answers in a more natural order.
-
-\NOTE[DPF]{When or where do you swap them back? This could be still clearer.}
-\NOTE[LKC]{Improved.}
+this case, we construct a new thunk. The new thunk swaps back the two spaces in the
+recursive call to \texttt{loop}. This is unnecessary for fairness---we do it to 
+produce answers in a more readable order.
 
 \section{breadth-first search}
 
@@ -573,10 +546,23 @@ replace \texttt{append$^\infty$} with \texttt{append$^\infty_{fair}$} in
 	``our \BFS,'' but yet a third implementation of \BFS?}
 \NOTE[LKC]{Improved.}
 
-This implementation is improvable in two ways. First, as mentioned in 
+\NOTE[DPF]{Why are the two texttt's macros, again?  Now, it hardly matters,
+but it is unfriendly to your other co-authors to have us reading long
+expressions when a newcommand would suffice.  I read the paper with a pen
+marking it up, then I read the paper on the .tex screen.  That's each time
+I read it.}
+
+\NOTE[DPF]{You know that ``bag'' is a technical terms.  It means that there
+is a structure where each element of the structure has an associated number, 
+which tells you have many occurrences of that element are in the list.
+For example, the list (a b a c a d c) could be represented like this:
+(a$^3$ b$^1$ c$^2$ d$^1$).  If that is not what you mean, you might change the name
+to bucket.}
+
+This implementation can be improved in two ways. First, as mentioned in 
 \autoref{sec:fairconj}, \BFS{} puts answers in bags and answers of the same 
 cost are in the same bag. In the above implementation, however, 
-it is not very clear how we manage cost information --- the \texttt{car}s of a 
+it is not obvious how we manage cost information---the \texttt{car}s of a 
 search space have cost 0 (i.e., they are all in the same bag), and every thunk 
 indicates an increment in cost. It is even more subtle that 
 \texttt{append$^\infty_{fair}$} and the \texttt{append-map$^\infty_{fair}$} 
@@ -613,7 +599,9 @@ by use 3 linefeeds.  They will still align nicely.}
 % the type of search space, modifying related function definitions, and 
 % introducing a few more functions.
 
-We make the cost information more clear by changing the type of search space, 
+\NOTE[DPF]{Font Space like in the code comments.}
+
+We make the cost information more clear by changing the Space type, 
 modifying related function definitions, and introducing a few more functions.
 
 The new type is a pair whose \texttt{car} is a list of answers (the bag), and 
@@ -637,10 +625,6 @@ arguments in reversed order; \texttt{none}, \texttt{unit}, and
 \texttt{append$^\infty_{fair}$} correspond to \texttt{mzero}, \texttt{unit}, and 
 \texttt{mplus}, respectively.
 
-\NOTE[DPF]{I am not in love with the two calls to null?. I can think of at least
-two ways to fix it.  Pick one.}
-\NOTE[LKC]{fixed}
-
 \begin{figure}
 	\lstinputlisting{Figures/BFSimp-cont.rkt}	
 	\caption{New and changed functions in our BFS that implement impure 
@@ -648,10 +632,8 @@ two ways to fix it.  Pick one.}
 	\label{BFSimp-cont}
 \end{figure}
 
-\NOTE[DPF]{The use of the references to Fig 7 twice tells me that something
-has to change for the sake of clarity.}
-\NOTE[LKC]{I guess you are talking about Table 1 becasue there is no Fig 7. I 
-have change the first reference.}
+\NOTE[DPF]{ks --> sk and kf --> fk and you don't need to say f and s
+mean success continuation and failure continuation.}
 
 Functions implementing impure features are in Fig.~\ref{BFSimp-cont}. The 
 first function, \texttt{elim}, takes a space \texttt{s$^\infty$} and two 
@@ -660,11 +642,6 @@ no answers, it calls \texttt{kf} with no argument. Otherwise, it calls
 \texttt{ks} with the first answer and the rest of the space. Here  `f' means 
 `fail' and `s' means `succeed'. This function is similar to an eliminator of 
 search spaces, hence the name. The remaining functions are as before.
-
-\NOTE[DPF]{If we forget to use {} after \reverso, the o ends up too near
-the next word.  I fixed reverso on the second line of section 7, but there 
-may be others.}
-\NOTE[LKC]{I have checked all uses of similar macros by text search.}
 
 \subsection{compare \BFSimp{} with \BFSser{}}
 
@@ -680,8 +657,6 @@ relational programming systems. The translated code is longer than \BFSimp{}.
 And it runs slower in all benchmarks. Details about differences in efficiency 
 are in \autoref{sec:quan}.
 % \autoref{compare-efficiency}
-
-\NOTE[LKC]{I ref the next section instead of the table}
 
 \section{quantitative evaluation}
 \label{sec:quan}
@@ -774,18 +749,8 @@ relational interpreters doesn't prevent closures from getting into pairs. I did
 so because I consider this restriction doesn't make sense. Benchmarks about 
 quine are already very slow so I didn't apply similar changes.}
 
-\NOTE[DPF]{There is still some clumsiness using our improved DFS, since
-at some point, we may want to make this clearer, so have DFS not be fonted
-is a little weird.  I think both should always use ourDFS and 
-macro expand it to <our improved DFS>.  Then changes will be much easier.}
-\NOTE[LKC]{I guess you are talking about ``our improved BFS''. I have added 
-relevant macros.}
-
-\NOTE[LKC]{I rewrote the following paragraph and the table to include our BFS 
-in additional to our improved BFS.}
-\NOTE[LKC]{I also re-measured all running time. I used to run benchmarks with 
-DrRacket, now I do it in command-line. Thus, the time measurements are smaller 
-and more stable.}
+\NOTE[DPF]{We don't have disequality constraints, so no absento.  You might just
+say that.}
 
 In general, only \DFSi{} and \DFSbi{} constantly perform well. \DFSf{}
 is just as efficient in \appendo, \reverso, and \texttt{quine}s. All BFS
@@ -819,10 +784,6 @@ with a straightforward translation of their Haskell code.
 \citet{rozplokhas2018improving} address the non-commutativity of conjunction, 
 while our work about \disj{} fairness addresses the non-commutativity of 
 disjunction.
-
-\NOTE[DPF]{We might find the reference Ocanren in the two Dmitri's paper
-and say something here about it.}
-\NOTE[LKC]{added}
 
 \section{conclusion}
 

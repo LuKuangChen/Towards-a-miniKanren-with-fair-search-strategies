@@ -37,6 +37,5 @@
       ((pair? vs)
        (cons (car vs)
          (loop (and n (sub1 n)) (cdr vs))))
-      (else
-       (let ((f (cdr s-inf)))
-         (if f (take-inf n (f)) '()))))))
+      (else (let ((f (cdr s-inf)))
+              (if f (take-inf n (f)) '()))))))
