@@ -84,6 +84,28 @@
 
 \begin{abstract}
 
+
+\NOTE[LKC]{
+We actually have two new BFS implementations. One is modified from DFSf with 
+two simple steps. It has been described briefly at the beginning of the BFS 
+section but was not given a name. The other is the one described with two large 
+figures and was given the name ``our improved BFS''. Both of them runs faster 
+than the current BFS.
+
+I didn't name the first one because (1) it is so simple and (2) I considered 
+it merely a stepstone to our improved BFS. Now I decided to also give the first 
+BFS implementation a name. This is because I think having a nameless impl is 
+confusing.
+
+Currently, the nameless implementation is given the name ``our BFS''. And I 
+have changed the paper accordingly.
+
+BUT, I am thinking about going further --- removing ``our improved BFS'' from 
+this paper. The first reason is that our BFS is actually more efficient than 
+our improved BFS in most benchmarks (see Table 1), despite its theoretical 
+space extravagence. The second reason is that DFSi, DFSf, and our BFS look nice 
+when sitting together.}
+
 We describe fairness levels in disjunction and conjunction
 implementations.  Specifically, a disjunction implementation can be
 fair, almost-fair, or unfair. And a conjunction implementation can
@@ -100,11 +122,6 @@ and that our breadth-first search implementations are more efficient than
 the current one.
 
 \NOTE[LKC]{``simpler'' -> ``shorter'' (more objective)}
-
-\NOTE[LKC]{We actually have two new BFS implementations, an easy one and an 
-improved one (BFSimp/BFSopt). Both of them runs faster than the current BFS. I 
-didn't name the easy one because I considered it just a stepstone to BFSimp. 
-But now I think giving names to both of them would be more clear.}
 
 % We describe fairness levels in disjunction and conjunction
 % implementations.  Specifically, a disjunction implementation can be
@@ -142,25 +159,24 @@ But now I think giving names to both of them would be more clear.}
 miniKanren is a family of relational programming languages.
 \citet{Friedman:2005:RS:1121583,friedman_reasoned_2018} introduce
 miniKanren and its implementation in \emph{The Reasoned Schemer} 
-and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). \citet{byrd2017unified} have 
+and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). Although originally written in 
+Scheme, miniKanren has been ported to many other languages (e.g. 
+OCanren\citep{kosarev2018typed}). \citet{byrd2017unified} have 
 demonstrated that miniKanren programs are useful in solving several difficult
 problems. miniKanren.org contains the seeds of many difficult problems and 
-their solutions.
+their solutions. 
 
 \NOTE[DPF]{...  Mostly the point is to also include a reference to
 the two dimitris and to the first OCamren (OCanren), whatever. It is up to you
 in this paragraph.  ...}
-\NOTE[LKC]{I have fixed the cite to TRS and TRS2.}
-\NOTE[LKC]{What is the point of citing dmitris?}
-\NOTE[LKC]{Are we citing OCanren to show that miniKanren is widely used? If 
-yes, do we need to cite other implementations as well?}
+\NOTE[LKC]{I have fixed the references to TRS and TRS2.}
+\NOTE[LKC]{I have cited OCanren in this paragraph.}
 
 \NOTE[DPF]{I have decided to agree with you that we should not use 
 BFSser, so I am going to remove all occurrences.  
 Also, we should say, ``Our implementation of BFS''
 and then say, shortened to ``Our BFS'' and then you can use it in the table,
 so one column should be Our BFS and the other should be BFS.}
-
 \NOTE[DPF]{Occurrences of BFS (without Our) mean Seres et al. (We need only say
 that once, or very occasionally}
 
@@ -238,13 +254,15 @@ To summarize our contributions, we
 depth-first search (\DFSbi{}), a new search strategy with almost-fair \disj{}.
 	\item propose and implement \textbf{f}air depth-first search (\DFSf{}), 
 a new search strategy with fair \disj{}.
-	\item implement in a new way the standard breath-first search (\BFS), a 
+	\item implement in two new ways the standard breath-first search (\BFS), a 
 search strategy with fair \disj{} and fair \conj{}. We refer to ``the current 
 BFS implementation'' (``BFS'' for short) as the implementation by 
 \citet{seres1999algebra} and refer to ``our BFS implementation'' (``our BFS'' 
-for short) as our new one. We formally prove that the two BFS implementations 
-are semantically equivalent, however, our BFS runs faster in all benchmarks and 
-is shorter.
+for short) and ``our improved BFS implementation'' (``our improved BFS`` for 
+short) as our new ones. We also refer to ``our \BFS{}s'' to both \BFSuni{} and 
+\BFSimp{}. We argue that our \BFS{}s are semantically equivalent and formally 
+prove that \BFSimp{} and \BFSser{} are semantically equivalent, however, our 
+\BFS{}s run faster in all benchmarks and are shorter.
 \end{itemize}
 
 \section{search strategies and fairness}
@@ -254,7 +272,7 @@ Before going further into fairness, we give a short review of the terms:
 \emph{state}, search \emph{space}, and \emph{goal}.
 A \emph{state} is a collection of constraints. (Here, we restrict 
 constraints to unification constraints.) Every answer corresponds to a 
-state. A space is a collection of states. And a \emph{goal} is a 
+state. A \emph{space} is a collection of states. And a \emph{goal} is a 
 function from a state to a space.
 
 % Goals check their input states and outpust possibly extended states. A goal 
@@ -567,9 +585,6 @@ extravagant in memory usage. It makes $O(n+m)$ new \texttt{cons} cells every
 time, where $n$ and $m$ are the ``length''s of input spaces. \DFSf{} also has 
 the space extravagance.
 
-\NOTE[LKC]{I have pointed out ``\DFSf{} also has the space extravagance'' at 
-the end of the above paragraph.}
-
 In the following subsections, we first describe \BFSimp{} implementation that 
 manages cost information in a more clear and concise way and is less 
 extravagant in memory usage. Then we compare \BFSimp{} with \BFSser{}.
@@ -754,10 +769,10 @@ We conjecture that \DFSi{} would perform badly in the second case because
 elimination rules complicate the problem when synthesizing (i.e., our 
 evaluation supports our conjecture.)
 
-\NOTE[LKC]{I change the benchmark '(I love you) such that it doesn't prevent 
-closures from getting into pairs because I consider this restriction not 
-reasonable. As for quines, they are already very slow so I didn't make the 
-changes.}
+\NOTE[LKC]{I have changed the benchmarks about '(I love you), such that their 
+relational interpreters doesn't prevent closures from getting into pairs. I did 
+so because I consider this restriction doesn't make sense. Benchmarks about 
+quine are already very slow so I didn't apply similar changes.}
 
 \NOTE[DPF]{There is still some clumsiness using our improved DFS, since
 at some point, we may want to make this clearer, so have DFS not be fonted
@@ -766,11 +781,11 @@ macro expand it to <our improved DFS>.  Then changes will be much easier.}
 \NOTE[LKC]{I guess you are talking about ``our improved BFS''. I have added 
 relevant macros.}
 
-\NOTE[LKC]{I rewrote the following paragraph and the table to include the 
-additional BFS and update the '(I love you) benchmark.
-
-Also, all running time are re-measured by running in command-line. I used to 
-run benchmarks with DrRacket. Thus, the time measurements are smaller.}
+\NOTE[LKC]{I rewrote the following paragraph and the table to include our BFS 
+in additional to our improved BFS.}
+\NOTE[LKC]{I also re-measured all running time. I used to run benchmarks with 
+DrRacket, now I do it in command-line. Thus, the time measurements are smaller 
+and more stable.}
 
 In general, only \DFSi{} and \DFSbi{} constantly perform well. \DFSf{}
 is just as efficient in \appendo, \reverso, and \texttt{quine}s. All BFS
@@ -782,12 +797,13 @@ contrast, \DFSbi{} still performs more stable than \DFSi{}. Thus, we consider
 \DFSbi{} a competitive alternative to \DFSi{}, the current standard miniKanren 
 search strategy. 
 Among the three implementations of \BFS, our \BFS{}s constantly perform as well 
-or better. \BFSimp{} only out-performs \BFSuni{} significantly in 
-\veryrecursiveo{} 300000, while performing as well or worse elsewhere. The 
-reason might be that the size of bags are usually too small to be worried about.
+or better. Among our \BFS{}s, \BFSimp{} only performs better in 
+\veryrecursiveo{} 300000. The reason might be that the size of bags are usually 
+too small to be worried about. 
 It is hard to conclude how \disj{} fairness affect performance based on these 
-statistics. Fair \conj{}, however, imposes considerable overhead constantly 
-except in \appendo. The reason might be that those strategies tend to keep more 
+statistics. 
+Fair \conj{}, however, imposes considerable overhead constantly except in 
+\appendo. The reason might be that those strategies tend to keep more 
 intermediate answers in the memory.
 
 \section{related works}
@@ -800,8 +816,13 @@ strategy. We present another implementation. Our implementation is semantically
 equivalent to theirs. But, ours is shorter and performs better in comparison 
 with a straightforward translation of their Haskell code.
 
+\citet{rozplokhas2018improving} address the non-commutativity of conjunction, 
+while our work about \disj{} fairness addresses the non-commutativity of 
+disjunction.
+
 \NOTE[DPF]{We might find the reference Ocanren in the two Dmitri's paper
 and say something here about it.}
+\NOTE[LKC]{added}
 
 \section{conclusion}
 
@@ -809,14 +830,14 @@ We analyze the definitions of fair \disj{} and fair \conj{}, then propose a
 new definition of fair \conj{}. Our definition is orthogonal with completeness.
 
 We devise two new search strategies (i.e. balanced interleaving DFS 
-(\DFSbi{}) and fair DFS (\DFSf{})) and devise a new 
-implementation of \BFS. These strategies have different features 
+(\DFSbi{}) and fair DFS (\DFSf{})) and devise two new 
+implementations of \BFS. These strategies have different features 
 in fairness: \DFSbi{} has an almost-fair \disj{} and unfair \conj{}. 
 \DFSf{} has fair \disj{} and unfair \conj{}. \BFS{} has both fair
 \disj{} and fair \conj{}.
 
-Our quantitative evaluation shows that \DFSbi{} and \DFSf{} are competitive 
-alternatives to \DFSi{}, the current miniKanren search strategy,
+Our quantitative evaluation shows that \DFSbi{} is a competitive 
+alternative to \DFSi{}, the current miniKanren search strategy,
 and that \BFS{} is less practical.
 % and that \BFSser{} is less practical than other breadth-first strategies.
 

@@ -57,7 +57,7 @@
 }
 
 @article{yang2010adventures,
-	author = {Yang, Edward Z},
+	author = {Yang, Edward Z.},
 	journal = {The Monad. Reader Issue 15},
 	pages = {11},
 	title = {Adventures in Three Monads},
