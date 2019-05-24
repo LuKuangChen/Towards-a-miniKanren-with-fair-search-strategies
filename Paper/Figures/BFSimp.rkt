@@ -1,11 +1,14 @@
 #| → Space |#
-(define (none)   `(()   . #f))
+(define (none)
+  `(() . #f))
 
 #| State → Space |#
-(define (unit s) `((,s) . #f))
+(define (unit s)
+  `((,s) . #f))
 
 #| (→ Space) → Space |#
-(define (step f) `(()   . ,f))
+(define (step f)
+  `(() . ,f))
 
 #| Space × Space → Space |#
 (define (append-inf/fair s-inf t-inf)

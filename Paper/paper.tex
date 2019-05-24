@@ -30,6 +30,7 @@
   		   {g0}{{g$_0$}}{2}
   		   {g1}{{g$_1$}}{2}
   		   {g2}{{g$_2$}}{2}
+  		   {g3}{{g$_3$}}{2}
   		   {gl}{{g$_l$}}{2}
   		   {gr}{{g$_r$}}{2}
   		   {DFSi }{{DFS$_{i}$}}{3}
@@ -71,7 +72,8 @@
 \newcommand{\DFSbi}[0]{DFS$_{bi}$}
 \newcommand{\BFS}[0]{BFS}
 \newcommand{\BFSser}[0]{BFS}
-\newcommand{\BFSimp}[0]{Our BFS}
+\newcommand{\BFSuni}[0]{our BFS}
+\newcommand{\BFSimp}[0]{our improved BFS}
 
 
 \newtheorem{defn}{Definition}[section]
@@ -89,12 +91,20 @@ be fair or unfair.  We compare the fairness level of four search
 strategies: the standard miniKanren interleaving depth-first search,
 the balanced interleaving depth-first search, the fair depth-first
 search, and the standard breadth-first search.
-The two non-standard depth-first searches are new. And we present a new, more 
-efficient and simpler implementation of the standard breadth-first search. Using 
+The two non-standard depth-first searches are new. And we present two new, more 
+efficient and shorter implementation of the standard breadth-first search. 
+Using 
 quantitative evaluation, we argue that the two new depth-first searches are 
 competitive alternatives to the standard one, 
-and that our breadth-first search implementation is more efficient than 
+and that our breadth-first search implementations are more efficient than 
 the current one.
+
+\NOTE[LKC]{``simpler'' -> ``shorter'' (more objective)}
+
+\NOTE[LKC]{We actually have two new BFS implementations, an easy one and an 
+improved one (BFSimp/BFSopt). Both of them runs faster than the current BFS. I 
+didn't name the easy one because I considered it just a stepstone to BFSimp. 
+But now I think giving names to both of them would be more clear.}
 
 % We describe fairness levels in disjunction and conjunction
 % implementations.  Specifically, a disjunction implementation can be
@@ -150,11 +160,13 @@ BFSser, so I am going to remove all occurrences.
 Also, we should say, ``Our implementation of BFS''
 and then say, shortened to ``Our BFS'' and then you can use it in the table,
 so one column should be Our BFS and the other should be BFS.}
+
 \NOTE[DPF]{Occurrences of BFS (without Our) mean Seres et al. (We need only say
 that once, or very occasionally}
+
 \NOTE[DPF]{Is the spelling of reverso truly written without the last e?
 Shouldn't it be reverseo with the appropriate raising of o.}
-\NOTE[LKC]{Yes, it is reverso (not reverseo) in Dmitris' paper}
+\NOTE[LKC]{Yes, it is reverso instead of reverseo in Dmitris' paper.}
 
 A subtlety arises 
 when a \conde{} contains many clauses: not every clause has an 
@@ -227,12 +239,12 @@ depth-first search (\DFSbi{}), a new search strategy with almost-fair \disj{}.
 	\item propose and implement \textbf{f}air depth-first search (\DFSf{}), 
 a new search strategy with fair \disj{}.
 	\item implement in a new way the standard breath-first search (\BFS), a 
-search strategy with fair \disj{} and fair \conj{}. We name the current 
-implementation by \citeauthor{seres1999algebra} and refer to ``our 
-BFS implementation as the improved one. We formally prove
-that the two BFS implementations are semantically 
-equivalent, however, our BFS implementation runs faster in all 
-benchmarks and is shorter.
+search strategy with fair \disj{} and fair \conj{}. We refer to ``the current 
+BFS implementation'' (``BFS'' for short) as the implementation by 
+\citet{seres1999algebra} and refer to ``our BFS implementation'' (``our BFS'' 
+for short) as our new one. We formally prove that the two BFS implementations 
+are semantically equivalent, however, our BFS runs faster in all benchmarks and 
+is shorter.
 \end{itemize}
 
 \section{search strategies and fairness}
@@ -369,9 +381,11 @@ context of miniKanren, a search strategy is complete means that every correct
 answer has a position in large enough answer lists.
 
 \NOTE[DPF]{Was this supposed to be a note?
-``We never use \texttt{run*} in this paper because fairness is only 
- interesting when we have an unbounded number of answers. However, it is 
- perfectly fine to use run* with any search strategies.''}
+``We never use \texttt{run*} in this paper because fairness is only interesting 
+when we have an unbounded number of answers. However, it is perfectly fine to 
+use run* with any search strategies.''}
+\NOTE[LKC]{I initially wrote it down as a note. I might get it wrong, but I 
+thought you suggested me to move it into the paper.}
 
 \begin{center}
 	\begin{tabular}{c}
@@ -524,57 +538,51 @@ produce answers in a more natural order.
 
 \section{breadth-first search}
 
-\BFS{} has both fair \disj{} and fair \conj{}. An easy implementation is based 
-on \DFSf{} (not \DFSi{}): (1) replace \texttt{append$^\infty$} with 
-\texttt{append$^\infty_{fair}$} in \texttt{append-map$^\infty$}'s body (2) 
-rename \texttt{append-map$^\infty$} to \texttt{append-map$^\infty_{fair}$}.
+\begin{figure}
+	\lstinputlisting{Figures/BFSuni.rkt}	
+	\caption{implementation of \BFSuni{} (based on \DFSf{})}
+	\label{BFSuni}
+\end{figure}
 
-% Our implementation is based 
-% on \DFSf{} (not \DFSi{}). To implement \BFS{} based on \DFSf{}, 
-% we need \texttt{append-map$^\infty_{fair}$} in addition to 
-% \texttt{append$^\infty_{fair}$}. 
-% The only difference between \texttt{append-map$^\infty$} and 
-% \texttt{append-map$^\infty_{fair}$} is that the latter calls 
-% \texttt{append$^\infty_{fair}$} instead of \texttt{append$^\infty$}.
+\BFS{} has both fair \disj{} and fair \conj{}. Our first implementation 
+(\autoref{BFSuni}) is based on \DFSf{} (not \DFSi{}). It is so similar to 
+\DFSf{} that we only need to apply two changes: (1) rename 
+\texttt{append-map$^\infty$} to \texttt{append-map$^\infty_{fair}$} and (2) 
+replace \texttt{append$^\infty$} with \texttt{append$^\infty_{fair}$} in 
+\texttt{append-map$^\infty$}'s body. 
 
-\NOTE[DPF]{I need clarification: Applying the above changes won't result in ``our \BFS,'' but yet a third implementation of \BFS?}
+\NOTE[DPF]{I need clarification: Applying the above changes won't result in 
+	``our \BFS,'' but yet a third implementation of \BFS?}
+\NOTE[LKC]{Improved.}
 
-% This implementation is improvable in two ways. First, as mentioned in 
-% \autoref{sec:fairconj}, \BFS{} puts answers in bags and answers of the same 
-% cost are in the same bag. In this implementation, however, it is unclear where 
-% this information is recorded. Second, \texttt{append$^\infty_{fair}$} is 
-% extravagant in memory usage. It makes $O(n+m)$ new \texttt{cons} cells every 
-% time, where $n$ and $m$ are the ``length''s of input search spaces.
+This implementation is improvable in two ways. First, as mentioned in 
+\autoref{sec:fairconj}, \BFS{} puts answers in bags and answers of the same 
+cost are in the same bag. In the above implementation, however, 
+it is not very clear how we manage cost information --- the \texttt{car}s of a 
+search space have cost 0 (i.e., they are all in the same bag), and every thunk 
+indicates an increment in cost. It is even more subtle that 
+\texttt{append$^\infty_{fair}$} and the \texttt{append-map$^\infty_{fair}$} 
+respects the cost information. Second, \texttt{append$^\infty_{fair}$} is 
+extravagant in memory usage. It makes $O(n+m)$ new \texttt{cons} cells every 
+time, where $n$ and $m$ are the ``length''s of input spaces. \DFSf{} also has 
+the space extravagance.
 
-This implementation is improvable in two ways. 
-First, as mentioned in \autoref{sec:fairconj}, \BFS{} puts answers in bags and 
-answers of the same cost are in the same bag. In our implementation, however, 
-we manage cost information subtly---the \texttt{car}s of a search space have 
-cost 0 (i.e., they are all in the same bag), and every thunk indicates an 
-increment in cost. It is even more subtle that \texttt{append$^\infty_{fair}$} 
-and the \texttt{append-map$^\infty_{fair}$} respects the cost information. 
-Second, \texttt{append$^\infty_{fair}$} is extravagant in memory usage. It 
-makes $O(n+m)$ new \texttt{cons} cells every time, where $n$ and $m$ are the 
-``length''s of input spaces.
+\NOTE[LKC]{I have pointed out ``\DFSf{} also has the space extravagance'' at 
+the end of the above paragraph.}
 
-\NOTE[LKC]{Should I point out that \DFSf{} also has the miserable space 
-extravagance?}
-\NOTE[DPF]{probably}
-
-In the following subsections, we first describe our improved \BFS{}
-implementation that manages cost information in a more clear and concise
-way and is less extravagant in memory usage. 
-Then we compare our BFS{} with \BFS{}, the 
-current implementation by \citeauthor{seres1999algebra}.
+In the following subsections, we first describe \BFSimp{} implementation that 
+manages cost information in a more clear and concise way and is less 
+extravagant in memory usage. Then we compare \BFSimp{} with \BFSser{}.
 
 \NOTE[DPF]{Let's use one more line and far less horizontal space
 by use 3 linefeeds.  They will still align nicely.}
+\NOTE[LKC]{fixed}
 
 \subsection{improved BFS}
 
 \begin{figure}
 	\lstinputlisting{Figures/BFSimp.rkt}	
-	\caption{New and changed functions in optimized BFS that implements pure 
+	\caption{New and changed functions in our BFS that implements pure 
 	features}
 	\label{BFSimp}
 \end{figure}
@@ -607,10 +615,6 @@ Luckily, the change in \texttt{append$^\infty_{fair}$} also fixes the miserable
 space extravagance---the use of \texttt{append} helps us to reuse the first bag 
 of \texttt{t$^\infty$}.
 
-\NOTE[LKC]{I do notice that in the below paragraph the leading sentence is not 
-at the beginning (but at the second position). Putting the current first 
-sentence at the beginning, however, looks more fun to me.}
-
 \citet{kiselyov2005backtracking} have demonstrated that a \emph{MonadPlus} 
 hides in implementations of logic programming system. \BFSimp{} is not an 
 exception: \texttt{append-map$^\infty_{fair}$} is like \texttt{bind}, but takes 
@@ -624,7 +628,7 @@ two ways to fix it.  Pick one.}
 
 \begin{figure}
 	\lstinputlisting{Figures/BFSimp-cont.rkt}	
-	\caption{New and changed functions in improved BFS that implement impure 
+	\caption{New and changed functions in our BFS that implement impure 
 		features}
 	\label{BFSimp-cont}
 \end{figure}
@@ -649,14 +653,15 @@ may be others.}
 
 \subsection{compare \BFSimp{} with \BFSser{}}
 
-In this subsection, we compare the pure subset of our BFS with \BFS{}. We 
-focus on the pure subset because \BFS{} is designed for a pure 
+In this subsection, we compare the pure subset of \BFSimp{} with \BFSser{}. We 
+focus on the pure subset because \BFSser{} is designed for a pure 
 relational programming system. We prove in Coq that these two search strategies 
 are are semantically equivalent, since \texttt{(run n ? g)} produces the same 
-result in both our improved \BFS{} and BFS. (See supplements for the formal proof.) To compare efficiency, we 
+result in both our BFS and BFS. (See supplements for the formal proof.) To 
+compare efficiency, we 
 translate \BFS{}'s Haskell code into Racket (See supplements for the 
 translated code). The translation is direct due to the similarity of the two 
-relational programming systems. The translated code is longer than our \BFS{}. 
+relational programming systems. The translated code is longer than \BFSimp{}. 
 And it runs slower in all benchmarks. Details about differences in efficiency 
 are in \autoref{sec:quan}.
 % \autoref{compare-efficiency}
@@ -667,87 +672,123 @@ are in \autoref{sec:quan}.
 \label{sec:quan}
 
 \begin{table}
-	\begin{tabular}{|c|c|c|c|c|c|c|}
+	% run in command line, with a memory limit of 500MB
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
 		\hline 
-		benchmark & size & \DFSi{} & \DFSbi{} & \DFSf{} & 
-		\BFSimp{} & \BFSser{}  
-		\\
+	benchmark & size & \DFSi & \DFSbi & \DFSf & \BFSuni & \BFSimp & \BFSser	\\
 		\hline
-		\veryrecursiveo & 100000 &  579 &  793 & 2131 & 1438 & 3617 \\
-		& 200000 & 1283 & 1610 & 3602 & 2803 & 4212 \\
-		& 300000 & 2160 & 2836 &    - & 6137 &    - \\
+		\veryrecursiveo & 100000 & 166 & 103 & 412 &   417 &   451 &   1024 \\
+	    				& 200000 & 283 & 146 & 765 &   766 &   839 &   1875 \\
+						& 300000 & 429 & 346 &2085 &  2066 &  1809 &   4408 \\
+		\hline  
+		\appendo        & 	 100 &  17 &  18 &  17 &    18 &    17 &     65 \\
+		         	  	& 	 200 & 145 & 137 & 137 &   137 &   142 &    121 \\
+          		      	&	 300 & 388 & 384 & 387 &   383 &   429 &    371 \\
+%   		& - & - & - & - & - & - \\
 		\hline 
-		\appendo  & 100 &  31 &  41 &  42 &  31 &  68 \\ 
-		& 200 & 224 & 222 & 221 & 226 & 218 \\ 
-		& 300 & 617 & 634 & 593 & 631 & 622 \\ 
-		\hline 
-		\reverso & 10 &   5 &   3 &   3 &     38 &     85 \\ 
-		& 20 & 107 &  98 &  51 &   4862 &   5844 \\
-		& 30 & 446 & 442 & 485 & 123288 & 132159 \\ 
+		\reverso		& 	  10 &   3 &   4 &   3 &    18 &    18 &     36 \\
+						& 	  20 &  35 &  35 &  33 &  3119 &  3070 &   3695 \\
+						& 	  30 & 329 & 333 & 315 & 76243 & 75079 & 107531 \\
 		\hline
-		quine-1 & 1 &  71 &  44 & 69 & - & - \\ 
-		& 2 & 127 & 142 & 95 & - & - \\ 
-		& 3 & 114 & 114 & 93 & - & - \\ 
+		quine-1 		& 1 & 13 & 14 & 10 & - & - & - \\
+						& 2 & 30 & 34 & 25 & - & - & - \\
+						& 3 & 41 & 48 & 33 & - & - & - \\
 		\hline
-		quine-2 & 1 & 147 & 112 &  56 & - & - \\ 
-		& 2 & 161 & 123 & 101 & - & - \\ 
-		& 3 & 289 & 189 & 104 & - & - \\ 
-		\hline 
-		'(I love you)-1 &  99 & 56 & 15 & 22 &  74 & 165 \\ 
-		& 198 & 53 & 72 & 55 &  47 &  74 \\
-		& 297 & 72 & 90 & 44 & 181 & 365 \\ 
+		quine-2 		& 1 & 22 & 21 & 12 & - & - & - \\
+						& 2 & 51 & 46 & 24 & - & - & - \\
+						& 3 & 72 & 76 & 32 & - & - & - \\
 		\hline
-		'(I love you)-2 &  99 & 242 &  61 & 16 &  66 &  99 \\ 
-		& 198 & 445 & 110 & 60 &  42 &  64 \\
-		& 297 & 476 & 146 & 49 & 186 & 322 \\ 
+%		quine-1 & 1 &  71 &  44 & 69 & ??? & - & - \\ 
+%		& 2 & 127 & 142 & 95 & ??? & - & - \\ 
+%		& 3 & 114 & 114 & 93 & ??? & - & - \\ 
+%		\hline
+%		quine-2 & 1 & 147 & 112 &  56 & ??? & - & - \\ 
+%		& 2 & 161 & 123 & 101 & ??? & - & - \\ 
+%		& 3 & 289 & 189 & 104 & ??? & - & - \\ 
+%		\hline 
+		'(I love you)-1 &  99 &  10 &  37 & - &   40 &   40 &   96 \\
+						& 198 &  22 &  71 & - &  374 &  374 &  652 \\
+						& 297 &  24 & 292 & - & 1707 & 1668 & 3759 \\
+		\hline
+		'(I love you)-2 &  99 & 485 & 179 & - &   38 &   44 &   94 \\
+						& 198 & 808 & 638 & - &  366 &  414 &  630 \\
+						& 297 &1265 & 916 & - & 1674 & 1651 & 3691 \\ 
 		\hline 
+		% The data below is test with old benchmarks
+%'(I love you)-1 &  99 & 56 & 15 & 22 & ??? &  74 & 165 \\ 
+%& 198 & 53 & 72 & 55 & ??? &  47 &  74 \\
+%& 297 & 72 & 90 & 44 & ??? & 181 & 365 \\ 
+%\hline
+%'(I love you)-2 &  99 & 242 &  61 & 16 & ??? &  66 &  99 \\ 
+%& 198 & 445 & 110 & 60 & ??? &  42 &  64 \\
+%& 297 & 476 & 146 & 49 & ??? & 186 & 322 \\ 
+%\hline 
 	\end{tabular}
 	\caption{The results of a quantitative evaluation: running times of 
-	benchmarks 
-		in milliseconds}
+	benchmarks in milliseconds}
 	\label{compare-efficiency}
 \end{table}
 
 In this section, we compare the efficiency of search strategies. A concise 
 description is in Table~\ref{compare-efficiency}. A hyphen means ``running out
-of memory.'' The first two benchmarks are from 
+of 500 MB memory.'' The first two benchmarks are from 
 TRS2. \reverso{} is from 
-\citet{rozplokhas2018improving}. The next two benchmarks 
-about quine are modified from a similar test case in \citet{byrd2017unified}. 
-The modifications are made 
-to circumvent the need for symbolic constraints (e.g. $\neq$, 
-\texttt{absent$^o$}). Our version generates de 
-Bruijnized expressions and prevents closures from being inside a list. The two 
-benchmarks differ in the \conde{} clause order of their relational 
-interpreters. 
-The last two 
-benchmarks are about synthesizing expressions that evaluate to \texttt{'(I love 
-you)}. This benchmark is from \citet{byrd2017unified}. Again, the 
-sibling benchmarks differ in the \conde{} clause order of their relational 
-interpreters. The first one 
-has elimination rules (i.e. application, \texttt{car}, and \texttt{cdr}) at the 
-end, while the other has them at the beginning. We conjecture that \DFSi{} 
-would 
-perform badly in the second case because elimination rules complicate the 
-problem when synthesizing (i.e., our evaluation supports our conjecture.)
+\citet{rozplokhas2018improving}. 
+The next two benchmarks about quine are modified from a similar test case in 
+\citet{byrd2017unified}. The modifications are made to circumvent the need for 
+symbolic constraints (e.g. $\neq$, \texttt{absent$^o$}).
+Our version generates de Bruijnized expressions and prevents closures from 
+being inside a list. 
+The sibling benchmarks differ in the \conde{} clause order of their relational 
+interpreters.
+The last two benchmarks are about synthesizing expressions that evaluate to 
+\texttt{'(I love you)}. 
+They are also modified from a similar test case in \citet{byrd2017unified} 
+because of the same reason. 
+Our version generates de Bruijnized expressions. 
+Again, the sibling benchmarks differ in the \conde{} clause order of their 
+relational interpreters. The first one has elimination rules (i.e. application, 
+\texttt{car}, and \texttt{cdr}) at the end, while the other has them at the 
+beginning. 
+We conjecture that \DFSi{} would perform badly in the second case because 
+elimination rules complicate the problem when synthesizing (i.e., our 
+evaluation supports our conjecture.)
+
+\NOTE[LKC]{I change the benchmark '(I love you) such that it doesn't prevent 
+closures from getting into pairs because I consider this restriction not 
+reasonable. As for quines, they are already very slow so I didn't make the 
+changes.}
 
 \NOTE[DPF]{There is still some clumsiness using our improved DFS, since
 at some point, we may want to make this clearer, so have DFS not be fonted
 is a little weird.  I think both should always use ourDFS and 
 macro expand it to <our improved DFS>.  Then changes will be much easier.}
+\NOTE[LKC]{I guess you are talking about ``our improved BFS''. I have added 
+relevant macros.}
+
+\NOTE[LKC]{I rewrote the following paragraph and the table to include the 
+additional BFS and update the '(I love you) benchmark.
+
+Also, all running time are re-measured by running in command-line. I used to 
+run benchmarks with DrRacket. Thus, the time measurements are smaller.}
 
 In general, only \DFSi{} and \DFSbi{} constantly perform well. \DFSf{}
-is just as efficient in all benchmarks except those of \veryrecursiveo. Both
-implementations of BFS have obvious overhead in many cases. Among the
-three variants of DFS, which all have unfair \conj{}, \DFSf{} is most
-resistant to clause permutation, followed by \DFSbi{} then
-\DFSi{}. Among the two implementation of BFS, our improved \BFS{}
-constantly performs as well or better. Interestingly, every strategy
-with fair \disj{} suffers in \veryrecursiveo{} and \DFSf{} performs
-well elsewhere. Therefore, this benchmark might be a special
-case. Fair \conj{} imposes considerable overhead constantly except in
-\appendo. The reason might be that strategies with fair \conj{} tend
-to keep more intermediate answers in the memory.
+is just as efficient in \appendo, \reverso, and \texttt{quine}s. All BFS
+implementations have obvious overhead in most cases. 
+Among the three variants of DFS, which all have unfair \conj{}, \DFSf{} is most 
+resistant to clause permutation in \texttt{quines}, followed by \DFSbi{} then 
+\DFSi{}. \DFSf{}, however, runs out of memory in \texttt{'(I love you)}s. In 
+contrast, \DFSbi{} still performs more stable than \DFSi{}. Thus, we consider 
+\DFSbi{} a competitive alternative to \DFSi{}, the current standard miniKanren 
+search strategy. 
+Among the three implementations of \BFS, our \BFS{}s constantly perform as well 
+or better. \BFSimp{} only out-performs \BFSuni{} significantly in 
+\veryrecursiveo{} 300000, while performing as well or worse elsewhere. The 
+reason might be that the size of bags are usually too small to be worried about.
+It is hard to conclude how \disj{} fairness affect performance based on these 
+statistics. Fair \conj{}, however, imposes considerable overhead constantly 
+except in \appendo. The reason might be that those strategies tend to keep more 
+intermediate answers in the memory.
 
 \section{related works}
 
@@ -775,7 +816,7 @@ in fairness: \DFSbi{} has an almost-fair \disj{} and unfair \conj{}.
 \disj{} and fair \conj{}.
 
 Our quantitative evaluation shows that \DFSbi{} and \DFSf{} are competitive 
-alternatives to \DFSi{}, the current search strategy miniKanren
+alternatives to \DFSi{}, the current miniKanren search strategy,
 and that \BFS{} is less practical.
 % and that \BFSser{} is less practical than other breadth-first strategies.
 

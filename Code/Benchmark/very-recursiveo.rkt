@@ -1,5 +1,5 @@
 #lang racket
-(require "../mk-BFSimp-1.rkt")
+(require "../mk-sBFS.rkt")
 
 (defrel (nevero)
   (nevero))

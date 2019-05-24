@@ -1,5 +1,5 @@
 #lang racket
-(require "../mk-fDFS.rkt")
+(require "../mk-sBFS.rkt")
 
 (defrel (evalo exp val)
   (eval-expo exp '() `(quote ,val)))
@@ -42,12 +42,15 @@
       ((== 0 x) (== v t))
       ((== `(add1 ,y) x) (lookupo y rest t)))))
 
-
+(custodian-limit-memory
+ (current-custodian)
+ (* 500 1024 1024))
 (define (just-time/quine n)
   (void (time (run n q
                 (evalo q q)))))
 
 (begin
+  (just-time/quine 0)
   (just-time/quine 1)
   (just-time/quine 2)
   (just-time/quine 3))

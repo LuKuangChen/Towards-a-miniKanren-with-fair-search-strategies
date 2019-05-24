@@ -1,5 +1,5 @@
 #lang racket
-(require "../mk-biDFS-mac.rkt")
+(require "../mk-sBFS.rkt")
 
 (defrel (nullo x)
   (== '() x))
