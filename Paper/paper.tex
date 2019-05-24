@@ -23,7 +23,7 @@
   		   {×}{{$\times$}}{1}
   		   {==}{{$\equiv$}}{1}
   		   {conde}{{\textcolor[rgb]{0,.3,.7}{\textbf{cond$^e$}}}}{4}
-                   {appendo}{{append$^o$}}{6}
+           {appendo}{{append$^o$}}{6}
   		   {repeato}{{repeat$^o$}}{6}
   		   {disj2}{{disj$_2$}}{4}
   		   {conj2}{{conj$_2$}}{4}
@@ -32,9 +32,9 @@
   		   {g2}{{g$_2$}}{2}
   		   {gl}{{g$_l$}}{2}
   		   {gr}{{g$_r$}}{2}
-  		   {DFSi }{{DFS$_\textrm{i}$}}{3}
-  		   {DFSbi}{{DFS$_\textrm{bi}$}}{3}
-  		   {DFSf }{{DFS$_\textrm{f}$}}{3}
+  		   {DFSi }{{DFS$_{i}$}}{3}
+  		   {DFSbi}{{DFS$_{bi}$}}{3}
+  		   {DFSf }{{DFS$_{f}$}}{3}
 }
 %% scheme-list .
 
@@ -66,12 +66,12 @@
 \newcommand{\reverso}{\texttt{revers$^o$}}
 \newcommand{\repeato}{\texttt{repeat$^o$}}
 
-\newcommand{\DFSi }[0]{DFS$_\textrm{i}$}
-\newcommand{\DFSf }[0]{DFS$_\textrm{f}$}
-\newcommand{\DFSbi}[0]{DFS$_\textrm{bi}$}
+\newcommand{\DFSi }[0]{DFS$_{i}$}
+\newcommand{\DFSf }[0]{DFS$_{f}$}
+\newcommand{\DFSbi}[0]{DFS$_{bi}$}
 \newcommand{\BFS}[0]{BFS}
-\newcommand{\BFSser}[0]{BFS$_\textrm{}$}
-\newcommand{\BFSimp}[0]{BFS$_\textrm{imp}$}
+\newcommand{\BFSser}[0]{BFS}
+\newcommand{\BFSimp}[0]{Our BFS}
 
 
 \newtheorem{defn}{Definition}[section]
@@ -130,19 +130,20 @@ the current one.
 \section{introduction}
 
 miniKanren is a family of relational programming languages.
-\citep{Friedman:2005:RS:1121583} \citet{friedman_reasoned_2018} introduce 
+\citet{Friedman:2005:RS:1121583,friedman_reasoned_2018} introduce
 miniKanren and its implementation in \emph{The Reasoned Schemer} 
 and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). \citet{byrd2017unified} have 
 demonstrated that miniKanren programs are useful in solving several difficult
 problems. miniKanren.org contains the seeds of many difficult problems and 
 their solutions.
 
-\NOTE[DPF]{[2,3] is the way to cite this, but I leave cleaning up this
-paragraph to you.  Mostly the point is to also include a reference to
+\NOTE[DPF]{...  Mostly the point is to also include a reference to
 the two dimitris and to the first OCamren (OCanren), whatever. It is up to you
-in this paragraph.  You can refer to
-the two books like this ``Friedman et al[2,3] ... .'' This way the 
-paragraph will have only one ``Friedman''}
+in this paragraph.  ...}
+\NOTE[LKC]{I have fixed the cite to TRS and TRS2.}
+\NOTE[LKC]{What is the point of citing dmitris?}
+\NOTE[LKC]{Are we citing OCanren to show that miniKanren is widely used? If 
+yes, do we need to cite other implementations as well?}
 
 \NOTE[DPF]{I have decided to agree with you that we should not use 
 BFSser, so I am going to remove all occurrences.  
@@ -151,13 +152,9 @@ and then say, shortened to ``Our BFS'' and then you can use it in the table,
 so one column should be Our BFS and the other should be BFS.}
 \NOTE[DPF]{Occurrences of BFS (without Our) mean Seres et al. (We need only say
 that once, or very occasionally}
-
-\NOTE[DPF]{I think that subscripts i, bi, and f should
-match what is in the comments above code, so it should be italic, emph,
-or math, whichever was used before.}
-
 \NOTE[DPF]{Is the spelling of reverso truly written without the last e?
 Shouldn't it be reverseo with the appropriate raising of o.}
+\NOTE[LKC]{Yes, it is reverso (not reverseo) in Dmitris' paper}
 
 A subtlety arises 
 when a \conde{} contains many clauses: not every clause has an 
@@ -252,12 +249,9 @@ function from a state to a space.
 % might fail for some inputs, in which case the output search space would be 
 % empty.
 
-\NOTE[LKC]{The following paragraph is extended to include an explanation on 
-\texttt{run*}}
-
-Now we elaborate fairness by running more queries about \repeato{}. We never use 
-\texttt{run*} in this paper because fairness is more interesting when we have 
-an unbounded number of answers. However, it is perfectly fine to use 
+Now we elaborate fairness by running more queries about \repeato{}. We never 
+use \texttt{run*} in this paper because fairness is more interesting when we 
+have an unbounded number of answers. However, it is perfectly fine to use 
 \texttt{run*} with any search strategies.
 
 \subsection{fair \texttt{disj}}
@@ -405,7 +399,9 @@ the cost of \texttt{((a) (a))} is $1 + 2 = 3$.
 
 \NOTE[DPF]{Would the answer be the same if the list had been this ((a) (b))
 or did you mean structurally the same?}
-\NOTE[LKC]{I have rewritten the relevant sentences.}
+\NOTE[LKC]{I mean for all answer in the answer list, the answer's inner lists 
+are pairwise \texttt{equal?}. It is impossible to see a \texttt{((a) (b))} in 
+the answer list.}
 
 \begin{center}
 	\begin{tabular}{c}
@@ -469,19 +465,6 @@ goal to states in the resulting search space. The helper function
 in its input search spaces and composes the resulting search spaces. It reuses 
 \texttt{append$^\infty$} for search space composition. The following syntax 
 definitions say \conj{} is also right-associative.
-% \begin{figure}
-% 	\lstinputlisting{Figures/conde.rkt}
-% 	\caption{implementation of \conde}
-% 	\label{conde}
-% \end{figure}
-% 
-% The definition of \conde{} (Fig.~\ref{conde}) is shared by all search 
-% strategies. It relates clauses disjunctively, and goals in the same 
-% clause conjunctively.
-
-\NOTE[DPF]{sure, go ahead and do it.}
-\NOTE[LKC]{I think we can simply remove \conde{} code and its accompany 
-description.}
 
 \section{balanced interleaving depth-first search}
 
@@ -637,6 +620,7 @@ arguments in reversed order; \texttt{none}, \texttt{unit}, and
 
 \NOTE[DPF]{I am not in love with the two calls to null?. I can think of at least
 two ways to fix it.  Pick one.}
+\NOTE[LKC]{fixed}
 
 \begin{figure}
 	\lstinputlisting{Figures/BFSimp-cont.rkt}	
@@ -647,6 +631,8 @@ two ways to fix it.  Pick one.}
 
 \NOTE[DPF]{The use of the references to Fig 7 twice tells me that something
 has to change for the sake of clarity.}
+\NOTE[LKC]{I guess you are talking about Table 1 becasue there is no Fig 7. I 
+have change the first reference.}
 
 Functions implementing impure features are in Fig.~\ref{BFSimp-cont}. The 
 first function, \texttt{elim}, takes a space \texttt{s$^\infty$} and two 
@@ -656,11 +642,10 @@ no answers, it calls \texttt{kf} with no argument. Otherwise, it calls
 `fail' and `s' means `succeed'. This function is similar to an eliminator of 
 search spaces, hence the name. The remaining functions are as before.
 
-\NOTE[LKC]{I swap \texttt{ks} and \texttt{kf} to mimic \texttt{ind-List}}
-
 \NOTE[DPF]{If we forget to use {} after \reverso, the o ends up too near
 the next word.  I fixed reverso on the second line of section 7, but there 
 may be others.}
+\NOTE[LKC]{I have checked all uses of similar macros by text search.}
 
 \subsection{compare \BFSimp{} with \BFSser{}}
 
@@ -673,9 +658,13 @@ translate \BFS{}'s Haskell code into Racket (See supplements for the
 translated code). The translation is direct due to the similarity of the two 
 relational programming systems. The translated code is longer than our \BFS{}. 
 And it runs slower in all benchmarks. Details about differences in efficiency 
-are in \autoref{compare-efficiency}.
+are in \autoref{sec:quan}.
+% \autoref{compare-efficiency}
+
+\NOTE[LKC]{I ref the next section instead of the table}
 
 \section{quantitative evaluation}
+\label{sec:quan}
 
 \begin{table}
 	\begin{tabular}{|c|c|c|c|c|c|c|}

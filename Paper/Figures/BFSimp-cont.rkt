@@ -2,10 +2,9 @@
 (define (elim s-inf kf ks)
   (let ((ss (car s-inf)) (f (cdr s-inf)))
     (cond
-      ((and (null? ss) f)
-       (step (lambda () (elim (f) kf ks))))
-      ((null? ss) (kf))
-      (else (ks (car ss) (cons (cdr ss) f))))))
+      ((pair? ss) (ks (car ss) (cons (cdr ss) f)))
+      (f (step (lambda () (elim (f) kf ks))))
+      (else (kf)))))
 
 #| Goal × Goal × Goal → Goal |#
 (define (ifte g1 g2 g3)

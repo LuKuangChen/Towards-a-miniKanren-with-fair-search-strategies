@@ -1,7 +1,7 @@
 #lang racket
 #| test cases from Chapter 9 of TRS2|#
 (require "./trs2-arith.rkt")
-(require "../mk-BFS-opt.rkt")
+(require "../mk-BFSimp.rkt")
 
 (defrel (alwayso)
   (conde
