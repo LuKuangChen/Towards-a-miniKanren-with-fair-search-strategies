@@ -150,6 +150,8 @@ problems. miniKanren.org contains the seeds of many difficult problems and
 their solutions. 
 
 \NOTE[DPF]{``current'' was for BFSser}
+\NOTE[LKC]{Do you mean I should not reserve ``current'' for BFSser, or I should 
+do so?}
 
 A subtlety arises 
 when a \conde{} contains many clauses: not every clause has an 
@@ -230,14 +232,6 @@ We refer to ``\BFSser{}'' as their implementation and ``the improved
 BFS'' as our new one. We formally prove that the two implementations are 
 semantically equivalent, however, \BFSimp{} runs faster in all benchmarks and 
 is shorter.
-%	\item implement in a new way the standard breath-first search (\BFS), a 
-%search strategy with fair \disj{} and fair \conj{}. We refer to ``the current 
-%BFS implementation'' (``BFS'' for short) as the one by 
-%\citet{seres1999algebra} 
-%and refer to ``our improved BFS implementation'' (``the improved BFS'' for 
-%short) as the new one. We formally prove that \BFSimp{} and \BFSser{} are 
-%semantically equivalent, however, \BFSimp{} runs faster in all benchmarks and 
-%is shorter.
 \end{itemize}
 
 \section{search strategies and fairness}
