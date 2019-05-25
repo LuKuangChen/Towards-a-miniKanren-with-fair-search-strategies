@@ -81,6 +81,7 @@
 \newcommand{\BFS}[0]{BFS}
 \newcommand{\BFSser}[0]{BFS}
 \newcommand{\BFSimp}[0]{the improved BFS}
+\newcommand{\BFSim}[0]{improved BFS}
 
 
 
@@ -559,8 +560,11 @@ finite.
 We list functions related to the pure subset in Fig.~\ref{BFSimp}. The first 
 three functions are space constructors. \texttt{none} makes an empty space; 
 \texttt{unit} makes a space from one answer; and \texttt{step} makes a space 
-from a thunk. The remaining functions are as before. We compare these functions 
-with \BFSser{} in our proof. 
+from a thunk. The remaining functions are as before. 
+%We compare these functions 
+%with \BFSser{} in our proof. 
+
+\NOTE[LKC]{I delete the ending sentence of the above paragraph.}
 
 Luckily, the change in \appendInfFair{} also fixes the miserable space 
 extravagance---the use of \texttt{append} helps us to reuse the first 
@@ -603,6 +607,8 @@ differences in efficiency are in \autoref{sec:quan}.
 
 \NOTE[DPF]{Make another macro or use a number when we want to drop ``the''
 from ``the improved BFS''.  In the table below, use that macro.}
+\NOTE[LKC]{I have defined another macro BFSim, which doesn't start with 
+``the''. Also, I have corrected the table below.}
 
 \section{quantitative evaluation}
 \label{sec:quan}
@@ -611,7 +617,7 @@ from ``the improved BFS''.  In the table below, use that macro.}
 	% run in command line, with a memory limit of 500MB
 	\begin{tabular}{|c|c|c|c|c|c|c|}
 		\hline 
-	benchmark & size & \DFSi & \DFSbi & \DFSf & \BFSimp & \BFSser	\\
+	benchmark & size & \DFSi & \DFSbi & \DFSf & \BFSim & \BFSser	\\
 		\hline
 		\veryrecursiveo & 100000 & 166 & 103 & 412 &   451 &   1024 \\
 	    				& 200000 & 283 & 146 & 765 &   839 &   1875 \\
@@ -666,6 +672,7 @@ from ``the improved BFS''.  In the table below, use that macro.}
 \end{table}
 
 \NOTE[DPF]{tilde problem 7 lines down.}
+\NOTE[LKC]{Corrected.}
 
 In this section, we compare the efficiency of search strategies. A concise 
 description is in Table~\ref{compare-efficiency}. A hyphen means ``running out
@@ -679,7 +686,8 @@ benchmarks differ in the \conde{} clause order of their relational
 interpreters.
 The last two benchmarks are about synthesizing expressions that 
 evaluate to \texttt{'(I love you)}. 
-They are also based on a similar test case in \citet{byrd2017unified}. Again, 
+They are also based on a similar test case in \mbox{\citet{byrd2017unified}}. 
+Again, 
 we modify the relational interpreters for the same reason. And the sibling 
 benchmarks differ in the \conde{} clause order of their relational 
 interpreters. The first one has elimination rules (i.e. application, 
@@ -742,6 +750,8 @@ We prove formally that \BFSimp{} is semantically equivalent to \BFSser{}. But,
 translation of their Haskell code.
 
 \NOTE[DPF]{Please leave ``prove'' and don't use ``proof''.}
+\NOTE[LKC]{Do you mean we should not use the word ``proof'' everywhere in this 
+paper?}
 
 We acknowledge that we are making large claims about efficiency given that we 
 have just a few benchmarks, but our intuition is based on sound principles. ...
