@@ -153,6 +153,7 @@ their solutions.
 
 \NOTE[DPF]{``current'' was for BFSser if we need it, which we probably won't
 since the re-emergence of BFSser.  So let's reserve the word just in case.}
+\NOTE[LKC]{What do you mean by ``re-emergence''?}
 
 A subtlety arises 
 when a \conde{} contains many clauses: not every clause has an 
@@ -724,7 +725,7 @@ We analyze the definitions of fair \disj{} and fair \conj{}, then propose a
 new definition of fair \conj{}. Our definition of fair \conj{} is orthogonal 
 with completeness.
 
-We devise two new search strategies (i.e. balanced interleaving DFS 
+We devise two new search strategies (i.e., balanced interleaving DFS 
 (\DFSbi{}) and fair DFS (\DFSf{})) and devise a new 
 implementation of \BFS. These strategies have different features 
 in fairness: \DFSbi{} has an almost-fair \disj{} and unfair \conj{}. 
@@ -741,6 +742,7 @@ We prove formally that \BFSimp{} is semantically equivalent to \BFSser{}. But,
 translation of their Haskell code.
 
 \NOTE[DPF]{Please leave ``prove'' (just here).}
+\NOTE[LKC]{OK. I won't touch it.}
 
 We acknowledge that we are making large claims about efficiency given that we 
 have just a few benchmarks, but our intuition is based on sound principles. ...

@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{00}
+\begin{thebibliography}{8}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -45,8 +45,8 @@
   \bibinfo{person}{Matthew Might}.} \bibinfo{year}{2017}\natexlab{}.
 \newblock \showarticletitle{A unified approach to solving seven programming
   problems (functional pearl)}.
-\newblock \bibinfo{journal}{{\em Proceedings of the ACM on Programming
-  Languages\/}} \bibinfo{volume}{1}, \bibinfo{number}{ICFP}
+\newblock \bibinfo{journal}{\emph{Proceedings of the ACM on Programming
+  Languages}} \bibinfo{volume}{1}, \bibinfo{number}{ICFP}
   (\bibinfo{year}{2017}).
 \newblock
 
@@ -57,7 +57,7 @@
 \bibfield{author}{\bibinfo{person}{Daniel~P. Friedman},
   \bibinfo{person}{William~E. Byrd}, {and} \bibinfo{person}{Oleg Kiselyov}.}
   \bibinfo{year}{2005}\natexlab{}.
-\newblock \bibinfo{booktitle}{{\em The Reasoned Schemer}}.
+\newblock \bibinfo{booktitle}{\emph{The Reasoned Schemer}}.
 \newblock \bibinfo{publisher}{The MIT Press}.
 \newblock
 \showISBNx{0262562146}
@@ -69,7 +69,7 @@
 \bibfield{author}{\bibinfo{person}{Daniel~P. Friedman},
   \bibinfo{person}{William~E. Byrd}, \bibinfo{person}{Oleg Kiselyov}, {and}
   \bibinfo{person}{Jason Hemann}.} \bibinfo{year}{2018}\natexlab{}.
-\newblock \bibinfo{booktitle}{{\em The {Reasoned} {Schemer}, {Second}
+\newblock \bibinfo{booktitle}{\emph{The {Reasoned} {Schemer}, {Second}
   {Edition}}}.
 \newblock
 
@@ -82,7 +82,7 @@
   Sabry}.} \bibinfo{year}{2005}\natexlab{}.
 \newblock \showarticletitle{Backtracking, interleaving, and terminating monad
   transformers:(functional pearl)}.
-\newblock \bibinfo{journal}{{\em ACM SIGPLAN Notices\/}} \bibinfo{volume}{40},
+\newblock \bibinfo{journal}{\emph{ACM SIGPLAN Notices}} \bibinfo{volume}{40},
   \bibinfo{number}{9} (\bibinfo{year}{2005}), \bibinfo{pages}{192--203}.
 \newblock
 
@@ -93,7 +93,7 @@
 \bibfield{author}{\bibinfo{person}{Dmitry Kosarev} {and}
   \bibinfo{person}{Dmitry Boulytchev}.} \bibinfo{year}{2018}\natexlab{}.
 \newblock \showarticletitle{Typed embedding of a relational language in OCaml}.
-\newblock \bibinfo{journal}{{\em arXiv preprint arXiv:1805.11006\/}}
+\newblock \bibinfo{journal}{\emph{arXiv preprint arXiv:1805.11006}}
   (\bibinfo{year}{2018}).
 \newblock
 
@@ -104,7 +104,7 @@
 \bibfield{author}{\bibinfo{person}{Dmitri Rozplokhas} {and}
   \bibinfo{person}{Dmitri Boulytchev}.} \bibinfo{year}{2018}\natexlab{}.
 \newblock \showarticletitle{Improving Refutational Completeness of Relational
-  Search via Divergence Test}. In \bibinfo{booktitle}{{\em Proceedings of the
+  Search via Divergence Test}. In \bibinfo{booktitle}{\emph{Proceedings of the
   20th International Symposium on Principles and Practice of Declarative
   Programming}}. ACM, \bibinfo{pages}{18}.
 \newblock
@@ -117,7 +117,7 @@
   Spivey}, {and} \bibinfo{person}{C.~A.~R. Hoare}.}
   \bibinfo{year}{1999}\natexlab{}.
 \newblock \showarticletitle{Algebra of Logic Programming.}. In
-  \bibinfo{booktitle}{{\em ICLP}}. \bibinfo{pages}{184--199}.
+  \bibinfo{booktitle}{\emph{ICLP}}. \bibinfo{pages}{184--199}.
 \newblock
 
 
@@ -126,7 +126,7 @@
 \bibfield{author}{\bibinfo{person}{Edward~Z. Yang}.}
   \bibinfo{year}{2010}\natexlab{}.
 \newblock \showarticletitle{Adventures in Three Monads}.
-\newblock \bibinfo{journal}{{\em The Monad. Reader Issue 15\/}}
+\newblock \bibinfo{journal}{\emph{The Monad. Reader Issue 15}}
   (\bibinfo{year}{2010}), \bibinfo{pages}{11}.
 \newblock
 
