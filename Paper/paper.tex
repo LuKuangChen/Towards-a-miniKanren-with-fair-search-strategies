@@ -79,7 +79,8 @@
 \newcommand{\DFSf }[0]{DFS$_{f}$}
 \newcommand{\DFSbi}[0]{DFS$_{bi}$}
 \newcommand{\BFS}[0]{BFS}
-\newcommand{\BFSser}[0]{BFS}
+\newcommand{\BFSser}[0]{the current BFS}
+\newcommand{\BFSse}[0]{current BFS}
 \newcommand{\BFSimp}[0]{the improved BFS}
 \newcommand{\BFSim}[0]{improved BFS}
 
@@ -519,7 +520,9 @@ produce answers in a more readable order.
 \end{figure}
 
 \BFS{} has both fair \disj{} and fair \conj{}. Our first BFS implementation 
-serves as a ``stepping-stone'' toward \BFSimp{}. It is so similar to \DFSf{} 
+(Fig.~\ref{BFSuni})
+serves as a ``stepping-stone'' toward \BFSimp{}. It is so 
+similar to \DFSf{} 
 (not \DFSi{}) that we only need to apply two changes: (1) rename 
 \appendMapInf{} 
 to \appendMapInfFair{} and (2) replace \appendInf{} with \appendInfFair{} in 
@@ -597,8 +600,8 @@ functions are as before.
 In this subsection, we compare the pure subset of \BFSimp{} with \BFSser{}. We 
 focus on the pure subset because \BFSser{} is designed for a pure 
 relational programming system. We prove in Coq that these two search strategies 
-are are semantically equivalent, since \texttt{(run n ? g)} produces the same 
-result in both BFS and \BFSimp{}. (See supplements for the formal proof.) To 
+are are semantically equivalent, since the result of \texttt{(run n ? g)} is 
+the same either way. (See supplements for the formal proof.) To 
 compare efficiency, we translate \BFSser{}'s Haskell code into Racket (See 
 supplements for the translated code). The translation is direct due to the 
 similarity of the two relational programming systems. The translated code is 
@@ -617,7 +620,7 @@ from ``the improved BFS''.  In the table below, use that macro.}
 	% run in command line, with a memory limit of 500MB
 	\begin{tabular}{|c|c|c|c|c|c|c|}
 		\hline 
-	benchmark & size & \DFSi & \DFSbi & \DFSf & \BFSim & \BFSser	\\
+	benchmark & size & \DFSi & \DFSbi & \DFSf & \BFSim & \BFSse	\\
 		\hline
 		\veryrecursiveo & 100000 & 166 & 103 & 412 &   451 &   1024 \\
 	    				& 200000 & 283 & 146 & 765 &   839 &   1875 \\
