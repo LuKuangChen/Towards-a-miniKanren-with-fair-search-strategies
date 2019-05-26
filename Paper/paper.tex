@@ -151,9 +151,8 @@ demonstrated that miniKanren programs are useful in solving several difficult
 problems. miniKanren.org contains the seeds of many difficult problems and 
 their solutions. 
 
-\NOTE[DPF]{``current'' was for BFSser}
-\NOTE[LKC]{Do you mean I should not reserve ``current'' for BFSser, or I should 
-do so?}
+\NOTE[DPF]{``current'' was for BFSser if we need it, which we probably won't
+since the re-emergence of BFSser.  So let's reserve the word just in case.}
 
 A subtlety arises 
 when a \conde{} contains many clauses: not every clause has an 
@@ -180,7 +179,7 @@ result, as follows.
 
 \clisting{Figures/run-repeato-idfs.rkt}
 
-The miniKanren in TRS2 implements interleaving DFS (\DFSi), the cause of this 
+The miniKanren in TRS2 implements \textbf{i}nterleaving DFS (\DFSi), the cause of this 
 unexpected result. With this search strategy, each \conde{} clause takes half 
 of its received computational resources and passes the other half to its 
 following clauses, except for the last clause that takes all resources it 
@@ -257,7 +256,7 @@ Given the following program, it is natural to expect lists of each
 letter to constitute $1/4$ in the answer list. \DFSi, TRS2's search
 strategy, however, results in many more lists of \texttt{a}s than
 lists of other letters. And some letters (e.g. \texttt{c} and
-\texttt{d}) are rarely seen. The more clauses the worse the situation.
+\texttt{d}) are rarely seen. The more clauses, the worse the situation.
 
 \begin{center}
 	\begin{tabular}{c}
@@ -537,7 +536,7 @@ thunk indicates an increment in cost. It is even more subtle that
 \appendInfFair{} and the \appendMapInfFair{} respects the cost information. 
 Second, \appendInfFair{} is extravagant in memory usage. It makes $O(n+m)$ new 
 \texttt{cons} cells every time, where $n$ and $m$ are the sizes of 
-the first buckets of two input spaces. \DFSf{} also has the space extravagance.
+the first buckets of two input spaces. \DFSf{} is also space extravagant.
 
 In the following subsections, we first describe \BFSimp{} implementation that 
 manages cost information in a more clear and concise way and is less 
@@ -566,8 +565,6 @@ three functions are space constructors. \texttt{none} makes an empty space;
 from a thunk. The remaining functions are as before. 
 %We compare these functions 
 %with \BFSser{} in our proof. 
-
-\NOTE[LKC]{I delete the ending sentence of the above paragraph.}
 
 Luckily, the change in \appendInfFair{} also fixes the miserable space 
 extravagance---the use of \texttt{append} helps us to reuse the first 
@@ -600,18 +597,13 @@ functions are as before.
 In this subsection, we compare the pure subset of \BFSimp{} with \BFSser{}. We 
 focus on the pure subset because \BFSser{} is designed for a pure 
 relational programming system. We prove in Coq that these two search strategies 
-are are semantically equivalent, since the result of \texttt{(run n ? g)} is 
+are semantically equivalent, since the result of \texttt{(run n ? g)} is 
 the same either way. (See supplements for the formal proof.) To 
 compare efficiency, we translate \BFSser{}'s Haskell code into Racket (See 
 supplements for the translated code). The translation is direct due to the 
 similarity of the two relational programming systems. The translated code is 
 longer than \BFSimp{}. And it runs slower in all benchmarks. Details about 
 differences in efficiency are in \autoref{sec:quan}.
-
-\NOTE[DPF]{Make another macro or use a number when we want to drop ``the''
-from ``the improved BFS''.  In the table below, use that macro.}
-\NOTE[LKC]{I have defined another macro BFSim, which doesn't start with 
-``the''. Also, I have corrected the table below.}
 
 \section{quantitative evaluation}
 \label{sec:quan}
@@ -674,9 +666,6 @@ from ``the improved BFS''.  In the table below, use that macro.}
 	\label{compare-efficiency}
 \end{table}
 
-\NOTE[DPF]{tilde problem 7 lines down.}
-\NOTE[LKC]{Corrected.}
-
 In this section, we compare the efficiency of search strategies. A concise 
 description is in Table~\ref{compare-efficiency}. A hyphen means ``running out
 of 500 MB memory''. The first two benchmarks are from 
@@ -706,8 +695,7 @@ Among the three variants of DFS, which all have unfair \conj{}, \DFSf{} is most
 resistant to clause permutation in \texttt{quines}, followed by \DFSbi{} then 
 \DFSi{}. \DFSf{}, however, runs out of memory in \texttt{'(I love you)}s. In 
 contrast, \DFSbi{} is still more stable than \DFSi{}. Thus, we consider 
-\DFSbi{} a competitive alternative to \DFSi{}, the current standard miniKanren 
-search strategy. 
+\DFSbi{} a competitive alternative to \DFSi{}.
 Among the two implementations of \BFS, \BFSimp{} constantly performs as well 
 or better. 
 It is hard to conclude how \disj{} fairness affects performance based on these 
@@ -752,9 +740,7 @@ We prove formally that \BFSimp{} is semantically equivalent to \BFSser{}. But,
 \BFSimp{} is shorter and performs better in comparison with a straightforward 
 translation of their Haskell code.
 
-\NOTE[DPF]{Please leave ``prove'' and don't use ``proof''.}
-\NOTE[LKC]{Do you mean we should not use the word ``proof'' everywhere in this 
-paper?}
+\NOTE[DPF]{Please leave ``prove'' (just here).}
 
 We acknowledge that we are making large claims about efficiency given that we 
 have just a few benchmarks, but our intuition is based on sound principles. ...
