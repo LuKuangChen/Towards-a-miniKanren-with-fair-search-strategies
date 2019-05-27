@@ -18,7 +18,7 @@
   alsodigit={!\$\%&*+-./:<=>?@^_~},
   morecomment=[l]{;,\#{}lang},
   mathescape=true,
-  literate={-inf}{{$^\infty$}}{1} {/fair}{{$_{fair}$}}{3}
+  literate={-inf}{{$^\infty$}}{1}{/fair}{{$_{fair}$}}{3}
   		   {→}{{$\rightarrow$}}{1}
   		   {×}{{$\times$}}{1}
   		   {==}{{$\equiv$}}{1}
@@ -145,15 +145,20 @@ miniKanren is a family of relational programming languages.
 \citet{Friedman:2005:RS:1121583,friedman_reasoned_2018} introduce
 miniKanren and its implementation in \emph{The Reasoned Schemer} 
 and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). Although originally written in 
-Scheme, miniKanren has been ported to many other languages (e.g. 
-OCanren\citep{kosarev2018typed}). \citet{byrd2017unified} have 
-demonstrated that miniKanren programs are useful in solving several difficult
-problems. miniKanren.org contains the seeds of many difficult problems and 
-their solutions. 
+Scheme, miniKanren has been implemented in many other languages, including
+multiple ones using the same language. (See miniKanren.org.) This has come
+about because of Hemann et al.'s work on microKanren. Also, miniKanren
+has been ported to Ocaml, and named OCanren\citep{kosarev2018typed}). 
+\citet{byrd2017unified} have 
+demonstrated that miniKanren problems that at first reading seem impossible
+are indeed possible by using a Scheme interpreter written in miniKanren, thereby
+having access to logic variables within Scheme.
+miniKanren.org contains the seeds of many interesting problems and 
+their solutions.
 
-\NOTE[DPF]{``current'' was for BFSser if we need it, which we probably won't
-since the re-emergence of BFSser.  So let's reserve the word just in case.}
-\NOTE[LKC]{What do you mean by ``re-emergence''?}
+\NOTE[DPF]{I thought we agreed to use BFSser throughout?  
+In that sense it had emerged a few days ago, and now it has
+re-emerged.  It is what we are going to use instead of ``current''.}
 
 A subtlety arises 
 when a \conde{} contains many clauses: not every clause has an 
@@ -463,7 +468,8 @@ definitions say \conj{} is also right-associative.
 	\label{balanced-disj}
 \end{figure}
 
-Balanced interleaving DFS (\DFSbi{}) has an almost-fair \disj{} and unfair 
+The strategy \textbf{b}alanced \textbf{i}nterleaving DFS (\DFSbi{}) has an 
+almost-fair \disj{} and unfair 
 \conj{}. The implementation of \DFSbi{} differs from 
 \DFSi{}'s in the \disj{} macro. When there are one or more disjunctive 
 goals, the new \disj{} builds a balanced binary tree whose leaves are the goals 
@@ -496,11 +502,11 @@ implementation of \DFSf{} differs from \DFSi{}'s in
 fair version of \appendInf{}. \appendInfFair{} 
 immediately 
 calls 
-its helper, \texttt{loop}, with the first argument, \texttt{s?}, set to 
+its helper, \texttt{loop}, with the first argument, \texttt{s?}, initialized to 
 \texttt{\#{}t}, which indicates that we haven't swapped
 \sInf{} and \tInf{}. The swapping 
 happens at 
-the third \texttt{cond} clause in the helper, where \texttt{s?} is updated 
+the third \texttt{cond} clause in \texttt{loop}, where \texttt{s?} is updated 
 accordingly. The first two \texttt{cond} clauses essentially copy the 
 \texttt{car}s and stop recursion when one of the input spaces is obviously 
 finite. The third clause, as we mentioned above, is just for swapping. When the 
@@ -667,12 +673,13 @@ differences in efficiency are in \autoref{sec:quan}.
 	\label{compare-efficiency}
 \end{table}
 
-In this section, we compare the efficiency of search strategies. A concise 
+In this section, we compare the efficiency of the search strategies. A concise 
 description is in Table~\ref{compare-efficiency}. A hyphen means ``running out
 of 500 MB memory''. The first two benchmarks are from 
 TRS2. \reverso{} is from 
 \citet{rozplokhas2018improving}. 
-The next two benchmarks about quine are based on a similar test case in 
+The next two benchmarks about generating quines are based on a similar test 
+case in 
 \citet{byrd2017unified}. We modify the relational interpreters because we don't 
 have disequality constraints (e.g. \texttt{absent$^o$}). The sibling 
 benchmarks differ in the \conde{} clause order of their relational 
@@ -740,9 +747,6 @@ and that \BFSimp{} is more practical than \BFSser{}.
 We prove formally that \BFSimp{} is semantically equivalent to \BFSser{}. But, 
 \BFSimp{} is shorter and performs better in comparison with a straightforward 
 translation of their Haskell code.
-
-\NOTE[DPF]{Please leave ``prove'' (just here).}
-\NOTE[LKC]{OK. I won't touch it.}
 
 We acknowledge that we are making large claims about efficiency given that we 
 have just a few benchmarks, but our intuition is based on sound principles. ...

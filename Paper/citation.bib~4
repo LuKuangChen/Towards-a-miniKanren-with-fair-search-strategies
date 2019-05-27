@@ -72,3 +72,17 @@
 	year = {2018}
 }
 
+@article{hemann2017framework,
+	author = {Hemann, Jason and Friedman, Daniel P},
+	journal = {arXiv preprint arXiv:1701.00633},
+	title = {A framework for extending microkanren with constraints},
+	year = {2017}
+}
+
+@article{byrd2010relational,
+	author = {Byrd, William E},
+	publisher = {[Bloomington, Ind.]: Indiana University},
+	title = {Relational programming in miniKanren: techniques, applications, and implementations},
+	year = {2010}
+}
+

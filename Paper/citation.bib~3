@@ -79,3 +79,18 @@
 	year = {2017}
 }
 
+@article{byrd2010relational,
+	author = {Byrd, William E},
+	publisher = {[Bloomington, Ind.]: Indiana University},
+	title = {Relational programming in miniKanren: techniques, applications, and implementations},
+	year = {2010}
+}
+
+@book{Friedman:2005:RS:1121583,
+	author = {Friedman, Daniel P. and Byrd, William E. and Kiselyov, Oleg},
+	isbn = {0262562146},
+	publisher = {The MIT Press},
+	title = {The Reasoned Schemer},
+	year = {2005}
+}
+

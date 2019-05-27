@@ -86,3 +86,18 @@
 	year = {2010}
 }
 
+@book{Friedman:2005:RS:1121583,
+	author = {Friedman, Daniel P. and Byrd, William E. and Kiselyov, Oleg},
+	isbn = {0262562146},
+	publisher = {The MIT Press},
+	title = {The Reasoned Schemer},
+	year = {2005}
+}
+
+@article{kosarev2018typed,
+	author = {Kosarev, Dmitry and Boulytchev, Dmitry},
+	journal = {arXiv preprint arXiv:1805.11006},
+	title = {Typed embedding of a relational language in OCaml},
+	year = {2018}
+}
+
