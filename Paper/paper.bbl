@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{8}
+\begin{thebibliography}{9}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -72,6 +72,22 @@
 \newblock \bibinfo{booktitle}{\emph{The {Reasoned} {Schemer}, {Second}
   {Edition}}}.
 \newblock
+
+
+\bibitem[\protect\citeauthoryear{Hemann, Friedman, Byrd, and Might}{Hemann
+  et~al\mbox{.}}{2016}]%
+        {Hemann_2016}
+\bibfield{author}{\bibinfo{person}{Jason Hemann}, \bibinfo{person}{Daniel~P.
+  Friedman}, \bibinfo{person}{William~E. Byrd}, {and} \bibinfo{person}{Matthew
+  Might}.} \bibinfo{year}{2016}\natexlab{}.
+\newblock \showarticletitle{A small embedding of logic programming with a
+  simple complete search}. In \bibinfo{booktitle}{\emph{Proceedings of the 12th
+  Symposium on Dynamic Languages - {DLS} 2016}}. \bibinfo{publisher}{{ACM}
+  Press}.
+\newblock
+\urldef\tempurl%
+\url{https://doi.org/10.1145/2989225.2989230}
+\showDOI{\tempurl}
 
 
 \bibitem[\protect\citeauthoryear{Kiselyov, Shan, Friedman, and Sabry}{Kiselyov
