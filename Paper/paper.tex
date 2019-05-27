@@ -1,4 +1,4 @@
-\documentclass[format=acmlarge, review=true, authordraft=true]{acmart}
+\documentclass[format=acmlarge, review=false, authordraft=false]{acmart}
 
 \usepackage{color}
 \usepackage{textcomp}
@@ -90,8 +90,6 @@
 
 \begin{document}
 
-\NOTE[LKC]{submission deadline: Mon 27 May 2019}
-
 \begin{abstract}
 
 We describe fairness levels in disjunction and conjunction
@@ -141,8 +139,6 @@ current one.
 
 \section{introduction}
 
-\NOTE[LKC]{I have restructured the following paragraph.}
-
 miniKanren is a family of relational programming languages.
 \citet{Friedman:2005:RS:1121583,friedman_reasoned_2018} introduce
 miniKanren and its implementation in \emph{The Reasoned Schemer} 
@@ -172,15 +168,6 @@ of many interesting problems and their solutions.
 %having access to logic variables within Scheme.
 %miniKanren.org contains the seeds of many interesting problems and 
 %their solutions.
-
-\NOTE[DPF]{I thought we agreed to use BFSser throughout?  
-In that sense it had emerged a few days ago, and now it has
-re-emerged.  It is what we are going to use instead of ``current''.}
-\NOTE[LKC]{I am confused. Do you mean we are going to use
-	``BFS'' for the search strategy,
-	``BFSser'' for Seres's BFS implementation, and
-	``the improved BFS'' for our BFS implementation
-?}
 
 A subtlety arises 
 when a \conde{} contains many clauses: not every clause has an 
@@ -243,8 +230,6 @@ these two uses cannot be efficient at the same time. In fact, to make one use
 efficient, the other one must be more sluggish. \citet{boskin} propose and 
 implement a means to eliminate or re-order disjunctive clauses to accommodate 
 varying search needs such as these.
-
-\NOTE[LKC]{I have cited Boskin in the above paragraph.}
 
 The specification that gives every clause in the same \conde{} equal 
 ``search priority'' is fair \disj{}. And search strategies with 
@@ -542,9 +527,6 @@ the
 recursive call to \texttt{loop}. This is unnecessary for fairness---we do it to 
 produce answers in a more readable order.
 
-\NOTE[LKC]{Following Boskin's suggestion, ``are ended with a thunk'' -> ``end 
-with thunks''}
-
 \section{breadth-first search}
 
 \begin{figure}
@@ -593,8 +575,6 @@ The new type of \texttt{Space} is a pair whose \texttt{car} is a list of
 answers (the bucket), and whose \texttt{cdr} is either \texttt{\#{}f} or a 
 thunk returning a space. The \texttt{\#{}f} here means the space is obviously 
 finite, just like empty list in other implementations.
-
-\NOTE[LKC]{I have rewritten the sentence about \texttt{\#{}f}.}
 
 We list functions related to the pure subset in Fig.~\ref{BFSimp}. The first 
 three functions are space constructors. \texttt{none} makes an empty space; 
@@ -726,8 +706,6 @@ beginning. We conjecture that \DFSi{} would perform badly in the second case
 because elimination rules complicate the problem when synthesizing (i.e., our 
 evaluation supports our conjecture.)
 
-\NOTE[LKC]{(following Boskin's suggestion) constantly -> consistently}
-
 In general, only \DFSi{} and \DFSbi{} consistently perform well. \DFSf{}
 is just as efficient in \appendo, \reverso, and \texttt{quine}s. All BFS
 implementations have obvious overhead in most cases. 
@@ -775,14 +753,7 @@ Our quantitative evaluation shows that \DFSbi{} is a competitive
 alternative to \DFSi{}, the current miniKanren search strategy,
 and that \BFSimp{} is more practical than \BFSser{}.
 We acknowledge that we are making large claims about efficiency given that we 
-have just a few benchmarks, but our benchmarks cover some practically 
-interesting cases (e.g. synthesizing expressions that evaluate to \texttt{'(I 
-love you)}.
-
-\NOTE[DPF]{Finish this paragraph with a clarification and you may
-place this anywhere in the conclusion. This may require some consultation with 
-Weixi.}
-\NOTE[LKC]{Correcting.}
+have just a few benchmarks, ...
 
 % \BFSimp{}
 We prove formally that \BFSimp{} is semantically equivalent to \BFSser{}. But, 
