@@ -18,7 +18,9 @@
   alsodigit={!\$\%&*+-./:<=>?@^_~},
   morecomment=[l]{;,\#{}lang},
   mathescape=true,
-  literate={-inf}{{$^\infty$}}{1}{/fair}{{$_{fair}$}}{3}
+  literate={append-inf/fair}{{append$^\infty_{fair}$}}{8}
+           {append-map-inf/fair}{{append-map$^\infty_{fair}$}}{11}
+           {-inf}{{$^\infty$}}{1}{/fair}{{$_{fair}$}}{3}
   		   {→}{{$\rightarrow$}}{1}
   		   {×}{{$\times$}}{1}
   		   {==}{{$\equiv$}}{1}
@@ -79,10 +81,8 @@
 \newcommand{\DFSf }[0]{DFS$_{f}$}
 \newcommand{\DFSbi}[0]{DFS$_{bi}$}
 \newcommand{\BFS}[0]{BFS}
-\newcommand{\BFSser}[0]{the current BFS}
-\newcommand{\BFSse}[0]{current BFS}
-\newcommand{\BFSimp}[0]{the improved BFS}
-\newcommand{\BFSim}[0]{improved BFS}
+\newcommand{\BFSser}[0]{BFS$_{ser}$}
+\newcommand{\BFSimp}[0]{BFS$_{imp}$}
 
 
 
@@ -142,10 +142,10 @@ current one.
 miniKanren is a family of relational programming languages.
 \citet{Friedman:2005:RS:1121583,friedman_reasoned_2018} introduce
 miniKanren and its implementation in \emph{The Reasoned Schemer} 
-and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). After \citet{Hemann_2016} 
+and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). After \mbox{\citet{Hemann_2016}}
 describe microKanren, a minimal core of miniKanren comprised of only 54 LOC, 
 miniKanren has been implemented in many other languages, including
-multiple ones using the same language. (e.g. OCanren\citep{kosarev2018typed}). 
+multiple ones using the same language (e.g. OCanren\citep{kosarev2018typed}). 
 \citet{byrd2017unified} have demonstrated that miniKanren problems that at 
 first reading seem impossible are indeed possible by using a Scheme interpreter 
 written in miniKanren, thereby having access to logic variables within Scheme.
@@ -245,8 +245,8 @@ depth-first search (\DFSbi{}), a new search strategy with almost-fair \disj{}.
 a new search strategy with fair \disj{}.
 	\item implement in a new way the standard breath-first search (\BFS) by 
 \citet{seres1999algebra}, a search strategy with fair \disj{} and fair \conj{}. 
-We refer to ``\BFSser{}'' as their implementation and ``the improved 
-BFS'' as our new one. We formally prove that the two implementations are 
+We refer to \BFSser{} as their implementation and \BFSimp{} as our new 
+one. We formally prove that the two implementations are 
 semantically equivalent, however, \BFSimp{} runs faster in all benchmarks and 
 is shorter.
 \end{itemize}
@@ -454,7 +454,7 @@ implementation but limited to unification constraints ($\equiv$).
 Fig.~\ref{DFSi-0} and Fig.~\ref{DFSi-1} show parts that are later compared 
 with other search strategies. We follow some conventions to name variables: 
 \texttt{s}s name states; \texttt{g}s (possibly with subscript) name goals; 
-variables ending with $^\infty$ name (search) spaces. Fig.~\ref{DFSi-0} shows 
+variables ending with $^\infty$ name spaces. Fig.~\ref{DFSi-0} shows 
 the 
 implementation of \disj. The 
 first function, \disjtwo, implements binary disjunction. It applies the 
@@ -555,11 +555,11 @@ Second, \appendInfFair{} is extravagant in memory usage. It makes $O(n+m)$ new
 \texttt{cons} cells every time, where $n$ and $m$ are the sizes of 
 the first buckets of two input spaces. \DFSf{} is also space extravagant.
 
-In the following subsections, we first describe \BFSimp{} implementation that 
+%In the following subsections,
+In the following paragraphs,
+we first describe \BFSimp{} implementation that 
 manages cost information in a more clear and concise way and is less 
 extravagant in memory usage. Then we compare \BFSimp{} with \BFSser{}.
-
-\subsection{Improved BFS}
 
 \begin{figure}
 	\lstinputlisting{Figures/BFSimp.rkt}	
@@ -568,32 +568,6 @@ extravagant in memory usage. Then we compare \BFSimp{} with \BFSser{}.
 	\label{BFSimp}
 \end{figure}
 
-We simplify the cost information by changing the \texttt{Space} type, 
-modifying related function definitions, and introducing a few more functions.
-
-The new type of \texttt{Space} is a pair whose \texttt{car} is a list of 
-answers (the bucket), and whose \texttt{cdr} is either \texttt{\#{}f} or a 
-thunk returning a space. The \texttt{\#{}f} here means the space is obviously 
-finite, just like empty list in other implementations.
-
-We list functions related to the pure subset in Fig.~\ref{BFSimp}. The first 
-three functions are space constructors. \texttt{none} makes an empty space; 
-\texttt{unit} makes a space from one answer; and \texttt{step} makes a space 
-from a thunk. The remaining functions are as before. 
-%We compare these functions 
-%with \BFSser{} in our proof. 
-
-Luckily, the change in \appendInfFair{} also fixes the miserable space 
-extravagance---the use of \texttt{append} helps us to reuse the first 
-bucket of \tInf{}.
-
-\citet{kiselyov2005backtracking} have demonstrated that a \emph{MonadPlus} 
-hides in implementations of logic programming systems. \BFSimp{} is not an 
-exception: \appendMapInfFair{} is like \texttt{bind}, but takes 
-arguments in reversed order; \texttt{none}, \texttt{unit}, and 
-\appendInfFair{} correspond to \texttt{mzero}, \texttt{unit}, and 
-\texttt{mplus}, respectively.
-
 \begin{figure}
 	\lstinputlisting{Figures/BFSimp-cont.rkt}	
 	\caption{New and changed functions in \BFSimp{} that implement impure 
@@ -601,6 +575,19 @@ arguments in reversed order; \texttt{none}, \texttt{unit}, and
 	\label{BFSimp-cont}
 \end{figure}
 
+We simplify the cost information by changing the \texttt{Space} type, 
+modifying related function definitions, and introducing a few more functions.
+The new type of \texttt{Space} is a pair whose \texttt{car} is a list of 
+answers (the bucket), and whose \texttt{cdr} is either \texttt{\#{}f} or a 
+thunk returning a space. The \texttt{\#{}f} here means the space is obviously 
+finite, just like empty list in other implementations.
+We list functions related to the pure subset in Fig.~\ref{BFSimp}. The first 
+three functions are space constructors. \texttt{none} makes an empty space; 
+\texttt{unit} makes a space from one answer; and \texttt{step} makes a space 
+from a thunk. The remaining functions are as before. 
+Luckily, the change in \appendInfFair{} also fixes the miserable space 
+extravagance---the use of \texttt{append} helps us to reuse the first 
+bucket of \tInf{}. 
 Functions implementing impure features are in Fig.~\ref{BFSimp-cont}. The 
 first function, \texttt{elim}, takes a space \sInf{} and two 
 continuations \texttt{fk} and \texttt{sk}. When \sInf{} contains 
@@ -609,9 +596,17 @@ no answers, it calls \texttt{fk}. Otherwise, it calls
 similar to an eliminator of spaces, hence the name. The remaining 
 functions are as before.
 
-\subsection{Compare \BFSimp{} with \BFSser{}}
+\citet{kiselyov2005backtracking} have demonstrated that a \emph{MonadPlus} 
+hides in implementations of logic programming systems. \BFSimp{} is not an 
+exception: \appendMapInfFair{} is like \texttt{bind}, but takes 
+arguments in reversed order; \texttt{none}, \texttt{unit}, and 
+\appendInfFair{} correspond to \texttt{mzero}, \texttt{unit}, and 
+\texttt{mplus}, respectively.
 
-In this subsection, we compare the pure subset of \BFSimp{} with \BFSser{}. We 
+%\subsection{Compare \BFSimp{} with \BFSser{}}
+
+%In this subsection,
+Now we compare the pure subset of \BFSimp{} with \BFSser{}. We 
 focus on the pure subset because \BFSser{} is designed for a pure 
 relational programming system. We prove in Coq that these two search strategies 
 are semantically equivalent, since the result of \texttt{(run n ? g)} is 
@@ -629,7 +624,7 @@ differences in efficiency are in \autoref{sec:quan}.
 	% run in command line, with a memory limit of 500MB
 	\begin{tabular}{|c|c|c|c|c|c|c|}
 		\hline 
-	benchmark & size & \DFSi & \DFSbi & \DFSf & \BFSim & \BFSse	\\
+	benchmark & size & \DFSi & \DFSbi & \DFSf & \BFSimp{} & \BFSser{} \\
 		\hline
 		\veryrecursiveo & 100000 & 166 & 103 & 412 &   451 &   1024 \\
 	    				& 200000 & 283 & 146 & 765 &   839 &   1875 \\
@@ -708,30 +703,26 @@ evaluation supports our conjecture.)
 
 In general, only \DFSi{} and \DFSbi{} consistently perform well. \DFSf{}
 is just as efficient in \appendo, \reverso, and \texttt{quine}s. All BFS
-implementations have obvious overhead in most cases. 
+implementations have obvious overhead in most cases. The reason might be that 
+those strategies %tend to keep more intermediate answers in the memory.
+tend to remember more states at the same time. 
 Among the three variants of DFS, which all have unfair \conj{}, \DFSf{} is most 
 resistant to clause permutation in \texttt{quines}, followed by \DFSbi{} then 
 \DFSi{}. \DFSf{}, however, runs out of memory in \texttt{'(I love you)}s. In 
 contrast, \DFSbi{} is still more stable than \DFSi{}. Thus, we consider 
 \DFSbi{} a competitive alternative to \DFSi{}.
 Among the two implementations of \BFS, \BFSimp{} constantly performs as well 
-or better. 
-It is hard to conclude how \disj{} fairness affects performance based on these 
-statistics.
-Fair \conj{}, however, imposes considerable overhead constantly except in 
-\appendo. The reason might be that those strategies tend to keep more 
-intermediate answers in the memory.
+or better.
 
 \section{related works}
 
-\citet{yang2010adventures} points out that a disjunct complex would be `fair' 
-if it were a full and balanced tree.
-
+In this section, we describe related works. 
+\citet{yang2010adventures} points 
+out that a disjunct complex would be `fair' if it were a full and balanced tree.
 \citet{seres1999algebra} describe a breadth-first search 
 strategy. We present another implementation. Our implementation is semantically 
 equivalent to theirs. But, ours is shorter and performs better in comparison 
 with a straightforward translation of their Haskell code.
-
 \citet{rozplokhas2018improving} address the non-commutativity of conjunction, 
 while our work about \disj{} fairness addresses the non-commutativity of 
 disjunction.
@@ -744,7 +735,7 @@ with completeness.
 
 We devise two new search strategies (i.e., balanced interleaving DFS 
 (\DFSbi{}) and fair DFS (\DFSf{})) and devise a new 
-implementation of \BFS. These strategies have different features 
+implementation of \BFS{} (\BFSimp{}). These strategies have different features 
 in fairness: \DFSbi{} has an almost-fair \disj{} and unfair \conj{}. 
 \DFSf{} has fair \disj{} and unfair \conj{}. \BFS{} has both fair
 \disj{} and fair \conj{}.
@@ -752,13 +743,16 @@ in fairness: \DFSbi{} has an almost-fair \disj{} and unfair \conj{}.
 Our quantitative evaluation shows that \DFSbi{} is a competitive 
 alternative to \DFSi{}, the current miniKanren search strategy,
 and that \BFSimp{} is more practical than \BFSser{}.
-We acknowledge that we are making large claims about efficiency given that we 
-have just a few benchmarks, ...
 
-% \BFSimp{}
 We prove formally that \BFSimp{} is semantically equivalent to \BFSser{}. But, 
 \BFSimp{} is shorter and performs better in comparison with a straightforward 
 translation of their Haskell code.
+
+Although there are very few benchmarks, this is preliminary work where we are 
+making a point that certain levels of fairness come without cost in some cases, 
+and that each of the search strategies: \DFSi, \DFSbi, \DFSf, and 
+\BFS, can co-exist inside one's head. Constructing a miniKanren with all 
+levels of fairness is future work.
 
 \section*{acknowledgments}
 
