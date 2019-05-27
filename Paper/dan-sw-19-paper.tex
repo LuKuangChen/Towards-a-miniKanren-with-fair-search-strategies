@@ -18,24 +18,24 @@
   alsodigit={!\$\%&*+-./:<=>?@^_~},
   morecomment=[l]{;,\#{}lang},
   mathescape=true,
-  literate={-inf}{{$^\infty$}}{1}{/fair}{{$_{fair}$}}{3}
-  		   {→}{{$\rightarrow$}}{1}
-  		   {×}{{$\times$}}{1}
-  		   {==}{{$\equiv$}}{1}
-  		   {conde}{{\textcolor[rgb]{0,.3,.7}{\textbf{cond$^e$}}}}{4}
+  literate={-inf}{{$^\infty$}}{1} {/fair}{{$_{fair}$}}{3}
+                   {→}{{$\rightarrow$}}{1}
+                   {×}{{$\times$}}{1}
+                   {==}{{$\equiv$}}{1}
+                   {conde}{{\textcolor[rgb]{0,.3,.7}{\textbf{cond$^e$}}}}{4}
            {appendo}{{append$^o$}}{6}
-  		   {repeato}{{repeat$^o$}}{6}
-  		   {disj2}{{disj$_2$}}{4}
-  		   {conj2}{{conj$_2$}}{4}
-  		   {g0}{{g$_0$}}{2}
-  		   {g1}{{g$_1$}}{2}
-  		   {g2}{{g$_2$}}{2}
-  		   {g3}{{g$_3$}}{2}
-  		   {gl}{{g$_l$}}{2}
-  		   {gr}{{g$_r$}}{2}
-  		   {DFSi }{{DFS$_{i}$}}{3}
-  		   {DFSbi}{{DFS$_{bi}$}}{3}
-  		   {DFSf }{{DFS$_{f}$}}{3}
+                   {repeato}{{repeat$^o$}}{6}
+                   {disj2}{{disj$_2$}}{4}
+                   {conj2}{{conj$_2$}}{4}
+                   {g0}{{g$_0$}}{2}
+                   {g1}{{g$_1$}}{2}
+                   {g2}{{g$_2$}}{2}
+                   {g3}{{g$_3$}}{2}
+                   {gl}{{g$_l$}}{2}
+                   {gr}{{g$_r$}}{2}
+                   {DFSi }{{DFS$_{i}$}}{3}
+                   {DFSbi}{{DFS$_{bi}$}}{3}
+                   {DFSf }{{DFS$_{f}$}}{3}
 }
 %% scheme-list .
 
@@ -55,7 +55,7 @@
 \newcommand{\clisting}[1]{
 \begin{center}
   \begin{tabular}{c}
-	\lstinputlisting{#1}
+        \lstinputlisting{#1}
     \end{tabular}
 \end{center}
 }
@@ -65,7 +65,7 @@
 \newcommand{\veryrecursiveo}{\texttt{very-recursive$^o$}}
 \newcommand{\appendo}{\texttt{append$^o$}}
 \newcommand{\reverso}{\texttt{revers$^o$}}
-\newcommand{\repeato}{\texttt{repeat$^o$}}
+\alphax\newcommand{\repeato}{\texttt{repeat$^o$}}
 \newcommand{\runstar}{\texttt{run$^*$}}
 \newcommand{\Space}{\texttt{Space}}
 \newcommand{\appendInf}{\texttt{append$^\infty$}}
@@ -141,46 +141,27 @@ current one.
 
 \section{introduction}
 
-\NOTE[LKC]{I have restructured the following paragraph.}
-
 miniKanren is a family of relational programming languages.
 \citet{Friedman:2005:RS:1121583,friedman_reasoned_2018} introduce
 miniKanren and its implementation in \emph{The Reasoned Schemer} 
-and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). After \citet{Hemann_2016} 
-describe microKanren, a minimal core of miniKanren comprised of only 54 LOC, 
-miniKanren has been implemented in many other languages, including
-multiple ones using the same language. (e.g. OCanren\citep{kosarev2018typed}). 
-\citet{byrd2017unified} have demonstrated that miniKanren problems that at 
-first reading seem impossible are indeed possible by using a Scheme interpreter 
-written in miniKanren, thereby having access to logic variables within Scheme.
-miniKanren.org contains links to many miniKanren implementations and the seeds 
-of many interesting problems and their solutions.
+and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). Although originally written in 
+Scheme, miniKanren has been implemented in many other languages, including
+multiple ones using the same language. (See miniKanren.org.) This has come
+about because of Hemann et al.'s work on microKanren. Also, miniKanren
+has been ported to Ocaml, and named OCanren\citep{kosarev2018typed}). 
+\citet{byrd2017unified} have 
+demonstrated that miniKanren problems that at first reading seem impossible
+are indeed possible by using a Scheme interpreter written in miniKanren, thereby
+having access to logic variables within Scheme.
+miniKanren.org contains the seeds of many interesting problems and 
+their solutions.
 
-%miniKanren is a family of relational programming languages.
-%\citet{Friedman:2005:RS:1121583,friedman_reasoned_2018} introduce
-%miniKanren and its implementation in \emph{The Reasoned Schemer} 
-%and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). Although originally written in 
-%Scheme, miniKanren has been implemented in many other languages, including
-%multiple ones using the same language. (See miniKanren.org.) This has come
-%about because of \citet{Hemann_2016}'s work on microKanren, a core of 
-%miniKanren comprised of only 54 LOC. Also, miniKanren
-%has been ported to Ocaml, and named OCanren\citep{kosarev2018typed}). 
-%\citet{byrd2017unified} have 
-%demonstrated that miniKanren problems that at first reading seem impossible
-%are indeed possible by using a Scheme interpreter written in miniKanren, 
-%thereby
-%having access to logic variables within Scheme.
-%miniKanren.org contains the seeds of many interesting problems and 
-%their solutions.
+
+
 
 \NOTE[DPF]{I thought we agreed to use BFSser throughout?  
 In that sense it had emerged a few days ago, and now it has
 re-emerged.  It is what we are going to use instead of ``current''.}
-\NOTE[LKC]{I am confused. Do you mean we are going to use
-	``BFS'' for the search strategy,
-	``BFSser'' for Seres's BFS implementation, and
-	``the improved BFS'' for our BFS implementation
-?}
 
 A subtlety arises 
 when a \conde{} contains many clauses: not every clause has an 
@@ -191,7 +172,8 @@ relation \repeato{} and its invocation.
 \clisting{Figures/repeato.rkt}
 
 \noindent Next, consider the following disjunction of invoking \repeato{} with 
-four different letters.
+four 
+different letters.
 
 \clisting{Figures/example.rkt}
 
@@ -240,11 +222,7 @@ the clauses for constructors had better be at the top of the
 When performing proof searches for complicated programs, the clauses for 
 eliminators had better be at the top of the \conde{} expression. With \DFSi, 
 these two uses cannot be efficient at the same time. In fact, to make one use 
-efficient, the other one must be more sluggish. \citet{boskin} propose and 
-implement a means to eliminate or re-order disjunctive clauses to accommodate 
-varying search needs such as these.
-
-\NOTE[LKC]{I have cited Boskin in the above paragraph.}
+efficient, the other one must be more sluggish.
 
 The specification that gives every clause in the same \conde{} equal 
 ``search priority'' is fair \disj{}. And search strategies with 
@@ -254,11 +232,11 @@ section.
 
 To summarize our contributions, we
 \begin{itemize}
-	\item propose and implement \textbf{b}alanced \textbf{i}nterleaving 
+        \item propose and implement \textbf{b}alanced \textbf{i}nterleaving 
 depth-first search (\DFSbi{}), a new search strategy with almost-fair \disj{}.
-	\item propose and implement \textbf{f}air depth-first search (\DFSf{}), 
+        \item propose and implement \textbf{f}air depth-first search (\DFSf{}), 
 a new search strategy with fair \disj{}.
-	\item implement in a new way the standard breath-first search (\BFS) by 
+        \item implement in a new way the standard breath-first search (\BFS) by 
 \citet{seres1999algebra}, a search strategy with fair \disj{} and fair \conj{}. 
 We refer to ``\BFSser{}'' as their implementation and ``the improved 
 BFS'' as our new one. We formally prove that the two implementations are 
@@ -281,7 +259,7 @@ use \runstar{} in this paper because fairness is more interesting when we
 have an unbounded number of answers. It is perfectly fine, however, to use 
 \runstar{} with any search strategy.
 
-\subsection{Fair \texttt{disj}}
+\subsection{fair \texttt{disj}}
 
 Given the following program, it is natural to expect lists of each
 letter to constitute $1/4$ in the answer list. \DFSi, TRS2's search
@@ -290,9 +268,9 @@ lists of other letters. And some letters (e.g. \texttt{c} and
 \texttt{d}) are rarely seen. The more clauses, the worse the situation.
 
 \begin{center}
-	\begin{tabular}{c}
-		\lstinputlisting{Figures/repeato-disj-DFSi.rkt}
-	\end{tabular}
+        \begin{tabular}{c}
+                \lstinputlisting{Figures/repeato-disj-DFSi.rkt}
+        \end{tabular}
 \end{center}
 
 Under the hood, the \conde{} here allocates computational resources to 
@@ -301,10 +279,10 @@ four trivially different spaces. The unfair \disj{} in
 contrary, fair \disj{} would allocate resources evenly to each space. 
 
 \begin{center}
-	\begin{tabular}{l|r}
-		\lstinputlisting{Figures/repeato-disj-DFSf.rkt} &
-		\lstinputlisting{Figures/repeato-disj-BFS.rkt}
-	\end{tabular}
+        \begin{tabular}{l|r}
+                \lstinputlisting{Figures/repeato-disj-DFSf.rkt} &
+                \lstinputlisting{Figures/repeato-disj-BFS.rkt}
+        \end{tabular}
 \end{center}
 
 Running the same program again with almost-fair \disj {} (e.g. 
@@ -312,9 +290,9 @@ Running the same program again with almost-fair \disj {} (e.g.
 completely fair, as shown by the following example. 
 
 \begin{center}
-	\begin{tabular}{c}
-		\lstinputlisting{Figures/repeato-disj-DFSbi.rkt}
-	\end{tabular}
+        \begin{tabular}{c}
+                \lstinputlisting{Figures/repeato-disj-DFSbi.rkt}
+        \end{tabular}
 \end{center}
 
 \DFSbi{} is fair only when the number of goals is a power of 2, 
@@ -345,7 +323,7 @@ the maximal ratio of resources is bounded by a constant.
 A \disj{} is unfair if and only if it is not almost-fair.
 \end{defn}
 
-\subsection{Fair \texttt{conj}}
+\subsection{fair \texttt{conj}}
 \label{sec:fairconj}
 
 Given the following program, it is natural to expect lists of each letter to
@@ -377,13 +355,13 @@ resources to the space of \texttt{a}. On the contrary, fair \conj{}
 would allocate resources evenly to each space. For example,
 
 \begin{center}
-	\begin{tabular}{c}
-		\lstinputlisting{Figures/repeato-conj-BFS.rkt}
-	\end{tabular}
+        \begin{tabular}{c}
+                \lstinputlisting{Figures/repeato-conj-BFS.rkt}
+        \end{tabular}
 \end{center}
 
 A more interesting situation is when the first conjunct produces an unbounded
-number of states. Consider the following example: a naive specification of 
+number of states. Consider the following example, a naive specification of 
 fair \conj{} 
 might require search strategies to produce all sorts of singleton lists, but 
 there
@@ -396,9 +374,9 @@ context of miniKanren, a search strategy is complete means that every correct
 answer has a position in large enough answer lists.
 
 \begin{center}
-	\begin{tabular}{c}
-		\lstinputlisting{Figures/repeato-conj-infinite-naive.rkt}
-	\end{tabular}
+        \begin{tabular}{c}
+                \lstinputlisting{Figures/repeato-conj-infinite-naive.rkt}
+        \end{tabular}
 \end{center}
 
 Our solution requires a search strategy with \emph{fair} \conj{} to organize
@@ -424,9 +402,9 @@ length of its outer list. For example, the cost of \texttt{((a) (a))} is $1 + 2
 = 3$.
 
 \begin{center}
-	\begin{tabular}{c}
-		\lstinputlisting{Figures/repeato-conj-infinite-sof.rkt}
-	\end{tabular}
+        \begin{tabular}{c}
+                \lstinputlisting{Figures/repeato-conj-infinite-sof.rkt}
+        \end{tabular}
 \end{center}
 
 We end this subsection with precise definitions of all levels of \conj{} 
@@ -450,15 +428,15 @@ A \conj{} is unfair if and only if it is not fair.
 \section{interleaving depth-first search}
 
 \begin{figure}
-	\lstinputlisting{Figures/DFSi-0.rkt}
-	\caption{implementation of \DFSi{} (Part I)}
-	\label{DFSi-0}
+        \lstinputlisting{Figures/DFSi-0.rkt}
+        \caption{implementation of \DFSi{} (Part I)}
+        \label{DFSi-0}
 \end{figure}
 
 \begin{figure}
-	\lstinputlisting{Figures/DFSi-1.rkt}
-	\caption{implementation of \DFSi{} (Part II)}
-	\label{DFSi-1}
+        \lstinputlisting{Figures/DFSi-1.rkt}
+        \caption{implementation of \DFSi{} (Part II)}
+        \label{DFSi-1}
 \end{figure}
 
 In this section, we review the implementation of interleaving depth-first 
@@ -488,13 +466,12 @@ definitions say \conj{} is also right-associative.
 \section{balanced interleaving depth-first search}
 
 \begin{figure}
-	\lstinputlisting{Figures/DFSbi.rkt}
-	\caption{implementation of \DFSbi{}}
-	\label{balanced-disj}
+        \lstinputlisting{Figures/DFSbi.rkt}
+        \caption{implementation of \DFSbi{}}
+        \label{balanced-disj}
 \end{figure}
 
-The strategy \textbf{b}alanced \textbf{i}nterleaving DFS (\DFSbi{}) has an 
-almost-fair \disj{} and unfair 
+The strategy \textbf{b}alanced \textbf{i}nterleaving DFS (\DFSbi{}) has an almost-fair \disj{} and unfair 
 \conj{}. The implementation of \DFSbi{} differs from 
 \DFSi{}'s in the \disj{} macro. When there are one or more disjunctive 
 goals, the new \disj{} builds a balanced binary tree whose leaves are the goals 
@@ -516,9 +493,9 @@ third clause, respectively.
 \section{fair depth-first search}
 
 \begin{figure}
-	\lstinputlisting{Figures/DFSf.rkt}
-	\caption{implementation of \DFSf{}}
-	\label{fDFS}
+        \lstinputlisting{Figures/DFSf.rkt}
+        \caption{implementation of \DFSf{}}
+        \label{fDFS}
 \end{figure}
 
 Fair DFS (\DFSf) has fair \disj{} and unfair \conj{}. The 
@@ -536,21 +513,18 @@ accordingly. The first two \texttt{cond} clauses essentially copy the
 \texttt{car}s and stop recursion when one of the input spaces is obviously 
 finite. The third clause, as we mentioned above, is just for swapping. When the 
 fourth and last clause runs, we know that both \sInf{} and 
-\tInf{} end with thunks, and that we have swapped them. In 
+\tInf{} are ended with a thunk, and that we have swapped them. In 
 this case, we construct a new thunk. The new thunk swaps back the two spaces in 
 the
 recursive call to \texttt{loop}. This is unnecessary for fairness---we do it to 
 produce answers in a more readable order.
 
-\NOTE[LKC]{Following Boskin's suggestion, ``are ended with a thunk'' -> ``end 
-with thunks''}
-
 \section{breadth-first search}
 
 \begin{figure}
-	\lstinputlisting{Figures/BFSuni.rkt}	
-	\caption{stepping-stone toward \BFSimp{} (based on \DFSf{})}
-	\label{BFSuni}
+        \lstinputlisting{Figures/BFSuni.rkt}    
+        \caption{stepping-stone toward \BFSimp{} (based on \DFSf{})}
+        \label{BFSuni}
 \end{figure}
 
 \BFS{} has both fair \disj{} and fair \conj{}. Our first BFS implementation 
@@ -577,13 +551,13 @@ In the following subsections, we first describe \BFSimp{} implementation that
 manages cost information in a more clear and concise way and is less 
 extravagant in memory usage. Then we compare \BFSimp{} with \BFSser{}.
 
-\subsection{Improved BFS}
+\subsection{improved BFS}
 
 \begin{figure}
-	\lstinputlisting{Figures/BFSimp.rkt}	
-	\caption{New and changed functions in \BFSimp{} that implements pure 
-	features}
-	\label{BFSimp}
+        \lstinputlisting{Figures/BFSimp.rkt}    
+        \caption{New and changed functions in \BFSimp{} that implements pure 
+        features}
+        \label{BFSimp}
 \end{figure}
 
 We simplify the cost information by changing the \texttt{Space} type, 
@@ -591,10 +565,8 @@ modifying related function definitions, and introducing a few more functions.
 
 The new type of \texttt{Space} is a pair whose \texttt{car} is a list of 
 answers (the bucket), and whose \texttt{cdr} is either \texttt{\#{}f} or a 
-thunk returning a space. The \texttt{\#{}f} here means the space is obviously 
-finite, just like empty list in other implementations.
-
-\NOTE[LKC]{I have rewritten the sentence about \texttt{\#{}f}.}
+thunk returning a space. A falsy \texttt{cdr} means the space is obviously 
+finite. 
 
 We list functions related to the pure subset in Fig.~\ref{BFSimp}. The first 
 three functions are space constructors. \texttt{none} makes an empty space; 
@@ -615,10 +587,10 @@ arguments in reversed order; \texttt{none}, \texttt{unit}, and
 \texttt{mplus}, respectively.
 
 \begin{figure}
-	\lstinputlisting{Figures/BFSimp-cont.rkt}	
-	\caption{New and changed functions in \BFSimp{} that implement impure 
-		features}
-	\label{BFSimp-cont}
+        \lstinputlisting{Figures/BFSimp-cont.rkt}       
+        \caption{New and changed functions in \BFSimp{} that implement impure 
+                features}
+        \label{BFSimp-cont}
 \end{figure}
 
 Functions implementing impure features are in Fig.~\ref{BFSimp-cont}. The 
@@ -629,7 +601,7 @@ no answers, it calls \texttt{fk}. Otherwise, it calls
 similar to an eliminator of spaces, hence the name. The remaining 
 functions are as before.
 
-\subsection{Compare \BFSimp{} with \BFSser{}}
+\subsection{compare \BFSimp{} with \BFSser{}}
 
 In this subsection, we compare the pure subset of \BFSimp{} with \BFSser{}. We 
 focus on the pure subset because \BFSser{} is designed for a pure 
@@ -646,49 +618,49 @@ differences in efficiency are in \autoref{sec:quan}.
 \label{sec:quan}
 
 \begin{table}
-	% run in command line, with a memory limit of 500MB
-	\begin{tabular}{|c|c|c|c|c|c|c|}
-		\hline 
-	benchmark & size & \DFSi & \DFSbi & \DFSf & \BFSim & \BFSse	\\
-		\hline
-		\veryrecursiveo & 100000 & 166 & 103 & 412 &   451 &   1024 \\
-	    				& 200000 & 283 & 146 & 765 &   839 &   1875 \\
-						& 300000 & 429 & 346 &2085 &  1809 &   4408 \\
-		\hline  
-		\appendo        & 	 100 &  17 &  18 &  17 &    17 &     65 \\
-		         	  	& 	 200 & 145 & 137 & 137 &   142 &    121 \\
-          		      	&	 300 & 388 & 384 & 387 &   429 &    371 \\
-%   		& - & - & - & - & - & - \\
-		\hline 
-		\reverso		& 	  10 &   3 &   4 &   3 &    18 &     36 \\
-						& 	  20 &  35 &  35 &  33 &  3070 &   3695 \\
-						& 	  30 & 329 & 333 & 315 & 75079 & 107531 \\
-		\hline
-		quine-1 		& 1 & 13 & 14 & 10 & - & - \\
-						& 2 & 30 & 34 & 25 & - & - \\
-						& 3 & 41 & 48 & 33 & - & - \\
-		\hline
-		quine-2 		& 1 & 22 & 21 & 12 & - & - \\
-						& 2 & 51 & 46 & 24 & - & - \\
-						& 3 & 72 & 76 & 32 & - & - \\
-		\hline
-		'(I love you)-1 &  99 &  10 &  37 & - &   40 &   96 \\
-						& 198 &  22 &  71 & - &  374 &  652 \\
-						& 297 &  24 & 292 & - & 1668 & 3759 \\
-		\hline
-		'(I love you)-2 &  99 & 485 & 179 & - &   44 &   94 \\
-						& 198 & 808 & 638 & - &  414 &  630 \\
-						& 297 &1265 & 916 & - & 1651 & 3691 \\ 
-		\hline 
-		% The data below is test with old benchmarks
-%		quine-1 & 1 &  71 &  44 & 69 & ??? & - & - \\ 
-%		& 2 & 127 & 142 & 95 & ??? & - & - \\ 
-%		& 3 & 114 & 114 & 93 & ??? & - & - \\ 
-%		\hline
-%		quine-2 & 1 & 147 & 112 &  56 & ??? & - & - \\ 
-%		& 2 & 161 & 123 & 101 & ??? & - & - \\ 
-%		& 3 & 289 & 189 & 104 & ??? & - & - \\ 
-%		\hline 
+        % run in command line, with a memory limit of 500MB
+        \begin{tabular}{|c|c|c|c|c|c|c|}
+                \hline 
+        benchmark & size & \DFSi & \DFSbi & \DFSf & \BFSim & \BFSse     \\
+                \hline
+                \veryrecursiveo & 100000 & 166 & 103 & 412 &   451 &   1024 \\
+                                        & 200000 & 283 & 146 & 765 &   839 &   1875 \\
+                                                & 300000 & 429 & 346 &2085 &  1809 &   4408 \\
+                \hline  
+                \appendo        &        100 &  17 &  18 &  17 &    17 &     65 \\
+                                        &        200 & 145 & 137 & 137 &   142 &    121 \\
+                                &        300 & 388 & 384 & 387 &   429 &    371 \\
+%               & - & - & - & - & - & - \\
+                \hline 
+                \reverso                &         10 &   3 &   4 &   3 &    18 &     36 \\
+                                                &         20 &  35 &  35 &  33 &  3070 &   3695 \\
+                                                &         30 & 329 & 333 & 315 & 75079 & 107531 \\
+                \hline
+                quine-1                 & 1 & 13 & 14 & 10 & - & - \\
+                                                & 2 & 30 & 34 & 25 & - & - \\
+                                                & 3 & 41 & 48 & 33 & - & - \\
+                \hline
+                quine-2                 & 1 & 22 & 21 & 12 & - & - \\
+                                                & 2 & 51 & 46 & 24 & - & - \\
+                                                & 3 & 72 & 76 & 32 & - & - \\
+                \hline
+                '(I love you)-1 &  99 &  10 &  37 & - &   40 &   96 \\
+                                                & 198 &  22 &  71 & - &  374 &  652 \\
+                                                & 297 &  24 & 292 & - & 1668 & 3759 \\
+                \hline
+                '(I love you)-2 &  99 & 485 & 179 & - &   44 &   94 \\
+                                                & 198 & 808 & 638 & - &  414 &  630 \\
+                                                & 297 &1265 & 916 & - & 1651 & 3691 \\ 
+                \hline 
+                % The data below is test with old benchmarks
+%               quine-1 & 1 &  71 &  44 & 69 & ??? & - & - \\ 
+%               & 2 & 127 & 142 & 95 & ??? & - & - \\ 
+%               & 3 & 114 & 114 & 93 & ??? & - & - \\ 
+%               \hline
+%               quine-2 & 1 & 147 & 112 &  56 & ??? & - & - \\ 
+%               & 2 & 161 & 123 & 101 & ??? & - & - \\ 
+%               & 3 & 289 & 189 & 104 & ??? & - & - \\ 
+%               \hline 
 %'(I love you)-1 &  99 & 56 & 15 & 22 & ??? &  74 & 165 \\ 
 %& 198 & 53 & 72 & 55 & ??? &  47 &  74 \\
 %& 297 & 72 & 90 & 44 & ??? & 181 & 365 \\ 
@@ -697,10 +669,10 @@ differences in efficiency are in \autoref{sec:quan}.
 %& 198 & 445 & 110 & 60 & ??? &  42 &  64 \\
 %& 297 & 476 & 146 & 49 & ??? & 186 & 322 \\ 
 %\hline 
-	\end{tabular}
-	\caption{The results of a quantitative evaluation: running times of 
-	benchmarks in milliseconds}
-	\label{compare-efficiency}
+        \end{tabular}
+        \caption{The results of a quantitative evaluation: running times of 
+        benchmarks in milliseconds}
+        \label{compare-efficiency}
 \end{table}
 
 In this section, we compare the efficiency of the search strategies. A concise 
@@ -708,8 +680,7 @@ description is in Table~\ref{compare-efficiency}. A hyphen means ``running out
 of 500 MB memory''. The first two benchmarks are from 
 TRS2. \reverso{} is from 
 \citet{rozplokhas2018improving}. 
-The next two benchmarks about generating quines are based on a similar test 
-case in 
+The next two benchmarks about generating quines are based on a similar test case in 
 \citet{byrd2017unified}. We modify the relational interpreters because we don't 
 have disequality constraints (e.g. \texttt{absent$^o$}). The sibling 
 benchmarks differ in the \conde{} clause order of their relational 
@@ -726,9 +697,7 @@ beginning. We conjecture that \DFSi{} would perform badly in the second case
 because elimination rules complicate the problem when synthesizing (i.e., our 
 evaluation supports our conjecture.)
 
-\NOTE[LKC]{(following Boskin's suggestion) constantly -> consistently}
-
-In general, only \DFSi{} and \DFSbi{} consistently perform well. \DFSf{}
+In general, only \DFSi{} and \DFSbi{} constantly perform well. \DFSf{}
 is just as efficient in \appendo, \reverso, and \texttt{quine}s. All BFS
 implementations have obvious overhead in most cases. 
 Among the three variants of DFS, which all have unfair \conj{}, \DFSf{} is most 
