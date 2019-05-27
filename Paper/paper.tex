@@ -773,20 +773,21 @@ in fairness: \DFSbi{} has an almost-fair \disj{} and unfair \conj{}.
 
 Our quantitative evaluation shows that \DFSbi{} is a competitive 
 alternative to \DFSi{}, the current miniKanren search strategy,
-and that \BFSimp{} is more practical than \BFSser{}. 
+and that \BFSimp{} is more practical than \BFSser{}.
+We acknowledge that we are making large claims about efficiency given that we 
+have just a few benchmarks, but our benchmarks cover some practically 
+interesting cases (e.g. synthesizing expressions that evaluate to \texttt{'(I 
+love you)}.
+
+\NOTE[DPF]{Finish this paragraph with a clarification and you may
+place this anywhere in the conclusion. This may require some consultation with 
+Weixi.}
+\NOTE[LKC]{Correcting.}
 
 % \BFSimp{}
 We prove formally that \BFSimp{} is semantically equivalent to \BFSser{}. But, 
 \BFSimp{} is shorter and performs better in comparison with a straightforward 
 translation of their Haskell code.
-
-We acknowledge that we are making large claims about efficiency given that we 
-have just a few benchmarks, but our intuition is based on sound principles. ...
-
-\NOTE[DPF]{Finish this paragraph with a clarification and you may
-place this anywhere in the conclusion. This may require some consultation with 
-Weixi.}
-\NOTE[LKC]{I have sent an email to Weixi on the clarification.}
 
 \section*{acknowledgments}
 
