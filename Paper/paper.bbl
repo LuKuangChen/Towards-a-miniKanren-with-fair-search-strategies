@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{9}
+\begin{thebibliography}{10}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -36,6 +36,18 @@
 \providecommand\bibinfo[2]{#2}
 \providecommand\natexlab[1]{#1}
 \providecommand\showeprint[2][]{arXiv:#2}
+
+\bibitem[\protect\citeauthoryear{Boskin, Ma, Christiansen, and Friedman}{Boskin
+  et~al\mbox{.}}{2018}]%
+        {boskin}
+\bibfield{author}{\bibinfo{person}{Benjamin~Strahan Boskin},
+  \bibinfo{person}{Weixi Ma}, \bibinfo{person}{David~Thrane Christiansen},
+  {and} \bibinfo{person}{Daniel~P. Friedman}.} \bibinfo{year}{2018}\natexlab{}.
+\newblock \showarticletitle{A {Surprisingly} {Competetive} {Conditional}
+  {Operator}: for {miniKanrenizing} the {Inference} {Rules} of {Pie}}
+  \emph{(\bibinfo{series}{Scheme '18})}. \bibinfo{address}{St Louis, MO, USA}.
+\newblock
+
 
 \bibitem[\protect\citeauthoryear{Byrd, Ballantyne, Rosenblatt, and Might}{Byrd
   et~al\mbox{.}}{2017}]%

@@ -10,6 +10,9 @@ Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
 Reallocated global_strs (elt_size=20001) to 20 items from 10.
 Reallocated glb_str_end (elt_size=4) to 20 items from 10.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
+Warning--empty booktitle in boskin
+Warning--empty publisher in boskin
+Warning--page numbers missing in both pages and numpages fields in boskin
 Warning--page numbers missing in both pages and numpages fields in byrd2017unified
 Warning--empty address in Friedman:2005:RS:1121583
 Warning--empty publisher in friedman_reasoned_2018
@@ -23,45 +26,45 @@ Warning--empty address in rozplokhas2018improving
 Warning--empty publisher in seres1999algebra
 Warning--empty address in seres1999algebra
 Warning--no number and no volume in yang2010adventures
-You've used 9 entries,
+You've used 10 entries,
             5733 wiz_defined-function locations,
-            1346 strings with 16107 characters,
-and the built_in function-call counts, 10011 in all, are:
-= -- 1231
-> -- 386
+            1351 strings with 16344 characters,
+and the built_in function-call counts, 11097 in all, are:
+= -- 1330
+> -- 438
 < -- 0
-+ -- 133
-- -- 128
-* -- 722
-:= -- 1032
-add.period$ -- 46
-call.type$ -- 9
-change.case$ -- 63
-chr.to.int$ -- 9
-cite$ -- 22
-duplicate$ -- 872
-empty$ -- 614
-format.name$ -- 160
-if$ -- 2408
++ -- 152
+- -- 144
+* -- 811
+:= -- 1150
+add.period$ -- 51
+call.type$ -- 10
+change.case$ -- 71
+chr.to.int$ -- 10
+cite$ -- 26
+duplicate$ -- 973
+empty$ -- 684
+format.name$ -- 180
+if$ -- 2653
 int.to.chr$ -- 2
 int.to.str$ -- 1
-missing$ -- 35
-newline$ -- 112
-num.names$ -- 72
-pop$ -- 365
+missing$ -- 40
+newline$ -- 119
+num.names$ -- 80
+pop$ -- 416
 preamble$ -- 1
-purify$ -- 144
+purify$ -- 161
 quote$ -- 0
-skip$ -- 291
+skip$ -- 325
 stack$ -- 0
-substring$ -- 634
-swap$ -- 76
+substring$ -- 692
+swap$ -- 81
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 184
-warning$ -- 13
-while$ -- 56
+type$ -- 214
+warning$ -- 16
+while$ -- 60
 width$ -- 0
-write$ -- 190
-(There were 13 warnings)
+write$ -- 206
+(There were 16 warnings)

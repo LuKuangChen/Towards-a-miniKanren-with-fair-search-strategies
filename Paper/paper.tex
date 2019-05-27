@@ -160,6 +160,7 @@ their solutions.
 \NOTE[DPF]{I thought we agreed to use BFSser throughout?  
 In that sense it had emerged a few days ago, and now it has
 re-emerged.  It is what we are going to use instead of ``current''.}
+\NOTE[LKC]{}
 
 A subtlety arises 
 when a \conde{} contains many clauses: not every clause has an 
@@ -220,7 +221,11 @@ the clauses for constructors had better be at the top of the
 When performing proof searches for complicated programs, the clauses for 
 eliminators had better be at the top of the \conde{} expression. With \DFSi, 
 these two uses cannot be efficient at the same time. In fact, to make one use 
-efficient, the other one must be more sluggish.
+efficient, the other one must be more sluggish. \citet{boskin} propose and 
+implement a means to eliminate or re-order disjunctive clauses to accommodate 
+varying search needs such as these.
+
+\NOTE[LKC]{I have cited Boskin in the above paragraph.}
 
 The specification that gives every clause in the same \conde{} equal 
 ``search priority'' is fair \disj{}. And search strategies with 
