@@ -146,11 +146,17 @@ and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). After \mbox{\citet{Hemann_2016}}
 describe microKanren, a minimal core of miniKanren comprised of only 54 LOC, 
 miniKanren has been implemented in many other languages, including
 multiple ones using the same language (e.g. OCanren\citep{kosarev2018typed}). 
-\citet{byrd2017unified} have demonstrated that miniKanren problems that at 
-first reading seem impossible are indeed possible by using a Scheme interpreter 
-written in miniKanren, thereby having access to logic variables within Scheme.
-miniKanren.org contains links to many miniKanren implementations and the seeds 
-of many interesting problems and their solutions.
+% \citet{byrd2017unified} have demonstrated that miniKanren problems that at 
+% first reading seem impossible are indeed possible by using a Scheme interpreter 
+% written in miniKanren, thereby having access to logic variables within Scheme.
+As demonstrated in \citet{byrd2017unified}, miniKanren can be used to
+naturally express difficult computations, such as using an interpreter
+to perform example-based program synthesis, or using a proof checker
+as a theorem prover.
+% miniKanren.org contains links to many miniKanren implementations and the seeds 
+% of many unusual problems and their solutions in miniKanren.
+The papers, talks, and tutorials on \url{miniKanren.org} present many
+other unusual problems, and their solutions in miniKanren.
 
 %miniKanren is a family of relational programming languages.
 %\citet{Friedman:2005:RS:1121583,friedman_reasoned_2018} introduce

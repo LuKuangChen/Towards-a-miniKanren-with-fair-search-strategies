@@ -17,8 +17,7 @@
       (cond
         ((not t1) t2)
         ((not t2) t1)
-        (else (lambda ()
-                (append-inf/fair (t1) (t2))))))))
+        (else (lambda () (append-inf/fair (t1) (t2))))))))
 
 #| Goal × Space → Space |#
 (define (append-map-inf/fair g s-inf)
