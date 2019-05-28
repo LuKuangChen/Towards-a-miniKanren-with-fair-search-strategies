@@ -14,6 +14,8 @@
 \lstset{
   language=Scheme,
   basicstyle=\ttfamily,
+  keywordstyle=\bf\ttfamily\color{black},
+  commentstyle=\color{black},
   morekeywords={run,conde,run*defrel,==,fresh,disj,conj,disj+},
   alsodigit={!\$\%&*+-./:<=>?@^_~},
   morecomment=[l]{;,\#{}lang},
@@ -24,7 +26,7 @@
   		   {→}{{$\rightarrow$}}{1}
   		   {×}{{$\times$}}{1}
   		   {==}{{$\equiv$}}{1}
-  		   {conde}{{\textcolor[rgb]{0,.3,.7}{\textbf{cond$^e$}}}}{4}
+  		   {conde}{{\textcolor{black}{\textbf{cond$^e$}}}}{4}
            {appendo}{{append$^o$}}{6}
   		   {repeato}{{repeat$^o$}}{6}
   		   {disj2}{{disj$_2$}}{4}
