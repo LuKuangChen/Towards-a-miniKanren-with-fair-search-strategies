@@ -1,6 +1,6 @@
 #lang racket
 (provide (all-defined-out))
-#| our BFS |#
+#| stepping-stone BFS |#
 
 (define var (lambda (x) (vector x)))
 (define var? (lambda (x) (vector? x)))

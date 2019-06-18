@@ -1,0 +1,78 @@
+=== Review #1A ===
+
+Q: I like the flow of the paper, the progression guided by examples, but also felt you might move a few of your definitions of fairness up in the paper and collect them in one place. Same with incomplete/complete search---it was a little odd to see this discussed only after fairness.
+
+A: I guess by ``a few definitions'', you mean ``fair disj'' and ``fair conj''. 
+I have added a paragraph at the beginning of Search Strategy And Fairness, describing the general idea of fairness.
+As for completeness, I prefer to keep its definition at the current place, 
+because this concept is irrelevant elsewhere.
+
+----------------------------------
+
+Q: You might review how goals map states to spaces a bit more where you have a reminder of state, space, and goal.
+
+A: I have added more descriptions on it.
+
+----------------------------------
+
+[TODO]
+Q: Does turning a k-ary disjunction into k-1 binary disjunctions change the nature of almost fairness? Does the same program become almost-fair under the normal DFS after this source->source transformation?
+
+A: I don't quite understand what is the transformation you are talking about.
+
+----------------------------------
+
+Q: On page 6 you start talking about bucketing without much introduction. I found this page a bit confusing initially.
+
+A: I have tried to clarify it.
+
+----------------------------------
+
+Q: You have various DFS_x and BFS_x algorithms you are discussing, can these be collected and compared in a single table perhaps? Something like Table 1, but for properties, and earlier in the paper.
+
+A: I have added a table at the end of Introduction.
+
+=== Review #1B ===
+
+[TODO]
+Q: It is a bit difficult to see the importance of fairness. If this paper 
+describes how to measure the goodness of fairness in the bigger examples, it 
+will be helpful to see the importance of fairness.
+
+A: I am conceiving such an example.
+
+----------------------------------
+
+Q: There is no combination of unfair disj and fair conj. Is it impossible?
+
+A: No, it is not impossible. We simply haven't seen a case where this kind of 
+search strategy would be interesting. I have clarified it in Conclusion.
+
+----------------------------------
+
+Q: Aren't the benchmark programs in the evaluation optimized for the current 
+miniKanren? If so, of course, DFSi should be faster.
+
+A: No, they aren't.
+
+----------------------------------
+
+Q: The results of the benchmark quine and I love you are quite different. 
+Analysis of the result will be useful to know because users can know which 
+strategy they should use.
+
+A: The interpreter in '(I love you)s was much more complicated than the one in quines. I used a complicated interpreter to allow closures to be stored in pairs. (I accepted the restriction in quines because it is already very slow to generate quines.) As you pointed out, this decision makes the results of these benchmarks quite different. Thus, now I decide to accept the same restriction in '(I love you) benchmarks. After this change, the results are similar. I have changed Table 2 and rewrite the last paragraph in Quantitative Evaluation.
+
+----------------------------------
+
+Q: A figure that explains "fair"/"almost fair"/"unfair" of each approach will be helpful for readers.
+
+A: Another reviewer has a similar viewpoint. I have added a table summarizing their features in fairness.
+
+----------------------------------
+
+Q: The abstract includes the word “fair”, but it is difficult to understand its 
+intuitive meaning of it from the abstract. Adding intuitive explanation will be 
+helpful.
+
+A: I feel it difficult to explain ``fair'' in a sentence. Thus I prefer to leave it unexplained.

@@ -95,9 +95,9 @@
 \begin{abstract}
 
 We describe fairness levels in disjunction and conjunction
-implementations.  Specifically, a disjunction implementation can be
+implementations. Specifically, a disjunction implementation can be
 fair, almost-fair, or unfair. And a conjunction implementation can be
-fair or unfair.  We compare the fairness level of four search
+fair or unfair. We compare the fairness level of four search
 strategies: the standard miniKanren interleaving depth-first search,
 the balanced interleaving depth-first search, the fair depth-first
 search, and the standard breadth-first search.  The two non-standard
@@ -245,29 +245,72 @@ almost-fair \disj{} give every clause similar priority.
 Fair \conj{}, a related concept, is more subtle. We cover it in the next 
 section.
 
-To summarize our contributions, we
+%To summarize our contributions, we
+%\begin{itemize}
+%	\item propose and implement \textbf{b}alanced \textbf{i}nterleaving 
+%depth-first search (\DFSbi{}), a new search strategy with almost-fair \disj{}.
+%	\item propose and implement \textbf{f}air depth-first search (\DFSf{}), 
+%a new search strategy with fair \disj{}.
+%	\item implement in a new way the standard breath-first search (\BFS) by 
+%\citet{seres1999algebra}, a search strategy with fair \disj{} and fair 
+%\conj{}. 
+%We refer to \BFSser{} as their implementation and \BFSimp{} as our new 
+%one. We formally prove that the two implementations are 
+%semantically equivalent, however, \BFSimp{} runs faster in all benchmarks and 
+%is shorter.
+%\end{itemize}
+
+Our research compares four search strategies with different features in fairness
+(\autoref{table-fairness}). To summarize our contributions, we
 \begin{itemize}
 	\item propose and implement \textbf{b}alanced \textbf{i}nterleaving 
-depth-first search (\DFSbi{}), a new search strategy with almost-fair \disj{}.
-	\item propose and implement \textbf{f}air depth-first search (\DFSf{}), 
-a new search strategy with fair \disj{}.
+	depth-first search (\DFSbi{})
+	\item propose and implement \textbf{f}air depth-first search (\DFSf{})
 	\item implement in a new way the standard breath-first search (\BFS) by 
-\citet{seres1999algebra}, a search strategy with fair \disj{} and fair \conj{}. 
-We refer to \BFSser{} as their implementation and \BFSimp{} as our new 
-one. We formally prove that the two implementations are 
-semantically equivalent, however, \BFSimp{} runs faster in all benchmarks and 
-is shorter.
+	\citet{seres1999algebra}
+	We refer to \BFSser{} as their implementation and \BFSimp{} as our new 
+	one. We formally prove that the two implementations are 
+	semantically equivalent, however, \BFSimp{} runs faster in all benchmarks 
+	and 
+	is shorter.
 \end{itemize}
+
+\begin{table}[h]
+	\begin{tabular}{|c|c|c|}
+		\hline 
+		Search Strategies & disj & conj \\ 
+		\hline 
+		\DFSi & unfair & unfair \\ 
+		\hline 
+		\DFSbi & almost-fair & unfair \\ 
+		\hline 
+		\DFSf & fair & unfair \\ 
+		\hline 
+		\BFS & fair & fair \\ 
+		\hline 
+	\end{tabular} 
+	\caption{Fairness of all search strategies}
+	\label{table-fairness}
+\end{table}
 
 \section{search strategies and fairness}
 
-In this section, we define fair \disj{}, almost-fair \disj{} and fair \conj{}. 
+% In this section, we define fair \disj{}, almost-fair \disj{} and fair 
+%\conj{}. 
+In this section, we define fairness levels in disjunction and conjunction
+implementations. Specifically, a disjunction implementation can be
+fair, almost-fair, or unfair. And a conjunction implementation can be
+fair or unfair. Fairness, intuitively, measures how evenly a search strategy 
+allocates computational resource to ``sibling'' spaces.
+
 Before going further into fairness, we give a short review of the terms:
 \emph{state}, \emph{space}, and \emph{goal}.
 A \emph{state} is a collection of constraints. (Here, we restrict 
 constraints to unification constraints.) Every answer corresponds to a 
 state. A \emph{space} is a collection of states. And a \emph{goal} is a 
 function from a state to a space.
+Every state in the output space includes the input state and possibly more 
+constraints.
 
 Now we elaborate fairness by running more queries about \repeato{}. We never 
 use \runstar{} in this paper because fairness is more interesting when we 
@@ -349,8 +392,9 @@ lists of other letters. And some letters are rarely seen. Here again, as the
 number of clauses grows, the situation worsens. 
 
 Although some strategies have a different level of fairness in \disj{}, they 
-have the same behavior when there is no call to a relational definition in 
-\conde{} clauses (including this case).
+have similar behavior when there is no call to a relational definition 
+in \conde{} clauses, including this case. (The only potential difference is 
+that \DFSbi{} might reorder states.)
 
 \begin{center}
 \begin{tabular}{l|c|r}
@@ -395,7 +439,8 @@ answer has a position in large enough answer lists.
 \end{center}
 
 Our solution requires a search strategy with \emph{fair} \conj{} to organize
-states in buckets in spaces, where each bucket contains finite states, 
+states in buckets in spaces, where each bucket is a finite collection of states
+and every space contains possibly infinite buckets,
 and 
 to allocate resources evenly among spaces derived from states in the 
 same bucket. It is up to a search strategy designer to decide by what criteria 
@@ -421,7 +466,7 @@ length of its outer list. For example, the cost of \texttt{((a) (a))} is $1 + 2
 		\lstinputlisting{Figures/repeato-conj-infinite-sof.rkt}
 	\end{tabular}
 \end{center}
-
+ 
 We end this subsection with precise definitions of all levels of \conj{} 
 fairness.
 
@@ -435,10 +480,6 @@ spaces with possibly unbounded collections of buckets.
 \begin{defn}[unfair \conj{}]
 A \conj{} is unfair if and only if it is not fair.
 \end{defn}
-
-
-
-
 
 \section{interleaving depth-first search}
 
@@ -647,21 +688,29 @@ differences in efficiency are in \autoref{sec:quan}.
 						& 	  20 &  35 &  35 &  33 &  3070 &   3695 \\
 						& 	  30 & 329 & 333 & 315 & 75079 & 107531 \\
 		\hline
-		quine-1 		& 1 & 13 & 14 & 10 & - & - \\
+	\texttt{quine-1}	& 1 & 13 & 14 & 10 & - & - \\
 						& 2 & 30 & 34 & 25 & - & - \\
 						& 3 & 41 & 48 & 33 & - & - \\
 		\hline
-		quine-2 		& 1 & 22 & 21 & 12 & - & - \\
+	\texttt{quine-2}	& 1 & 22 & 21 & 12 & - & - \\
 						& 2 & 51 & 46 & 24 & - & - \\
 						& 3 & 72 & 76 & 32 & - & - \\
 		\hline
-		'(I love you)-1 &  99 &  10 &  37 & - &   40 &   96 \\
-						& 198 &  22 &  71 & - &  374 &  652 \\
-						& 297 &  24 & 292 & - & 1668 & 3759 \\
+%		'(I love you)-1 &  99 &  10 &  37 & - &   40 &   96 \\
+%						& 198 &  22 &  71 & - &  374 &  652 \\
+%						& 297 &  24 & 292 & - & 1668 & 3759 \\
+%		\hline
+%		'(I love you)-2 &  99 & 485 & 179 & - &   44 &   94 \\
+%						& 198 & 808 & 638 & - &  414 &  630 \\
+%						& 297 &1265 & 916 & - & 1651 & 3691 \\ 
+%		\hline 
+\texttt{'(I love you)-1}&  999 &  78 &  70 &  59 & 254 & 605 \\
+						& 1998 & 152 & 154 & 109 & 315 & 635 \\
+						& 2997 & 430 & 440 & 266 & 317 & 643 \\
 		\hline
-		'(I love you)-2 &  99 & 485 & 179 & - &   44 &   94 \\
-						& 198 & 808 & 638 & - &  414 &  630 \\
-						& 297 &1265 & 916 & - & 1651 & 3691 \\ 
+\texttt{'(I love you)-2}&  999 & 631 & 173 &  61 & 253 & 605 \\
+						& 1998 &1233 & 511 & 111 & 308 & 659 \\
+						& 2997 &2145 & 682 & 269 & 307 & 642 \\ 
 		\hline 
 		% The data below is test with old benchmarks
 %		quine-1 & 1 &  71 &  44 & 69 & ??? & - & - \\ 
@@ -709,18 +758,27 @@ beginning. We conjecture that \DFSi{} would perform badly in the second case
 because elimination rules complicate the problem when synthesizing (i.e., our 
 evaluation supports our conjecture.)
 
-In general, only \DFSi{} and \DFSbi{} consistently perform well. \DFSf{}
-is just as efficient in \appendo, \reverso, and \texttt{quine}s. All BFS
-implementations have obvious overhead in most cases. The reason might be that 
-those strategies %tend to keep more intermediate answers in the memory.
-tend to remember more states at the same time. 
-Among the three variants of DFS, which all have unfair \conj{}, \DFSf{} is most 
-resistant to clause permutation in \texttt{quines}, followed by \DFSbi{} then 
-\DFSi{}. \DFSf{}, however, runs out of memory in \texttt{'(I love you)}s. In 
-contrast, \DFSbi{} is still more stable than \DFSi{}. Thus, we consider 
-\DFSbi{} a competitive alternative to \DFSi{}.
-Among the two implementations of \BFS, \BFSimp{} constantly performs as well 
-or better.
+%In general, only \DFSi{} and \DFSbi{} consistently perform well. \DFSf{}
+%is just as efficient in \appendo, \reverso, and \texttt{quine}s. All BFS
+%implementations have obvious overhead in most cases. The reason might be that 
+%those strategies %tend to keep more intermediate answers in the memory.
+%tend to remember more states at the same time. 
+%Among the three variants of DFS, which all have unfair \conj{}, \DFSf{} is 
+%most 
+%resistant to clause permutation in \texttt{quines}, followed by \DFSbi{} then 
+%\DFSi{}. \DFSf{}, however, runs out of memory in \texttt{'(I love you)}s. In 
+%contrast, \DFSbi{} is still more stable than \DFSi{}. Thus, we consider 
+%\DFSbi{} a competitive alternative to \DFSi{}.
+%Among the two implementations of \BFS, \BFSimp{} constantly performs as well 
+%or better.
+
+In general, variants of DFS usually performs better than BFS. The reason might 
+be that \BFS{} tends to remember more states at the same time. Among the three 
+variants of DFS, which all have unfair \conj{}, \DFSf{} is most resistant to 
+clause permutation in \texttt{quine}s and \texttt{'(I love you)}s, followed by 
+\DFSbi{} then \DFSi{}. Thus, we consider \DFSbi{} and \DFSf{} competitive 
+alternatives to \DFSi{}. Among the two implementations of \BFS, \BFSimp{} 
+constantly performs as well or better.
 
 \section{related works}
 
@@ -746,7 +804,9 @@ We devise two new search strategies (i.e., balanced interleaving DFS
 implementation of \BFS{} (\BFSimp{}). These strategies have different features 
 in fairness: \DFSbi{} has an almost-fair \disj{} and unfair \conj{}. 
 \DFSf{} has fair \disj{} and unfair \conj{}. \BFS{} has both fair
-\disj{} and fair \conj{}.
+\disj{} and fair \conj{}. No search strategy in this paper combines unfair 
+\disj{} and fair \conj{}. This is because we haven't seen a case where this 
+kind of search strategies would be interesting.
 
 Our quantitative evaluation shows that \DFSbi{} is a competitive 
 alternative to \DFSi{}, the current miniKanren search strategy,

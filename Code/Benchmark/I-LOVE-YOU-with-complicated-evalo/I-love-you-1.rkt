@@ -3,25 +3,17 @@
 
 (defrel (evalo exp out)
   (fresh (val)
-    (eval-expo exp '() val)
-    (observeo val out)))
+    (observeo val out)
+    (eval-expo exp '() val)))
 
 (defrel (observeo val out)
   (conde
     ((== `(quote ,out) val))
-    ((fresh (vs)
-       (== `(list . ,vs) val)
-       (observe*o vs out)))))
-
-(defrel (observe*o vals outs)
-  (conde
-    ((== '() vals)
-     (== '() outs))
-    ((fresh (v0 o0 v* o*)
-       (== `(,v0 . ,v*) vals)
-       (== `(,o0 . ,o*) outs)
-       (observeo v0 o0)
-       (observe*o v* o*)))))
+    ((fresh (av dv ao do)
+       (== `(cons ,av ,dv) val)
+       (== `(,ao . ,do) out)
+       (observeo av ao)
+       (observeo dv do)))))
 
 (defrel (eval-expo exp env val)
   (conde
@@ -34,23 +26,30 @@
     ((fresh (x body)
        (== `(lambda ,body) exp)
        (== `(closure ,body ,env) val)))
-    ((fresh (exps vals)
-       (== `(list . ,exps) exp)
-       (== `(list . ,vals) val)
-       (proper-listo exps env vals)))
+    ((fresh (ea va ed vd)
+       (== `(cons ,ea ,ed) exp)
+       (== `(cons ,va ,vd) val)
+       (eval-expo ea env va)
+       (eval-expo ed env vd)))
     ((fresh (rator rand x body env^ a)
        (== `(app ,rator ,rand) exp)
        (eval-expo rator env `(closure ,body ,env^))
        (eval-expo rand env a)
-       (eval-expo body `(,a . ,env^) val)))))
+       (eval-expo body `(,a . ,env^) val)))
+    ((fresh (pr vd)
+       (== `(car ,pr) exp)
+       (eval-expo pr env `(cons ,val ,vd))))
+    ((fresh (pr va)
+       (== `(cdr ,pr) exp)
+       (eval-expo pr env `(cons ,va ,val))))))
 
-(defrel (proper-listo exps env vals)
+(defrel (proper-listo exps env val)
   (conde
     ((== '() exps)
-     (== '() vals))
+     (== '(quote ()) val))
     ((fresh (e0 e* v0 v*)
        (== `(,e0 . ,e*) exps)
-       (== `(,v0 . ,v*) vals)
+       (== `(cons ,v0 ,v*) val)
        (eval-expo e0 env v0)
        (proper-listo e* env v*)))))
 
@@ -59,17 +58,18 @@
     (== `(,v . ,rest) env)
     (conde
       ((== 0 x) (== v t))
-      ((== `(add1 ,y) x) (lookupo y rest t)))))
+      ((== `(add1 ,y) x)
+       (lookupo y rest t)))))
 
 (define (just-time n)
   (void (time (run n q
-                (evalo q q)))))
+                (evalo q '(I love you))))))
 
 (custodian-limit-memory
  (current-custodian)
  (* 500 1024 1024))
 
 (begin
-  (just-time 1)
-  (just-time 2)
-  (just-time 3))
+  (just-time 99)
+  (just-time 198)
+  (just-time 297))

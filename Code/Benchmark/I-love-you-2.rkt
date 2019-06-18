@@ -1,19 +1,8 @@
 #lang racket
-(require "../mk-sBFS.rkt")
+(require "../mk-BFSser.rkt")
 
-(defrel (evalo exp out)
-  (fresh (val)
-    (observeo val out)
-    (eval-expo exp '() val)))
-
-(defrel (observeo val out)
-  (conde
-    ((== `(quote ,out) val))
-    ((fresh (av dv ao do)
-       (== `(cons ,av ,dv) val)
-       (== `(,ao . ,do) out)
-       (observeo av ao)
-       (observeo dv do)))))
+(defrel (evalo exp val)
+  (eval-expo exp '() `(quote ,val)))
 
 (defrel (eval-expo exp env val)
   (conde
@@ -22,12 +11,14 @@
        (eval-expo rator env `(closure ,body ,env^))
        (eval-expo rand env a)
        (eval-expo body `(,a . ,env^) val)))
-    ((fresh (pr vd)
+    ((fresh (pr av dv)
        (== `(car ,pr) exp)
-       (eval-expo pr env `(cons ,val ,vd))))
-    ((fresh (pr va)
+       (== `(quote ,av) val)
+       (eval-expo pr env `(quote (,av . ,dv)))))
+    ((fresh (pr av dv)
        (== `(cdr ,pr) exp)
-       (eval-expo pr env `(cons ,va ,val))))
+       (== `(quote ,dv) val)
+       (eval-expo pr env `(quote (,av . ,dv)))))
     ((fresh (var)
        (== `(var ,var) exp)
        (lookupo var env val)))
@@ -37,21 +28,21 @@
     ((fresh (x body)
        (== `(lambda ,body) exp)
        (== `(closure ,body ,env) val)))
-    ((fresh (ea va ed vd)
-       (== `(cons ,ea ,ed) exp)
-       (== `(cons ,va ,vd) val)
-       (eval-expo ea env va)
-       (eval-expo ed env vd)))))
+    ((fresh (a av d dv)
+       (== `(cons ,a ,d) exp)
+       (== `(quote (,av . ,dv)) val)
+       (eval-expo a env `(quote ,av))
+       (eval-expo d env `(quote ,dv))))))
 
-(defrel (proper-listo exps env val)
+(defrel (proper-listo exp env val)
   (conde
-    ((== '() exps)
-     (== '(quote ()) val))
-    ((fresh (e0 e* v0 v*)
-       (== `(,e0 . ,e*) exps)
-       (== `(cons ,v0 ,v*) val)
-       (eval-expo e0 env v0)
-       (proper-listo e* env v*)))))
+    ((== '() exp)
+     (== '() val))
+    ((fresh (a d t-a t-d)
+       (== `(,a . ,d) exp)
+       (== `(,t-a . ,t-d) val)
+       (eval-expo a env `(quote ,t-a))
+       (proper-listo d env t-d)))))
 
 (defrel (lookupo x env t)
   (fresh (rest y v)
@@ -60,13 +51,14 @@
       ((== 0 x) (== v t))
       ((== `(add1 ,y) x) (lookupo y rest t)))))
 
+
 (define (just-time n)
+  (collect-garbage)
   (void (time (run n q
                 (evalo q '(I love you))))))
-(custodian-limit-memory
- (current-custodian)
- (* 500 1024 1024))
+
 (begin
-  (just-time 99)
-  (just-time 198)
-  (just-time 297))
+  (collect-garbage)
+  (just-time  999)
+  (just-time 1999)
+  (just-time 2999))
