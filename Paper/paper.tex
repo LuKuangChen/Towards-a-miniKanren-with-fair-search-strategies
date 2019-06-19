@@ -1,4 +1,27 @@
-\documentclass[format=acmlarge, review=false, authordraft=false]{acmart}
+\documentclass[acmlarge, review=true]{acmart}
+%TODO 1. delete `, review=true' ; 2. delete this line .
+\usepackage[
+    type={CC},       
+    modifier={by-sa},
+    version={4.0},   
+]{doclicense}        
+
+\settopmatter{printacmref=false}
+\fancyfoot{}
+
+\makeatletter
+\def\@formatdoi#1{}
+\def\@permissionCodeOne{miniKanren.org/workshop}
+\def\@copyrightpermission{\doclicenseThis} % your choice of text
+\def\@copyrightowner{Copyright held by the author(s).} % your choice
+\makeatother
+
+\copyrightyear{2019}
+\setcopyright{rightsretained}
+
+\acmMonth{8}
+\acmArticle{1}
+
 
 \usepackage{color}
 \usepackage{textcomp}
@@ -47,11 +70,20 @@
 
 \title{Towards a miniKanren with fair search strategies}
 \author{Kuang-Chen Lu}
-\affiliation{Indiana University}
+\affiliation{%
+  \institution{Indiana University}
+  \country{USA}}
+\email{kl13@iu.edu}
 \author{Weixi Ma}
-\affiliation{Indiana University}
+\affiliation{%
+  \institution{Indiana University}
+  \country{USA}}
+\email{mvc@iu.edu}
 \author{Daniel P. Friedman}
-\affiliation{Indiana University}
+\affiliation{%
+  \institution{Indiana University}
+  \country{USA}}
+\email{dfried@indiana.edu}
 
 \newcommand{\conde}{\texttt{cond$^e$}}
 \newcommand{\conj}{\texttt{conj}}
@@ -138,6 +170,8 @@ current one.
 \end{abstract}
 
 \maketitle
+%\thispagestyle{empty}
+%TODO uncomment the line above to be camera-ready
 
 \section{introduction}
 
