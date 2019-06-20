@@ -178,7 +178,7 @@ current one.
 miniKanren is a family of relational programming languages.
 \citet{Friedman:2005:RS:1121583,friedman_reasoned_2018} introduce
 miniKanren and its implementation in \emph{The Reasoned Schemer} 
-and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). After \mbox{\citet{Hemann_2016}}
+and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). \mbox{\citet{Hemann_2016}}
 describe microKanren, a minimal core of miniKanren comprised of only 54 LOC, 
 miniKanren has been implemented in many other languages, including
 multiple ones using the same language (e.g. OCanren\citep{kosarev2018typed}). 
@@ -300,9 +300,9 @@ Our research compares four search strategies with different features in fairness
 	\item propose and implement \textbf{b}alanced \textbf{i}nterleaving 
 	depth-first search (\DFSbi{})
 	\item propose and implement \textbf{f}air depth-first search (\DFSf{})
-	\item implement in a new way the standard breath-first search (\BFS) by 
-	\citet{seres1999algebra}
-	We refer to \BFSser{} as their implementation and \BFSimp{} as our new 
+	\item implement in a new way the standard breath-first search. 
+	We refer to \BFSser{} as the original implementation by 
+	\citet{seres1999algebra} and \BFSimp{} as our new 
 	one. We formally prove that the two implementations are 
 	semantically equivalent, however, \BFSimp{} runs faster in all benchmarks 
 	and 
@@ -320,7 +320,7 @@ Our research compares four search strategies with different features in fairness
 		\hline 
 		\DFSf & fair & unfair \\ 
 		\hline 
-		\BFS & fair & fair \\ 
+		\BFSimp, \BFSser & fair & fair \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Fairness of all search strategies}
@@ -347,8 +347,8 @@ Every state in the output space includes the input state and possibly more
 constraints.
 
 Now we elaborate fairness by running more queries about \repeato{}. We never 
-use \runstar{} in this paper because fairness is more interesting when we 
-have an unbounded number of answers. It is perfectly fine, however, to use 
+use \runstar{} here because fairness is more interesting when we 
+ask a bounded number of answers. It is perfectly fine, however, to use 
 \runstar{} with any search strategy.
 
 \subsection{Fair \texttt{disj}}
@@ -530,7 +530,7 @@ A \conj{} is unfair if and only if it is not fair.
 \end{figure}
 
 In this section, we review the implementation of interleaving depth-first 
-search (\DFSi). We focus on parts that are relevant to this paper. TRS2,
+search (\DFSi). We focus on parts that are relevant to other strategies. TRS2,
 chapter 10 and the appendix, ``Connecting the wires'', 
 provide a comprehensive description of the miniKanren 
 implementation but limited to unification constraints ($\equiv$).
@@ -814,9 +814,9 @@ clause permutation in \texttt{quine}s and \texttt{'(I love you)}s, followed by
 alternatives to \DFSi{}. Among the two implementations of \BFS, \BFSimp{} 
 constantly performs as well or better.
 
-\section{related works}
+\section{related research}
 
-In this section, we describe related works. 
+In this section, we describe related research. 
 \citet{yang2010adventures} points 
 out that a disjunct complex would be `fair' if it were a full and balanced tree.
 \citet{seres1999algebra} describe a breadth-first search 
@@ -838,7 +838,7 @@ We devise two new search strategies (i.e., balanced interleaving DFS
 implementation of \BFS{} (\BFSimp{}). These strategies have different features 
 in fairness: \DFSbi{} has an almost-fair \disj{} and unfair \conj{}. 
 \DFSf{} has fair \disj{} and unfair \conj{}. \BFS{} has both fair
-\disj{} and fair \conj{}. No search strategy in this paper combines unfair 
+\disj{} and fair \conj{}. No search strategy here combines unfair 
 \disj{} and fair \conj{}. This is because we haven't seen a case where this 
 kind of search strategies would be interesting.
 
