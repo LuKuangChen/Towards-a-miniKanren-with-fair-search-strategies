@@ -303,7 +303,9 @@ Our research compares four search strategies with different features in fairness
 	\item implement in a new way the standard breath-first search. 
 	We refer to \BFSser{} as the original implementation by 
 	\citet{seres1999algebra} and \BFSimp{} as our new 
-	one. We formally prove that the two implementations are 
+	one. When we use BFS without subscripts, we mean both \BFSser{} and 
+	\BFSimp{}.
+	We formally prove that the two implementations are 
 	semantically equivalent, however, \BFSimp{} runs faster in all benchmarks 
 	and 
 	is shorter.
@@ -320,7 +322,7 @@ Our research compares four search strategies with different features in fairness
 		\hline 
 		\DFSf & fair & unfair \\ 
 		\hline 
-		\BFSimp, \BFSser & fair & fair \\ 
+		\BFS & fair & fair \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Fairness of all search strategies}
@@ -857,6 +859,9 @@ and that each of the search strategies: \DFSi, \DFSbi, \DFSf, and
 levels of fairness is future work.
 
 \section*{acknowledgments}
+
+We would like to thank our reviewers, both known and anonymous, for their 
+corrections and insightful suggestions.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{citation}
