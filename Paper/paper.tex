@@ -139,33 +139,6 @@ competitive alternative to the standard one, and that our improved
 breadth-first search implementation is more efficient than the
 current one.
 
-% We describe fairness levels in disjunction and conjunction
-% implementations.  Specifically, a disjunction implementation can be
-% fair, almost-fair, or unfair. And a conjunction implementation can
-% be fair or unfair.  We compare the fairness level of four search
-% strategies: the standard miniKanren interleaving depth-first search (\DFSi),
-% the balanced interleaving depth-first search (\DFSbi), the fair depth-first
-% search (\DFSf), and the standard breadth-first search (\BFSser).
-% \DFSbi{} and \DFSf{} are new. And we present a new, more efficient
-% and simpler implementation of \BFSser. Using quantitative evaluation, 
-% we argue that
-% \DFSbi{} and \DFSf{} are competitive alternatives to \DFSi, 
-% and that our \BFSser{} implementation is more efficient than the current one.
-
-% The syntax of a programming language should reflect its semantics. When 
-%writing 
-% a \conde{} expression in miniKanren, a programmer would expect all clauses 
-% share the same chance of being explored, as these clauses are written in 
-% parallel. The existing search strategy, interleaving depth-first search 
-% (\DFSi{}), 
-% however, prioritizes its clauses by the order how they are written down. 
-% Similarly, when a \conde{} is followed by another goal conjunctively, a 
-% programmer would expect states in parallel share the same chance of being 
-% explored. Again, the answers by \DFSi{} is different from the 
-% expectation. We have devised three new search strategies that have different 
-% level of fairness in \disj{} and \conj{}.
-% 
-
 \end{abstract}
 
 \maketitle
@@ -180,34 +153,12 @@ and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). \mbox{\citet{Hemann_2016}}
 describe microKanren, a minimal core of miniKanren comprised of only 54 LOC, 
 miniKanren has been implemented in many other languages, including
 multiple ones using the same language (e.g. OCanren\citep{kosarev2018typed}). 
-% \citet{byrd2017unified} have demonstrated that miniKanren problems that at 
-% first reading seem impossible are indeed possible by using a Scheme interpreter 
-% written in miniKanren, thereby having access to logic variables within Scheme.
 As demonstrated in \citet{byrd2017unified}, miniKanren can be used to
 naturally express difficult computations, such as using an interpreter
 to perform example-based program synthesis, or using a proof checker
 as a theorem prover.
-% miniKanren.org contains links to many miniKanren implementations and the seeds 
-% of many unusual problems and their solutions in miniKanren.
 The papers, talks, and tutorials on \url{miniKanren.org} present many
 other unusual problems, and their solutions in miniKanren.
-
-%miniKanren is a family of relational programming languages.
-%\citet{Friedman:2005:RS:1121583,friedman_reasoned_2018} introduce
-%miniKanren and its implementation in \emph{The Reasoned Schemer} 
-%and \emph{The Reasoned Schemer, 2nd Ed} (TRS2). Although originally written in 
-%Scheme, miniKanren has been implemented in many other languages, including
-%multiple ones using the same language. (See miniKanren.org.) This has come
-%about because of \citet{Hemann_2016}'s work on microKanren, a core of 
-%miniKanren comprised of only 54 LOC. Also, miniKanren
-%has been ported to Ocaml, and named OCanren\citep{kosarev2018typed}). 
-%\citet{byrd2017unified} have 
-%demonstrated that miniKanren problems that at first reading seem impossible
-%are indeed possible by using a Scheme interpreter written in miniKanren, 
-%thereby
-%having access to logic variables within Scheme.
-%miniKanren.org contains the seeds of many interesting problems and 
-%their solutions.
 
 A subtlety arises 
 when a \conde{} contains many clauses: not every clause has an 
@@ -241,18 +192,10 @@ receives. In the example above, the \texttt{a} clause takes half of all
 resourses. And the \texttt{b} clause takes a quarter. Thus \texttt{c} and 
 \texttt{d} barely contribute to the result.
 
-%In the example above, the letters \texttt{c} and \texttt{d} are 
-%allocated with less resources than \texttt{a}, and thus \texttt{c} and 
-%\texttt{d} barely contribute to the result.
-
 \DFSi{} is sometimes powerful for an expert. By carefully organizing the order 
 of \conde{} clauses, a miniKanren program can explore more ``interesting'' 
 clauses than those uninteresting ones, and thus use computational resources 
 efficiently.
-
-% A little miniKanrener, however, may beg to differ--understanding
-% implementation details and fiddling with clause order is not the first
-% priority of a beginner.
 
 \DFSi{} is not always the best choice. For instance, it might be less 
 desirable for novice miniKanren users---understanding implementation details 
@@ -276,21 +219,6 @@ The specification that gives every clause in the same \conde{} equal
 almost-fair \disj{} give every clause similar priority. 
 Fair \conj{}, a related concept, is more subtle. We cover it in the next 
 section.
-
-%To summarize our contributions, we
-%\begin{itemize}
-%	\item propose and implement \textbf{b}alanced \textbf{i}nterleaving 
-%depth-first search (\DFSbi{}), a new search strategy with almost-fair \disj{}.
-%	\item propose and implement \textbf{f}air depth-first search (\DFSf{}), 
-%a new search strategy with fair \disj{}.
-%	\item implement in a new way the standard breath-first search (\BFS) by 
-%\citet{seres1999algebra}, a search strategy with fair \disj{} and fair 
-%\conj{}. 
-%We refer to \BFSser{} as their implementation and \BFSimp{} as our new 
-%one. We formally prove that the two implementations are 
-%semantically equivalent, however, \BFSimp{} runs faster in all benchmarks and 
-%is shorter.
-%\end{itemize}
 
 Our research compares four search strategies with different features in fairness
 (\autoref{table-fairness}). To summarize our contributions, we
@@ -348,7 +276,7 @@ constraints.
 
 Now we elaborate fairness by running more queries about \repeato{}. We never 
 use \runstar{} here because fairness is more interesting when we 
-ask a bounded number of answers. It is perfectly fine, however, to use 
+ask for a bounded number of answers. It is perfectly fine, however, to use 
 \runstar{} with any search strategy.
 
 \subsection{Fair \texttt{disj}}
@@ -529,8 +457,8 @@ A \conj{} is unfair if and only if it is not fair.
 	\label{DFSi-1}
 \end{figure}
 
-In this section, we review the implementation of interleaving depth-first 
-search (\DFSi). We focus on parts that are relevant to other strategies. TRS2,
+In this section, we review the implementation of \DFSi{}. We focus on parts 
+that are relevant to other strategies. TRS2,
 chapter 10 and the appendix, ``Connecting the wires'', 
 provide a comprehensive description of the miniKanren 
 implementation but limited to unification constraints ($\equiv$).
@@ -561,9 +489,8 @@ definitions say \conj{} is also right-associative.
 	\label{balanced-disj}
 \end{figure}
 
-The strategy \textbf{b}alanced \textbf{i}nterleaving DFS (\DFSbi{}) has an 
-almost-fair \disj{} and unfair 
-\conj{}. The implementation of \DFSbi{} differs from 
+\DFSbi{} has almost-fair \disj{} and unfair \conj{}. Its 
+implementation differs from 
 \DFSi{}'s in the \disj{} macro. When there are one or more disjunctive 
 goals, the new \disj{} builds a balanced binary tree whose leaves are the goals 
 and 
@@ -589,8 +516,8 @@ third clause, respectively.
 	\label{fDFS}
 \end{figure}
 
-Fair DFS (\DFSf) has fair \disj{} and unfair \conj{}. The 
-implementation of \DFSf{} differs from \DFSi{}'s in 
+\DFSf{} has fair \disj{} and unfair \conj{}. Its 
+implementation differs from \DFSi{}'s in 
 \disjtwo{} (Fig.~\ref{fDFS}). The new \disjtwo{} calls a new and 
 fair version of \appendInf{}. \appendInfFair{} 
 immediately 
@@ -839,8 +766,8 @@ implementation of \BFS{} (\BFSimp{}). These strategies have different features
 in fairness: \DFSbi{} has an almost-fair \disj{} and unfair \conj{}. 
 \DFSf{} has fair \disj{} and unfair \conj{}. \BFS{} has both fair
 \disj{} and fair \conj{}. No search strategy here combines unfair 
-\disj{} and fair \conj{}. This is because we haven't seen a case where this 
-kind of search strategies would be interesting.
+\disj{} and fair \conj{}. This is because we haven't seen a case where these 
+kinds of search strategies would be interesting.
 
 Our quantitative evaluation shows that \DFSbi{} is a competitive 
 alternative to \DFSi{}, the current miniKanren search strategy,

@@ -15,12 +15,6 @@ A: We have added more descriptions on it.
 
 ----------------------------------
 
-Q: Does turning a k-ary disjunction into k-1 binary disjunctions change the nature of almost fairness? Does the same program become almost-fair under the normal DFS after this source->source transformation?
-
-A: We don't quite understand what is the transformation you are talking about.
-
-----------------------------------
-
 Q: On page 6 you start talking about bucketing without much introduction. I found this page a bit confusing initially.
 
 A: We have tried to clarify it.
@@ -37,7 +31,7 @@ Q: It is a bit difficult to see the importance of fairness. If this paper
 describes how to measure the goodness of fairness in the bigger examples, it 
 will be helpful to see the importance of fairness.
 
-A: [TODO]
+A: Thank you for the suggestion. But we find it difficult to measure the goodness of fairness when unfair conj interplay with fair or unfair disj.
 
 ----------------------------------
 
@@ -59,7 +53,7 @@ Q: The results of the benchmark quine and I love you are quite different.
 Analysis of the result will be useful to know because users can know which 
 strategy they should use.
 
-A: The interpreter in '(I love you)s was much more complicated than the one in quines. We used a complicated interpreter to allow closures to be stored in pairs. (We accepted the restriction in quines because it is already very slow to generate quines.) As you pointed out, this decision makes the results of these benchmarks quite different. Thus, now we decide to accept the same restriction in '(I love you) benchmarks. After this change, the results are similar. We have changed Table 2 and rewrite the last paragraph in Quantitative Evaluation.
+A: The interpreter in '(I love you)s was much more complicated than the one in quines. We used a complicated interpreter to allow closures to be stored in pairs. (We accepted the restriction in quines because it is already very slow to generate quines.) As you pointed out, this decision makes the results of these benchmarks quite different. Thus, now we decide to accept the same restriction in '(I love you) benchmarks. After this change, the results are similar. We have changed Table 2 and have rewritten the last paragraph in Quantitative Evaluation.
 
 ----------------------------------
 

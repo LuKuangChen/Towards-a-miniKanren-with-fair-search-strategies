@@ -1,5 +1,5 @@
 #lang racket
-(require "../mk-biDFS.rkt")
+(require "../mk-DFSi.rkt")
 
 
 (defrel (repeato x out)
@@ -22,7 +22,7 @@
     [(repeato 'b q)]
     [(repeato 'c q)]
     [(repeato 'd q)]))
-
+#;
 (run 16 q
   (conde
     [(repeato 'a q)]
@@ -48,11 +48,3 @@
       [(== 'b x)]
       [(== 'c x)]
       [(== 'd x)])))
-
-#;
-(run 12 q
-  (fresh (xs)
-    (conde
-      [(repeato 'a xs)]
-      [(repeato 'b xs)])
-    (repeato xs q)))
