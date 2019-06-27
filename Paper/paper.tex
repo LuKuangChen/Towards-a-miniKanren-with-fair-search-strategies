@@ -237,6 +237,14 @@ Our research compares four search strategies with different features in fairness
 	is shorter.
 \end{itemize}
 
+Source code of implementations, examples, benchmarks, and formal proofs are 
+available at the 
+following URL:
+
+\begin{center}
+\url{https://github.com/LuKC1024/Towards-a-miniKanren-with-fair-search-strategies}
+\end{center}
+
 \begin{table}[h]
 	\begin{tabular}{|c|c|c|}
 		\hline 
@@ -613,16 +621,14 @@ arguments in reversed order; \texttt{none}, \texttt{unit}, and
 \appendInfFair{} correspond to \texttt{mzero}, \texttt{unit}, and 
 \texttt{mplus}, respectively.
 
-%\subsection{Compare \BFSimp{} with \BFSser{}}
-
-%In this subsection,
 Now we compare the pure subset of \BFSimp{} with \BFSser{}. We 
 focus on the pure subset because \BFSser{} is designed for a pure 
 relational programming system. We prove in Coq that these two search strategies 
 are semantically equivalent, since the result of \texttt{(run n ? g)} is 
-the same either way. (See supplements for the formal proof.) To 
-compare efficiency, we translate \BFSser{}'s Haskell code into Racket (See 
-supplements for the translated code). The translation is direct due to the 
+the same either way. (See the GitHub repository for the formal proofs.) To 
+compare efficiency, we translate \BFSser{}'s Haskell code into Racket. (See the 
+GitHub repository for the translated code.)
+The translation is direct due to the 
 similarity of the two relational programming systems. The translated code is 
 longer than \BFSimp{}. And it runs slower in all benchmarks. Details about 
 differences in efficiency are in \autoref{sec:quan}.
@@ -756,22 +762,38 @@ disjunction.
 
 \section{conclusion}
 
-We analyze the definitions of fair \disj{} and fair \conj{}, then propose a 
-new definition of fair \conj{}. Our definition of fair \conj{} is orthogonal 
-with completeness.
+%We analyze the definitions of fair \disj{} and fair \conj{}, then propose a 
+%new definition of fair \conj{}. Our definition of fair \conj{} is orthogonal 
+%with completeness.
 
-We devise two new search strategies (i.e., balanced interleaving DFS 
-(\DFSbi{}) and fair DFS (\DFSf{})) and devise a new 
-implementation of \BFS{} (\BFSimp{}). These strategies have different features 
-in fairness: \DFSbi{} has an almost-fair \disj{} and unfair \conj{}. 
+We analyze the definitions of fairness. Implementation of \disj{} can be fair, 
+almost-fair, or unfair, depending on how evenly it allocates computational 
+resources to spaces related to disjunctive goals. Implementation of \conj{}
+can be fair or unfair, depending on how evenly it allocates computational 
+resources to spaces related to states in the same bucket. Our definition of 
+fair \conj{}, unlike the one by \citet{seres1999algebra}, is orthogonal with 
+completeness.
+
+%We devise two new search strategies (i.e., balanced interleaving DFS 
+%(\DFSbi{}) and fair DFS (\DFSf{})) and devise a new 
+%implementation of \BFS{} (\BFSimp{}). These strategies have different features 
+%in fairness: \DFSbi{} has an almost-fair \disj{} and unfair \conj{}. 
+%\DFSf{} has fair \disj{} and unfair \conj{}. \BFS{} has both fair
+%\disj{} and fair \conj{}. No search strategy here combines unfair 
+%\disj{} and fair \conj{}. This is because we haven't seen a case where these 
+%kinds of search strategies would be interesting.
+
+We devise two new search strategies (i.e., \DFSbi{} and \DFSf{}) and devise a 
+new implementation of \BFS{}, \BFSimp{}. These strategies have different 
+features in fairness: \DFSbi{} has an almost-fair \disj{} and unfair \conj{}. 
 \DFSf{} has fair \disj{} and unfair \conj{}. \BFS{} has both fair
 \disj{} and fair \conj{}. No search strategy here combines unfair 
 \disj{} and fair \conj{}. This is because we haven't seen a case where these 
 kinds of search strategies would be interesting.
 
-Our quantitative evaluation shows that \DFSbi{} is a competitive 
-alternative to \DFSi{}, the current miniKanren search strategy,
-and that \BFSimp{} is more practical than \BFSser{}.
+Our quantitative evaluation shows that \DFSbi{} and \DFSf{} are competitive 
+alternatives to \DFSi{}, the current miniKanren search strategy, and that 
+\BFSimp{} is more practical than \BFSser{}.
 
 We prove formally that \BFSimp{} is semantically equivalent to \BFSser{}. But, 
 \BFSimp{} is shorter and performs better in comparison with a straightforward 
