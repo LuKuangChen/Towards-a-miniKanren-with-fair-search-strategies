@@ -6,15 +6,15 @@ workshop. We are going to talk about our paper,
 Towards a miniKanren with fair search strategies.
 
 miniKanren is quite a big family of programming languages.
-So where did we start to move toward our goal?
+So where did we start to move towards our goal?
 
 
 
 ## Where to start?
 
 We started with the implementation described in this book,
-TRS2. We chose it because it is one of the simplest 
-implementations out there.
+TRS2. We chose the yellow-green book because it was my first introduction
+to miniKanren, and I found its implementation to be simple.
 
 
 
@@ -29,7 +29,7 @@ We think there are two aspects of fairness:
 And there are three levels of disj fairness.
 and two levels of conj fairness.
 
-We will come back when we describe strategies.
+We will discuss these later.
 
 
 ## Examples
@@ -44,11 +44,11 @@ and xs is a list of one or more xs.
 For example, the following query gives three 
 lists of lambdas.
 
-
+;;; Three lambs
 
 ## Fairness in Disjunctions
 
-Sometimes people want more kinds of lists.
+Sometimes we want more kinds of lists.
 Here we ask for lists of ants, lists of birds,
 and lists of cherries.
 
@@ -67,104 +67,112 @@ Let's see what would happen if the search strategy has
 almost-fair disjunctions.
 At first glance, the result looks like the previous one.
 However, almost-fair strategy guarantees that the maximal 
-ratio of computational resources spent in there clauses
+ratio of computational resources spent in these clauses
 is bounded by a constant, no matter how many clauses 
 we have here. The constant for our strategy
 is 2. Here the bird clause is the lucky one. It is 
-allocated twice as many resources as each of other clauses.
+allocated twice as many resources as each of the other clauses.
 
 (next slide)
 
-Strategies with fair disjunctions provide even stronger
+Strategies with fair disjunctions provide an even stronger
 guarantee -- resources are allocated completely evenly.
-So the answers are generated in less surprising order.
+So the answers are generated in a less surprising order.
 
 
 
 ## (Search) Space
 
-Before explaining fairness in conjunctions, we would like
-to talk about search spaces first.
+Before explaining fairness in conjunctions, we will 
+introduce spaces first.  These spaces are like streams.
 
 Search strategies determine how to organize states in 
 spaces. All our strategies share the same Space structure.
+(but we improve execution time by reformulating the space's representation.)
 
 A space is either
 an empty list, 
-a pair of state and space,
-or a thunk returning space.
+a pair of a state and a space,
+or a suspension.
 
 (next slides)
 
 We visualize spaces like these examples.
+(Note Make black rectangle mean finite stream
+ turn red rectangles into gray rectangles)
 
-The first space has a state at the beginning -- 
-we represent states as squares. Then comes a red rectangle,
-which indicates that everything after it is in a thunk.
-Within the thunk, there are two more states. Then comes
-the end of the space, which is shown as a black square.
+In the first diagram, the space starts with a state -- 
+we represent all states as squares, followed by a gray rectangle,
+which indicates that everything after the gray rectangle is in the
+suspension.  Within the suspension there are two more states followed by
+a black rectangle.  The black rectangle terminates the space.
+
+(Note make larger (and only one ellipsis))
 
 The second diagram shows a possibly infinite space. 
 Although spaces can be infinitely large, the number of 
-squares between any two red rectangles is always finite.
+squares between any two gray rectangles is always finite.
 
 
 
 ## Fairness in Conjunctions
 
 Fairness in conjunctions is different from fairness in 
-disjunctions. When we consider fairness in disjunction,
+disjunctions. When we consider fairness in disjunctions,
 what we are looking for is fair multi-arity disjunction.
-However, in the case of conjunctions, we only care about
-binary cases.
+In the case of conjunctions, however, we only care about
+the binary case.
 
 A binary conjunction has two relations to satisfy.
-Here the space displayed horizontally is the result of 
-satisfying the first relation. We want each state also
-satisfy the second relation. So we have more spaces
-below. Each vertical space corresponds to a horizontal
-space. Every state in the vertical spaces satisfies both 
-relations, thus they are solution to this conjunction.
+In the left-side of the diagram, the space displayed vertically is the result of 
+satisfying the first conjunct. We want each state to also
+satisfy the second conjunct. So we have more spaces
+to the right. Each horizontal space corresponds to a state in the vertical
+space. Every state in the horizontal spaces satisfies both 
+relations, thus they comprise a solution to this conjunction.
 
-The key point of fair conjunction is to combine vertical
-spaces of the same color fairly, just like how we did for 
-fair disjunction.
+The key point of fair conjunction is to combine horizontal
+spaces of the same color fairly, just as we did for fair disjunction.
 
 
 
 ## Search Strategies
 
+DFS stands for Depth-First Search
+BFS stands for Breadth-First Search
+i stands for interleaving
+bi stands for balanced
+f stands for fair
+
 We analyzed 4 search strategies. Their fairness levels in
-two aspects are summarized in the table.
+two aspects are summarized here.  DFSi is the current miniKanren 
+search strategy.
 
 Among these strategies, DFSbi and DFSf are new.
 
 Our BFS implementation is shorter and more efficient.
-
+than the one presented in "Algebra of Logic Programming"
 
 
 ## Why fairness?
 
 But... why do we want fairness?
 
-We have two reasons.
+We have three reasons.
 
-Firstly, Fair strategies sometimes generate answers in less
-surprising order, as we shown in the repeato examples.
-BFS even generates answers in increasing order of their
-costs. 
+First, as we have seen in the repeato examples, fair strategies can 
+sometimes generate answers in a more understandable order.
 
-Another goodness is that strategies with fair or 
-almost-fair disjunction perform more stably when conde
-clause order changes. This is good for novice programmers
-because they don't have to order conde clauses as careful
-as they used to. Besides, programmers sometimes run
-a relation in many directions. But the optimal orders for
-each direction can be different. In this case, 
-the stable performance of fair strategies can be helpful.
+Second, the performance of search strategies with fair or almost-fair disjunction
+is more resistant to permuting conde clauses.
 
-
+As a corollary, programmers sometimes run a relation in several modes.
+But the optimal orders for each mode can be different.  Then, fair
+strategies lead to stable performance.
 
 ## Q & A
 
-That's all. Thank you for listening!
+That's all. Thanks!
+
+
+Let's take that discussion offline.
