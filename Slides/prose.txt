@@ -1,38 +1,91 @@
 ## Towards a miniKanren with fair search strategies
 
-(KC: I finish it in 20 minutes)
-
 Hello everyone, I am Kuang-Chen, from Indiana University. It is my pleasure to 
-be here, the first miniKanren workshop. I am going to talk about our paper,
-"Towards a miniKanren with fair search strategies."
+be here, the first miniKanren workshop. Today I am going to talk about our 
+paper, "Towards a miniKanren with fair search strategies."
 
-(If there are any questions, please feel free to ask.)
+## Content
 
-## Where to start?
+Our presentation has five parts.
 
+First, let's begin with the Background.
 
-miniKanren is a family of programming languages.  Our research is 
+=== Background ===
+
+## The Reasoned Schemer, 2nd Edition
+
+miniKanren is a family of programming languages.  And our research is 
 done with the miniKanren in this little yellow-green book, TRS2. We chose 
-the book because it was my first introduction to miniKanren.
+this implementation because it was my first introduction to miniKanren.
 
+## Commandments for miniKanren Programmers
 
-## What is fairness?
+;; TODO: ask Dan if `Commandments' is appropriate here, as the second one
+;; is not in the Book.
 
-(Perhaps there is something about in fair in operating sytems
- that could be stated, if nothing else, there are all kinds of
- fairness, our particular is tied to ordering processes)
+When I was introduced to miniKanren, I learned a few commandments.
 
-So, what is fairness in miniKanren?
+The most memorable one is: within each sequence of goals, move 
+non-recursive goals before recursive goals.
+
+And the second most memorable one is: if your miniKanren program is slow, 
+fiddle with its conde-lines.
+
+Sometimes the program might even seem not terminating because it is so slow.
+
+I guess many people in this room have played the game of permuting conde-lines.
+
+The reason why we sometimes have to play this game is that interleaving DFS, 
+the search strategy in the little yellow-green book and microKanren, allocates 
+half computational resources to the first conde-line, a quarter to the second 
+line, one-eighth to the third, and so on.  So when a conde expression has many 
+lines, the last few lines are hardly explored.
+
+In other words, this search strategy has an unfair disjunctions.
+
+This unfair behavior is sometimes powerful as it enables us to control the 
+priority of each conde-line.
+
+In some cases, however, it might not be the best choice.
+
+## Cases where we might want a fair strategy
+
+At least in these cases, we might want strategies to allocate resources more 
+evenly to every conde-lines.
+
+- teaching new miniKanren programmers
+
+If strategies allocate computational resources evenly to every conde-line, 
+beginners need not be concerned about line order as much as they use to.  
+Besides, it is intractable to try all permutation of a large conde expression.
+
+(Note: Kuang-Chen is trying to say a joke --- the complexity of permutation is 
+not polynomial, thus intractable)
+
+- writing relational definitions that runs in different running modes
+
+miniKanren programmers sometimes run a relation in several modes.  Some people 
+call it running forward and backward.  But the optimal orders for each mode can 
+be different.  Sometimes, the optimal order for one mode can be the worst order 
+for another mode.  If strategies allocate computational resources evenly to 
+every conde-line, we might be able to use one definition for different running 
+modes while having more acceptable performance.
+
+=== Contributions ===
+
+Now let's move on to our contributions.
+
+## Fairness
+ 
+First, we analyze fairness.
 
 We think there are two aspects of fairness:
 
-* fairness in disjunction, and
+* fairness in disjunctions, and
 
-* fairness in conjunction
+* fairness in conjunctions
 
-Elaborate those levels of fairness.
-
-An implementation of disjunction can be 
+We have three levels of fairness in disjunctions:
 
   unfair, 
 
@@ -40,188 +93,296 @@ An implementation of disjunction can be
 
   or fair.
 
-An implementation of conjunction can be 
+And we have two levels of fairness in conjunctions:
 
   unfair
 
   or fair.
 
+We will elaborate on these concepts later.
 
-We will discuss these later. After showing some example programs.
+## Search Strategies
 
+Here are all 4 search strategies that we analyzed. 
+Interleaving DFS is the search strategy in the little yellow-green book.
+Balanced interleaving DFS and fair DFS are new.
 
-## Examples
+(next slide)
+
+We give a new implementation of BFS, described in "Algebra of Logic 
+Programming".
+Our implementation is shorter and more efficient.
+
+=== The Behavior of Strategies ===
+
+Let's see the behavior of these strategies by running some programs.
+
+## 
 
 Our examples are about running this relation, repeato.
-repeato relates `x' with `l', where `l' is a list of one or more `x's.
+repeato takes two arguments, `x' and `l',
+where `x' is an arbitrary thing.
+and   `l' is a list of one or more `x's.
 
-(next slide)
+For example, in this query, we ask for 3 `q's such that each `q' is a list of 
+one or more lambdas. We get three answers: 
+a list of one lambda,
+a list of two lambdas, and
+a list of three lambdas.
 
-For example, in this query, we ask for 3 qs such that each q is a list of one 
-or more lambdas. miniKanren gives us three answers: a list of one lambda, a
-a list of two lambdas, and a list of three lambdas.
+## Interleaving DFS (Unfair Disjunction)
 
+Sometimes we want lists of things other than lambdas, like, lambs!
+Here we ask for 15 `q's such that each `q' is either a list of lambdas, a 
+list of white lambs, a list of grey lambs, a list of cats or a list of dogs.
 
+Interleaving DFS, which has unfair disjunction, gives us way more lambdas than 
+other things.
 
-## Fairness in Disjunctions
+We cannot find a list of cats or a list of dogs in the first 15 answers. We can 
+imagine, in general, when there are many lines in the same conde, the last few 
+lines are hardly explored.
 
-Sometimes we want lists of things other than lambdas.
-Here we ask for 9 qs such that each q is either a list of lambdas, or a list of 
-lambs. Here we have two kinds of lambs: grey lambs and white lambs.
+So miniKanren programmers sometimes need to be very careful about the order of 
+their conde-lines.
 
-(next slide)
+## Balanced-interleaving DFS (Almost-fair Disjunction)
 
-The search strategy in the little yellow-green book gives many more lambdas 
-than lambs.  This is because the disjunction of this search strategy 
-is unfair.
+In contrast, if we ask the same question to the strategy with almost-fair 
+disjunction. We would get a more diverse collection of answers.  We can see all 
+sorts of lists in the first 15 answers.
 
-We use the word ``disjunction'' because conde relates its lines
-disjunctively.  
+If we look closer to the answer list, we can see a pattern: the first four 
+answers are white lamb, gray lamb, cat, and lambda.  The next four answers are, 
+again, white lamb, gray lamb, cat, and ... dog!  And the next four answers 
+repeat the pattern.  So the last answer in the third line is a list of two 
+lambdas.  If we ask for one more answer, it would be a list of two dogs.
 
-To put this another way, these three uses of repeato
-are conceptually related by logical OR.
-
-(next slide)
-
-Let's ask the same question to a miniKanren with almost-fair disjunction.  This 
-time we get many more white lambs than other things.  The result might look 
-similar to the unfair one.  As the number of lines increases, however, 
-things will change. 
-
-## Compare fair and almost-fair
-
-Here are two new conde-lines: one for cats and one for dogs.  With
-these two additional lines, the search strategy in the little
-yellow-green book still gives us many lambdas.
-
-
-We can imagine when there are many lines in the same conde, 
-the last few lines are hardly explored.  
-
-
-So miniKanren programmers sometimes need to be very careful about how
-to order their conde lines.
-
-(next slide)
-
-In contrast, the strategy with almost-fair disjunction would give us 
-more lists of lambs and lists of cats, and fewer lists of lambdas and lists 
-of dogs.   (Explain why we have so few lmabdas.) (15 was chosen to point
-another convention in slide 9.)
-
-There is a pattern in the answer list. The first four answers are white lamb, 
-grey lamb, cat, and lambda.  The next four answers are, again, white lamb, 
-grey lamb, cat, and ... dog!  And the next four answers repeat the pattern.
-So the last answer in the third line is a list of two lambdas. If we ask for 
-one more answer, it would be a list of two dogs.
+The pattern here is that for every four answers, the first three are white 
+lamb, gray lamb, and cat, while lambda and dog appear alternatively at the last 
+position.
 
 Almost-fair disjunctions guarantee that the maximal ratio of computational 
 resources spent in each conde-line is bounded by a constant, no matter how many 
 lines there are. The constant for our strategy is 2.
 
+If you are curious about why we have so few lambdas, I will explain it later.
 
-
-## Fairness in Disjunctions (again)
+## Fair DFS & BFS (Fair Disjunction)
 
 Strategies with fair disjunctions provide an even stronger guarantee. That is 
-resources are allocated evenly to every conde-line in the same conde. 
+resources are allocated evenly to every line in the same conde. 
 Thus, the answers appear in a more easily grokked order.
 
+=== Implementations of Strategies ===
 
+Now let's turn to the implementations.
+
+## Review
+
+Before going into the details about implementations, let's have a short review 
+of these concepts. If you have any question about information on this slide, 
+please feel free to ask.
+
+A goal is a function from a state to a space. 
+
+A state is a way to satisfy some relations.  In our strategies, every state is 
+just a substitution.  In more powerful miniKanrens, for example, miniKanrens 
+with symbolic constrains, the states can include other information.
+
+A search space, or a space for short, is a collection of states.  Spaces are 
+like streams in the little yellow-green book.  We use the word space to name 
+the interface because we are also using another representation.
 
 ## (Search) Space
 
-Before explaining fairness in conjunctions, we introduce spaces.
-They are like streams.  All of our strategies share the same
-Space structure.  But we reformulate space representation in one of the
-search strategies to improve execution time.  This representation, however,
-produces the same values in the same order.  So it is fine to focus on that
-representation.  A space is either the empty list, a suspension, or a
-pair of a state and a space.
+Spaces play a very important role in the implementations of the strategies. 
+ 
+So let me elaborate on that.
+
+A space is either 
+
+  the empty list,
+
+  a suspension, or
+  
+  a pair of a state and a space.
+  
+All of our strategies share the same Space structure.  But we reformulate space 
+representation in one of the search strategies to improve execution time.  This 
+representation, however, produces the same values in the same order.  
+So, for now, a space is just a stream.  
+More details can be found in our paper.
 
 (next slides)
 
 We visualize spaces like these examples.
 
-In the first diagram, the space starts with a state -- 
-Each state is represented using a square.
+In this diagram, the space starts with a pair.  The left-most white square 
+represents a state, the first part of the pair. And everything after it is in 
+the second part of the pair.  Every square in our diagrams represents a state. 
 
-The state is 
-followed by a gray rectangle, which means everything after it is in a 
-suspension.  Within the suspension, there are two more states followed by
-a black rectangle. The black rectangle represents the empty list and 
-terminates the space.
+The state is followed by a gray rectangle, which means everything after it is in 
+a suspension.  
 
-The second diagram shows a possibly infinite space. Although spaces can be 
+Within the suspension, there are two more states followed by a black rectangle. 
+The black rectangle represents the empty list and terminates the space.
+
+(next slides)
+
+The next diagram shows a possibly infinite space. Although spaces can be 
 infinitely large, the number of squares between any two gray rectangles is 
 always finite.
 
 
 
-## Fairness in Conjunctions
+## Implementation of Unfair Disjunction
+
+Now, going back to the implementations.  I'd like to start with the 
+implementation of unfair disjunction.
+
+Say we have a conde expression with five lines. Each line corresponds to a 
+search space. A disjunction combines these five spaces into one.
+
+The implementation of the unfair disjunction combines these spaces 
+right-associatively, which is visualized by the binary tree in the left side.
+
+(next slide)
+
+Let's zoom in to see what happens.
+
+(next slide)
+
+When we combine two search spaces, we copy the first few states in the 
+first space, up to the first suspension,
+
+(next slide)
+
+then copy the first few states of the second space, also up to the first 
+suspension.
+
+(next slide)
+
+and so on...
+
+(next slide)
+
+So the resulting space would be a fair mixture of two input spaces.
+
+(next slide)
+
+This function shows how disjunction is implemented in the little 
+yellow-green book. The first cond-line allows us to terminate when a space is 
+empty. And the second line copies the beginning states. The last line handles 
+suspensions, where the positions of the two spaces are swapped.
+
+## Implementation of Almost-fair Disjunction
+
+Moving on to the implementation of almost-fair disjunction. It shares the same 
+`append-inf' but uses it differently. We saw a binary tree in the previous 
+example. That tree is very unbalanced. Here we construct a similar but 
+balanced binary tree. 
+
+The way we construct the balanced tree is to separate all spaces into two parts 
+of roughly the same size. We place spaces that correspond to odd line-numbers 
+in one part and the other lines in the other part. By doing this thing 
+recursively, we get a balanced tree.
+
+(next slide)
+
+The lambda line is at line 1. And 1 is an odd number. After the first 
+partition, the lambda is still at line 1. And so on. So this line is allocated 
+the least amount of resources.
+
+## Implementation of Fair Disjunction
+
+Fair disjunction, as we have seen in the repeato examples, would collect all 
+beginning states together. Its implementation uses a fair version of append-inf.
+
+(next slide)
+
+The first two cond-lines of this version is similar to the previous one.
+
+The first time we reach the third line, we know `s?' is #t and `s-inf' and 
+`t-inf' haven't been swapped. So we swap them and change `s?' accordingly.
+When the fourth and last line runs, we know that both `s-inf' and `t-inf' end 
+with a suspension, and that we have swapped them. In this case, we construct a 
+new suspension. The new suspension swaps back the two spaces in the recursive 
+call to loop.
+
+## Implementation of Conjunctions
 
 Now let's talk about fairness in conjunction.
 
 Fairness in conjunctions is a bit different from fairness in disjunctions.  
-When we consider fairness in disjunctions, we are looking for fair multi-arity 
-disjunction because conde can have multiple lines.  In the case of 
-conjunctions, however, we only care about binary conjunction.
+When we consider fairness in disjunctions, what we are looking for is fair 
+multi-arity disjunction because conde can have multiple lines and we want to 
+say something about these lines.  In the case of conjunctions, however, we only 
+care about binary conjunction.
 
 (next slide)
 
 A binary conjunction has two relations to satisfy.
-In the left side of the diagram, the space displayed vertically is the result 
-of satisfying the first conjunct. We 
-want each state to also satisfy the second conjunct. So we have more spaces
-to the right. Each horizontal space corresponds to a state in the vertical
-space. Every state in the horizontal spaces satisfies both 
-relations, thus they comprise a solution to this conjunction.
+In the left side of the diagram, the space labeled with g1 is the result 
+of satisfying the first conjunct, g1. We want to search for states that also
+satisfy the second conjunct. So we have more spaces to the right. 
+Every one of these spaces corresponds to a state in the g1 space. 
+Every state on the right side satisfies both relations, thus they 
+comprise a solution to this conjunction.
 
-The key point of fair conjunction is to combine horizontal spaces of the same 
-color fairly.  This part is the same as how we implementation fair disjunction.
+A conjunction implementation need to combine spaces on the right side into one 
+space.
 
+The key point of fair conjunction is to combine spaces of the same color just 
+like how we implement fair disjunction.
 
+(next slide)
 
-## Search Strategies
+This function shows how conjunction is implemented in the little 
+yellow-green book. To implement fair conjunction, all we have to do is to 
+replace the only use of `append-inf' with `append-inf/fair'.
 
-Here are all 4 search strategies we analyzed. 
-Interleaving DFS is the search strategy in the little yellow-green book.
-Balanced interleaving DFS and fair DFS are new.
+=== Conclusion ===
 
-We give a new implementation of BFS.
-Ours is shorter and more efficient than the one presented in "Algebra of Logic 
-Programming" in the dissertation of Silvja Seres.
+Now let's move to the conclusion.
 
+## Quantitative Evaluation
 
+Here are some of our benchmarks. We are showing them to argue that 
+strategies with fair or almost-fair disjunction are more resistant to 
+permutation of conde-lines. 
 
-## Why fairness?
+The first two benchmarks, quine-1 and quine-2, are about generating 3 quines 
+with a relational interpreter. Their interpreters order conde-lines 
+differently. Interleaving DFS and balanced interleaving DFS have similar 
+performance. Fair DFS is more stable and more efficient. The two BFS 
+implementations consume too much memory. So we don't have execution times for 
+them.
 
-But... why do we want fairness?
+The next two benchmarks are about synthesizing expressions that reduce to the 
+list '(I love you). Our timing shows that all strategies with fair or 
+almost-fair disjunction are more stable than the interleaving DFS.
 
-We have three reasons.
+## Conclusion
 
-First, as we have seen in the repeato examples, fair strategies can 
-sometimes generate answers in a more understandable order.
+Let's wrap it up. We have three reasons why we want fairness.
 
-Second, the performance of search strategies with fair or almost-fair  
+First, the performance of search strategies with fair or almost-fair  
 disjunction is more resistant to playing the game of permuting conde lines.
 
-It follows that beginners need not be concerned about conde-line order.
+It follows that beginners need not be concerned about conde-line order as much 
+as they use to.
 
 And miniKanren programmers sometimes run a relation in several modes.
+Some people call it running forward and backward.
 But the optimal orders for each mode can be different.  Then, fair
 strategies allow using one definition for different running modes while having 
 more acceptable performance.
 
-## Q & A
-
-That's all. Thanks!
-
+Besides, as we have seen in the repeato examples, fair strategies can 
+sometimes generate answers in a more understandable order.
 
 
+=== Q & A ===
 
-(*
-
-When you don't know how to answer a question ...
-    "Let's take that discussion offline."
-*)
+That's all. Thank you!
