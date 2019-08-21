@@ -109,15 +109,12 @@
  (item "If your miniKanren program is slow, fiddle with its" conde "-lines.")
  (para "(interleaving DFS, the strategy of"
        (scale (bitmap "./TRS2.jpg") 0.04)
-       " and μKanren, is unfair in disjunction)"))
+       " and μKanren, has unfair disjunction)"))
 
 (slide
  #:title "Cases Where We Might Want Other Strategies"
  (item "teaching new miniKanren programmers")
- (item "writing relational definitions that runs in different running modes"))
-
-
-
+ (item "writing relational definitions that run in different running modes"))
 
 (slide
  #:title "Content"
@@ -129,7 +126,7 @@
 
 (slide
  #:title "Fairness"
- (item "fairness in disjunctions: unfair, almost-fair, unfair")
+ (item "fairness in disjunctions: unfair, almost-fair, fair")
  (item "fairness in conjunctions: unfair, fair"))
 
 (slide
@@ -179,9 +176,17 @@
 
 (slide
  (code (repeatᵒ x l))
- (item (code x) "is an arbitrary thing.")
+ (item (code x) "is an arbitrary term.")
  (item (code l) "is a list of one or more" (code x) "s.")
- (blank)
+ 'next
+ (code
+  (defrel (repeatᵒ x l)
+    (condᵉ
+      [(== `(,x) l)]
+      [(fresh (res)
+         (== (cons x res) l)
+         (repeatᵒ x res))])))
+ 'next
  (repl> (run 3 q
           (repeatᵒ 'λ q)))
  (repl: '((λ) (λ λ) (λ λ λ))))
@@ -421,6 +426,8 @@
        [block2 (hc-append (square "Lime Green") (inc))])
    (hc-append block1 block2 block1 block2 block1 block2 block1 block2 (ddd))))
 
+(re-slide unfair-impl)
+
 (slide
  (code (define (append-inf s-inf t-inf)
          (cond
@@ -433,6 +440,62 @@
 
 (slide
  #:title "Implementation of Almost-fair Disjunction"
+ (let* ([sp1 (let ([block (hc-append (square "gold") (inc))])
+              (hc-append block block block block (ddd)))]
+       [sp2 (let ([block (hc-append (square "yellow") (inc))])
+              (hc-append block block block block (ddd)))]
+       [sp3 (let ([block (hc-append (square "white") (inc))])
+              (hc-append block block block block (ddd)))]
+       [sp4 (let ([block (hc-append (square "Pale Green") (inc))])
+              (hc-append block block block block (ddd)))]
+       [sp5 (let ([block (hc-append (square "Lime Green") (inc))])
+              (hc-append block block block block (ddd)))])
+  (let* ([node (vl-append 20 sp1 sp2 sp3 sp4 sp5)]
+         [node0 (vl-append 20 sp1 sp3 sp5)]
+         [node1 (vl-append 20 sp2 sp4)]
+         [node00 (vl-append 20 sp1 sp5)]
+         [node01 (vl-append 20 sp3)]
+         [node10 (vl-append 20 sp2)]
+         [node11 (vl-append 20 sp4)]
+         [node000 (vl-append 20 sp1)]
+         [node001 (vl-append 20 sp5)])
+    (define ((build-tree max-h) t)
+      (match-define (cons parent children) t)
+      (set! parent (cc-superimpose (blank 50 max-h) (scale parent 0.35)))
+      (cond
+        [(null? children) parent]
+        [else
+         (define children-picts (map (build-tree (/ max-h 2)) children))
+         (define head parent)
+         (define body (apply ht-append 30 children-picts))
+         (define edge-h 40)
+         (define edges
+           (dc (λ (dc dx dy)
+                 (define old-pen (send dc get-pen))
+                 (send dc set-pen
+                       (new pen% [color "black"]))
+                 (define path (new dc-path%))
+                 (send path move-to (/ (pict-width (car children-picts)) 2) edge-h)
+                 (send path line-to (/ (pict-width body) 2) 0)
+                 (send path line-to (- (pict-width body)
+                                       (/ (pict-width (last children-picts)) 2))
+                       edge-h)
+                 (send dc draw-path path dx dy)
+                 (send dc set-pen old-pen))
+               (pict-width body)
+               edge-h))
+         (vc-append 10 head edges body)]))
+    ((build-tree (* (pict-height node) 0.5))
+     (list node
+           (list node0
+                 (list node00
+                       (list node000)
+                       (list node001))
+                 (list node01))
+           (list node1
+                 (list node10)
+                 (list node11))))))
+ #;
  (let* ([sp1 (let ([block (hc-append (square "gold") (inc))])
                (hc-append block block block block (ddd)))]
         [sp2 (let ([block (hc-append (square "yellow") (inc))])
@@ -486,10 +549,127 @@
                      (loop #t (t-inf) (s-inf)))))))))
 
 (slide
+ (cc-superimpose
+   (code (define (append-inf/fair s-inf t-inf)
+           (let loop ((s? #t) (s-inf s-inf) (t-inf t-inf))
+             (cond
+               ((null? s-inf) t-inf)
+               ((pair? s-inf)
+                (cons (car s-inf)
+                  (loop s? (cdr s-inf) t-inf)))
+               (s? (loop #f t-inf s-inf))
+               (else (lambda ()
+                       (loop #t (t-inf) (s-inf))))))))
+   (inset (rectangle 510 40
+                     #:border-width 5
+                     #:border-color "Red")
+          -210 200 0 0)))
+
+(slide
+ (cc-superimpose
+   (code (define (append-inf/fair s-inf t-inf)
+           (let loop ((s? #t) (s-inf s-inf) (t-inf t-inf))
+             (cond
+               ((null? s-inf) t-inf)
+               ((pair? s-inf)
+                (cons (car s-inf)
+                  (loop s? (cdr s-inf) t-inf)))
+               (s? (loop #f t-inf s-inf))
+               (else (lambda ()
+                       (loop #t (t-inf) (s-inf))))))))
+   (inset (rectangle 490 40
+                     #:border-width 5
+                     #:border-color "Red")
+          +75 +360 0 0)))
+
+(slide
  #:title "Implementations of Conjunctions"
- ;; Move g1 and g2 such that
- ;; g1 is over the first box
- ;; and g2 is over the first space to the right
+ 'next
+ (ht-append
+  (vc-append
+   (code g1)
+   (blank 20 20)
+   (rot (hc-append (square "green") (square "green") (square "green") (inc)
+                   (square "yellow") (inc)
+                   (square "lightblue") (square "lightblue") (inc)
+                   (ddd))))
+  (blank 40 60)
+  (vc-append
+   (code (conj2 g1 g2))
+   (blank 20 20))))
+
+
+(slide
+ #:title "Implementations of Conjunctions"
+ (ht-append
+  (vc-append
+   (code g1)
+   (blank 20 20)
+   (rot (hc-append (square "green") (square "green") (square "green") (inc)
+                   (square "yellow") (inc)
+                   (square "lightblue") (square "lightblue") (inc)
+                   (ddd))))
+  (blank 40 60)
+  (vc-append
+   (code (conj2 g1 g2))
+   (blank 20 20)
+   (let ([smaller-hc-append
+          (lambda ps
+            (vl-append
+             (blank 10 (* 60 1/10))
+             (scale (apply hc-append ps) 4/5)
+             (blank 10 (* 60 1/10))))])
+     (vl-append (smaller-hc-append (square "green") (square "green") (inc) (ddd)))))))
+
+(slide
+ #:title "Implementations of Conjunctions"
+ (ht-append
+  (vc-append
+   (code g1)
+   (blank 20 20)
+   (rot (hc-append (square "green") (square "green") (square "green") (inc)
+                   (square "yellow") (inc)
+                   (square "lightblue") (square "lightblue") (inc)
+                   (ddd))))
+  (blank 40 60)
+  (vc-append
+   (code (conj2 g1 g2))
+   (blank 20 20)
+   (let ([smaller-hc-append
+          (lambda ps
+            (vl-append
+             (blank 10 (* 60 1/10))
+             (scale (apply hc-append ps) 4/5)
+             (blank 10 (* 60 1/10))))])
+     (vl-append (smaller-hc-append (square "green") (square "green") (inc) (ddd))
+                (smaller-hc-append (stop)))))))
+
+(slide
+ #:title "Implementations of Conjunctions"
+ (ht-append
+  (vc-append
+   (code g1)
+   (blank 20 20)
+   (rot (hc-append (square "green") (square "green") (square "green") (inc)
+                   (square "yellow") (inc)
+                   (square "lightblue") (square "lightblue") (inc)
+                   (ddd))))
+  (blank 40 60)
+  (vc-append
+   (code (conj2 g1 g2))
+   (blank 20 20)
+   (let ([smaller-hc-append
+          (lambda ps
+            (vl-append
+             (blank 10 (* 60 1/10))
+             (scale (apply hc-append ps) 4/5)
+             (blank 10 (* 60 1/10))))])
+     (vl-append (smaller-hc-append (square "green") (square "green") (inc) (ddd))
+                (smaller-hc-append (stop))
+                (smaller-hc-append (square "green") (inc) (ddd)))))))
+
+(slide
+ #:title "Implementations of Conjunctions"
  (ht-append
   (vc-append
    (code g1)
@@ -530,6 +710,21 @@
                    (append-map-inf g (s-inf))))))))
 
 (slide
+ (cc-superimpose
+   (code (define (append-map-inf g s-inf)
+           (cond
+             ((null? s-inf) '())
+             ((pair? s-inf)
+              (append-inf (g (car s-inf))
+                (append-map-inf g (cdr s-inf))))
+             (else (lambda () 
+                     (append-map-inf g (s-inf)))))))
+   (inset (rectangle 200 40
+                     #:border-width 5
+                     #:border-color "red")
+          -382 40 0 0)))
+
+(slide
  #:title "Content"
  (item "Background ✓")
  (item "Contributions ✓")
@@ -560,5 +755,4 @@
 
 (slide
  (titlet "Q & A"))
-
  
