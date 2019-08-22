@@ -83,7 +83,7 @@
  (item "Background")
  (item "Contributions")
  (item "The Behavior of Strategies")
- (item "The Implementation of Strategies")
+ (item "The Implementations of Strategies")
  (item "Conclusion"))
 
 
@@ -93,7 +93,7 @@
  (item "Background ◁")
  (item "Contributions")
  (item "The Behavior of Strategies")
- (item "The Implementation of Strategies")
+ (item "The Implementations of Strategies")
  (item "Conclusion"))
 
 
@@ -121,7 +121,7 @@
  (item "Background ✓")
  (item "Contributions ◁") ;; <--
  (item "The Behavior of Strategies")
- (item "The Implementation of Strategies")
+ (item "The Implementations of Strategies")
  (item "Conclusion"))
 
 (slide
@@ -171,7 +171,7 @@
  (item "Background ✓")
  (item "Contributions ✓")
  (item "The Behavior of Strategies ◁") ;; <-
- (item "The Implementation of Strategies")
+ (item "The Implementations of Strategies")
  (item "Conclusion"))
 
 (slide
@@ -246,7 +246,7 @@
  (item "Background ✓")
  (item "Contributions ✓")
  (item "The Behavior of Strategies ✓")
- (item "The Implementation of Strategies ◁") ;; <-
+ (item "The Implementations of Strategies ◁") ;; <-
  (item "Conclusion"))
 
 (slide
@@ -729,7 +729,7 @@
  (item "Background ✓")
  (item "Contributions ✓")
  (item "The Behavior of Strategies ✓")
- (item "The Implementation of Strategies ✓")
+ (item "The Implementations of Strategies ✓")
  (item "Conclusion ◁"))
 
 (slide
